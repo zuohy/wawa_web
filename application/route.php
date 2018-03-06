@@ -14,7 +14,7 @@
 
 /*  测试环境禁止操作路由绑定 */
 think\Route::post([
-    'admin/index/pass'    => function () {
+    /*'admin/index/pass'    => function () {
         return json(['code' => 0, 'msg' => '测试环境禁修改用户密码！']);
     },
     'admin/user/pass'     => function () {
@@ -40,16 +40,16 @@ think\Route::post([
     },
     'admin/menu/del'      => function () {
         return json(['code' => 0, 'msg' => '测试环境禁止删除菜单操作！']);
-    },
+    },*/
     'wechat/config/index' => function () {
         return json(['code' => 0, 'msg' => '测试环境禁止修改微信配置操作！']);
     },
     'wechat/config/pay'   => function () {
         return json(['code' => 0, 'msg' => '测试环境禁止修改微信支付操作！']);
     },
-    'admin/node/save'     => function () {
+    /*'admin/node/save'     => function () {
         return json(['code' => 0, 'msg' => '测试环境禁止修改节点数据操作！']);
-    },
+    },*/
     'wechat/menu/edit'    => function () {
         return json(['code' => 0, 'msg' => '测试环境禁止修改微信菜单操作！']);
     },

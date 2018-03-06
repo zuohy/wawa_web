@@ -42,6 +42,7 @@ require.config({
         'jquery.ztree': ['../plugs/ztree/jquery.ztree.all.min'],
         'jquery.masonry': ['../plugs/jquery/masonry.min'],
         'jquery.cookies': ['../plugs/jquery/jquery.cookie'],
+        'phone':['../plugs/phone/js/index'],
     },
     shim: {
         'layui': {deps: ['jquery']},
@@ -55,6 +56,7 @@ require.config({
         'jquery.ztree': {deps: ['jquery', 'css!' + _root + '../plugs/ztree/zTreeStyle/zTreeStyle.css']},
         'jquery.cookies': {deps: ['jquery']},
         'jquery.masonry': {deps: ['jquery']},
+        'phone': {deps: ['jquery', 'bootstrap']},
     },
     // deps: [],
     // 开启debug模式，不缓存资源

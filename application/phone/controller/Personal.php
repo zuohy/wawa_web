@@ -12,42 +12,36 @@
 // | github开源项目：https://github.com/zoujingli/ThinkAdmin
 // +----------------------------------------------------------------------
 
-namespace app\index\controller;
+namespace app\phone\controller;
 
-use think\Controller;
+use controller\BasicAdmin;
+use service\DataService;
+use service\NodeService;
+use service\ToolsService;
+use think\Db;
+use think\View;
 
 /**
- * 网站入口控制器
+ * 手机个人信息
  * Class Index
- * @package app\index\controller
+ * @package app\admin\controller
  * @author Anyon <zoujingli@qq.com>
- * @date 2017/04/05 10:38
+ * @date 2017/02/15 10:41
  */
-class Index extends Controller
+class Personal extends BasicAdmin
 {
 
     /**
-     * 网站入口
+     * 后台框架布局
+     * @return View
      */
     public function index()
     {
-        $entryType = !isset($_GET['entry_type']) ? 0 : $_GET['entry_type'];
-        if($entryType){
-            $this->redirect('@phone');
-        }else{
-            $this->redirect('@admin');
-        }
-
+        NodeService::applyAuthNode();
+        $list = (array) Db::name('SystemMenu')->where(['status' => '1'])->order('sort asc,id asc')->select();
+        //$menus = $this->_filterMenuData(ToolsService::arr2tree($list), NodeService::get(), !!session('user'));
+        return view('', ['title' => '个人中心']);
     }
 
-    public function qrc()
-    {
-        $wechat = load_wechat('Extends');
-        for ($i = 10; $i < 90; $i++) {
-            $qrc = $wechat->getQRCode($i, 1);
-            print_r($qrc);
-        }
-
-    }
 
 }
