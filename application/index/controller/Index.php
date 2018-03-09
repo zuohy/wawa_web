@@ -31,12 +31,8 @@ class Index extends Controller
      */
     public function index()
     {
-        $entryType = !isset($_GET['entry_type']) ? 0 : $_GET['entry_type'];
-        if($entryType){
-            $this->redirect('@phone');
-        }else{
-            $this->redirect('@admin');
-        }
+
+        $this->redirect('@admin');
 
     }
 

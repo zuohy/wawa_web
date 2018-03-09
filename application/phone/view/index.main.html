@@ -1,6 +1,6 @@
-{extend name='extra@admin/content'}
+{extend name="extra@phone/main"}
 
-{block name="content"}
+{block name="body"}
 
 <!--banner-->
 <div id="carousel-example-generic" class="carousel slide banner" data-ride="carousel">
@@ -217,13 +217,13 @@
                 </a>
             </div>
             <div class="col-xs-3">
-                <a href="wallet.html" class="dao">
+                <a data-href='{:url("phone/index/mainLogin")}' href="javascript:void(0)" class="dao">
                     <i class="iconfont icon-qianbao-"></i>
-                    <span class="nav_ti">钱包</span>
+                    <span class="nav_ti">钱包</span>mainLogin
                 </a>
             </div>
             <div class="col-xs-3">
-                <a  class="dao" data-href='{:url("phone/personal/index")}' href="javascript:void(0)">
+                <a data-href='{:url("phone/personal/index")}' href="javascript:void(0)" class="dao">
                     <i class="iconfont icon-information"></i>
                     <span class="nav_ti">个人中心</span>
                 </a>

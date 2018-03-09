@@ -40,7 +40,7 @@ class Index extends BasicAdmin
         NodeService::applyAuthNode();
         $list = (array) Db::name('SystemMenu')->where(['status' => '1'])->order('sort asc,id asc')->select();
         $menus = $this->_filterMenuData(ToolsService::arr2tree($list), NodeService::get(), !!session('user'));
-        return view('', ['title' => '系统管理', 'menus' => $menus]);
+        return view('', ['title' => '客户端']);
     }
 
     /**
@@ -81,6 +81,27 @@ class Index extends BasicAdmin
     {
         $_version = Db::query('select version() as ver');
         return view('', ['mysql_ver' => array_pop($_version)['ver'], 'title' => '首页']);
+    }
+
+
+    /**
+     * 主机信息显示
+     * @return View
+     */
+    public function mainLogin()
+    {
+        $_version = Db::query('select version() as ver');
+        $this->success('登录成功，正在进入系统...');
+    }
+
+    /**
+     * 主机信息显示
+     * @return View
+     */
+    public function personal()
+    {
+        $_version = Db::query('select version() as ver');
+        return view('', ['mysql_ver' => array_pop($_version)['ver'], 'title' => '个人中心']);
     }
 
     /**
