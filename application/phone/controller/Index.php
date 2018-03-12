@@ -20,7 +20,7 @@ use service\NodeService;
 use service\ToolsService;
 use think\Db;
 use think\View;
-
+use service\WebsocketService;
 /**
  * 手机入口
  * Class Index
@@ -80,6 +80,16 @@ class Index extends BasicAdmin
     public function main()
     {
         $_version = Db::query('select version() as ver');
+/*
+        WebsocketService::getWsUrl('1', '2', '3', 'true');
+        WebsocketService::sendCoinsData('16025821436281');
+
+        WebsocketService::sendControlData('r');
+        sleep(1);
+        WebsocketService::sendControlData('rr');
+        sleep(5);
+        WebsocketService::sendControlData('g');
+        */
         return view('', ['mysql_ver' => array_pop($_version)['ver'], 'title' => '首页']);
     }
 
@@ -104,41 +114,8 @@ class Index extends BasicAdmin
         return view('', ['mysql_ver' => array_pop($_version)['ver'], 'title' => '个人中心']);
     }
 
-    /**
-     * 修改密码
-     */
-    public function pass()
-    {
-        if (intval($this->request->request('id')) !== intval(session('user.id'))) {
-            $this->error('只能修改当前用户的密码！');
-        }
-        if ($this->request->isGet()) {
-            $this->assign('verify', true);
-            return $this->_form('SystemUser', 'user/pass');
-        }
-        $data = $this->request->post();
-        if ($data['password'] !== $data['repassword']) {
-            $this->error('两次输入的密码不一致，请重新输入！');
-        }
-        $user = Db::name('SystemUser')->where('id', session('user.id'))->find();
-        if (md5($data['oldpassword']) !== $user['password']) {
-            $this->error('旧密码验证失败，请重新输入！');
-        }
-        if (DataService::save('SystemUser', ['id' => session('user.id'), 'password' => md5($data['password'])])) {
-            $this->success('密码修改成功，下次请使用新密码登录！', '');
-        }
-        $this->error('密码修改失败，请稍候再试！');
-    }
 
-    /**
-     * 修改资料
-     */
-    public function info()
-    {
-        if (intval($this->request->request('id')) === intval(session('user.id'))) {
-            return $this->_form('SystemUser', 'user/form');
-        }
-        $this->error('只能修改当前用户的资料！');
-    }
 
 }
+
+

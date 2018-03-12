@@ -25,6 +25,7 @@ class ComposerStaticInitfe89c4b4846ee05aaf280a07388d870b
         'W' => 
         array (
             'Wechat\\' => 7,
+            'WebSocket\\' => 10,
         ),
         'S' => 
         array (
@@ -69,6 +70,10 @@ class ComposerStaticInitfe89c4b4846ee05aaf280a07388d870b
         'Wechat\\' => 
         array (
             0 => __DIR__ . '/..' . '/zoujingli/wechat-php-sdk/Wechat',
+        ),
+        'WebSocket\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/textalk/websocket/lib',
         ),
         'Symfony\\Component\\OptionsResolver\\' => 
         array (
