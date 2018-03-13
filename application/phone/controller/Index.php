@@ -14,7 +14,7 @@
 
 namespace app\phone\controller;
 
-use controller\BasicAdmin;
+use controller\BasicBaby;
 use service\DataService;
 use service\NodeService;
 use service\ToolsService;
@@ -28,18 +28,16 @@ use service\WebsocketService;
  * @author Anyon <zoujingli@qq.com>
  * @date 2017/02/15 10:41
  */
-class Index extends BasicAdmin
+class Index extends BasicBaby
 {
 
     /**
-     * 后台框架布局
+     * 手机框架布局
      * @return View
      */
     public function index()
     {
-        NodeService::applyAuthNode();
-        $list = (array) Db::name('SystemMenu')->where(['status' => '1'])->order('sort asc,id asc')->select();
-        $menus = $this->_filterMenuData(ToolsService::arr2tree($list), NodeService::get(), !!session('user'));
+
         return view('', ['title' => '客户端']);
     }
 
@@ -74,44 +72,33 @@ class Index extends BasicAdmin
     }
 
     /**
-     * 主机信息显示
+     * 手机首页
      * @return View
      */
     public function main()
     {
-        $_version = Db::query('select version() as ver');
-/*
-        WebsocketService::getWsUrl('1', '2', '3', 'true');
+ /*       WebsocketService::getWsUrl('1', '2', '3', 'true');
         WebsocketService::sendCoinsData('16025821436281');
 
-        WebsocketService::sendControlData('r');
+        //WebsocketService::sendControlData('r');
+        //WebsocketService::sendControlData('rr');
         sleep(1);
-        WebsocketService::sendControlData('rr');
-        sleep(5);
         WebsocketService::sendControlData('g');
+        $retMsg = WebsocketService::getMsgData();
+        $retMsg = WebsocketService::getMsgData();
         */
-        return view('', ['mysql_ver' => array_pop($_version)['ver'], 'title' => '首页']);
+        return view('', ['mysql_ver' => '', 'title' => '首页']);
     }
 
 
     /**
-     * 主机信息显示
+     * 主机登录
      * @return View
      */
     public function mainLogin()
     {
-        $_version = Db::query('select version() as ver');
-        $this->success('登录成功，正在进入系统...');
-    }
 
-    /**
-     * 主机信息显示
-     * @return View
-     */
-    public function personal()
-    {
-        $_version = Db::query('select version() as ver');
-        return view('', ['mysql_ver' => array_pop($_version)['ver'], 'title' => '个人中心']);
+        $this->success('登录成功，正在进入系统...');
     }
 
 

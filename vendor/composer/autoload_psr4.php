@@ -16,5 +16,7 @@ return array(
     'Symfony\\Component\\OptionsResolver\\' => array($vendorDir . '/symfony/options-resolver'),
     'Qiniu\\' => array($vendorDir . '/qiniu/php-sdk/src/Qiniu'),
     'OSS\\' => array($vendorDir . '/aliyuncs/oss-sdk-php/src/OSS'),
+    'GatewayClient\\' => array($vendorDir . '/workerman/gatewayclient'),
+    'vakata\\websocket\\' => array($vendorDir . '/vakata/websocket/src'),
     'Endroid\\QrCode\\' => array($vendorDir . '/endroid/qrcode/src'),
 );

@@ -14,8 +14,10 @@
 
 namespace service;
 
-use WebSocket\Client;
+//use vakata\websocket\Client;
 use service\HttpService;
+use think\Log;
+use WebSocket\Client;
 /**
  * websocket 请求服务
  * Class WebsocketService
@@ -95,67 +97,98 @@ class WebsocketService
         return $jsonCmd;
     }
 
-    public static function sendCoinsData($data, $type = 'json', $masked = true)
+    /**
+     * websocket 建立链接 并投币消息，
+     * @param obj $client websocket 链接对象
+     * @param string $data 命令参数
+     * @param string $type 命令参数类型
+     * @return bool|string
+     */
+    public static function sendCoinsData($client, $data, $type = 'json')
     {
+        self::$_client = $client;
         $retMsg = '';
-        if(self::$_connected === false)
-        {
-            //trigger_error("Not connected", E_USER_WARNING);
-            return $retMsg;
-        }
 
         if( !is_string($data)) {
-            //trigger_error("Not a string data was given.", E_USER_WARNING);
+            Log::error("Not a string data was given.", E_USER_WARNING);
             return $retMsg;
         }
         if (strlen($data) == 0)
         {
+            Log::error("Not a string data content", E_USER_WARNING);
             return $retMsg;
         }
-        //"ws://ws1.open.wowgotcha.com:9090/play/7996d3e8ad7483d8d6c6d3475cd49265549a6430"
-        self::$_client = new Client(self::$_host);
+
 
         $wsCmd = self::buildCmd('insert_coins', '16025821436281');
 
         //{"id": "123456","method": "insert_coins","params": {"out_trade_no": "16025821436283"}}
         self::$_client->send($wsCmd);
+        Log::info("device send cmd: ", $wsCmd);
 
         $retMsg = self::$_client->receive();
+        Log::info("device receive cmd: ", $retMsg);
 
         return $retMsg;
     }
 
-    public static function sendControlData($data, $type = 'json', $masked = true)
+    /**
+     * sendControlData  控制设备命令，
+     * @param obj $client websocket 链接对象
+     * @param string $data 命令参数
+     * @param string $type 命令参数类型
+     * @return bool|string
+     */
+    public static function sendControlData($client, $data, $type = 'json')
     {
+        self::$_client = $client;
+        self::$_connected = $client->isConnected();
         $retMsg = '';
-        if(self::$_connected === false)
-        {
-            //trigger_error("Not connected", E_USER_WARNING);
-            return $retMsg;
-        }
 
         if( !is_string($data)) {
-            //trigger_error("Not a string data was given.", E_USER_WARNING);
+            Log::error("Not a string data was given.", E_USER_WARNING);
             return $retMsg;
         }
         if (strlen($data) == 0)
         {
             return $retMsg;
         }
-        //"ws://ws1.open.wowgotcha.com:9090/play/7996d3e8ad7483d8d6c6d3475cd49265549a6430"
-        //self::$_client = new Client(self::$_host);
 
         $wsCmd = self::buildCmd('control', $data);
 
         //{"id": "123457","method": "control","params": {"operation": "u"}}
         self::$_client->send($wsCmd);
+        Log::info("device send cmd: ", $wsCmd);
 
         $retMsg = self::$_client->receive();
-
+        Log::info("device receive cmd: ", $retMsg);
         return $retMsg;
     }
 
+    /**
+     * getMsgData  获取 设备服务器websocket 推送的命令，
+     * @param obj $client websocket 链接对象
+     * @param string $data 命令参数
+     * @param string $type 命令参数类型
+     * @return bool|string
+     */
+    public static function getMsgData()
+    {
+        $retMsg = '';
 
+        self::$_client->setTimeout(1);
+        $retMsg = self::$_client->receive();
+        Log::info("device receive cmd: ", $retMsg);
+        return $retMsg;
+    }
+
+    /**
+     * getWsUrl  获取 设备服务器websocket url 地址 60秒有效
+     * @param string $host url 地址
+     * @param string $port 命令参数
+     * @param string $path 命令参数类型
+     * @return bool|string
+     */
     public static function getWsUrl($host, $port, $path, $origin = false)
     {
 
@@ -163,7 +196,7 @@ class WebsocketService
         self::$_path = $path;
         self::$_origin = $origin;
 
-        $jsonRet = HttpService::get("", [], 30, []);
+        $jsonRet = HttpService::get("http://api.open.wowgotcha.com/openapi/v1/websocket_url/?appid=wow04d608ed68hk73092za1&binding_id=3&room_id=3", [], 30, []);
         $stRet = json_decode($jsonRet);
 
         if($stRet->errcode != 0){
@@ -174,8 +207,12 @@ class WebsocketService
         $wsUrl = $stData->ws_url;
 
         self::$_host = $wsUrl;
+        //"ws://ws1.open.wowgotcha.com:9090/play/7996d3e8ad7483d8d6c6d3475cd49265549a6430"
+        self::$_client = new Client(self::$_host);
+        $retMsg = self::$_client->receive();
 
-        return self::$_connected = true;
+        self::$_connected = true;
+        return self::$_client;
     }
 
     public static function checkConnection()
@@ -219,6 +256,7 @@ class WebsocketService
         $randomString = substr($randomString, 0, $length);
         return $randomString;
     }
+
 
 }
 

@@ -1,0 +1,106 @@
+{extend name="extra@phone/main"}
+
+{block name="body"}
+
+
+<!--top-->
+<div class="top_c">
+    <p class="titi">钱包</p>
+</div>
+
+<!--头部-->
+<div class="tou">
+    <span>可用余额（元）</span>
+    <p>22215.22</p>
+</div>
+
+<!--列表-->
+<div class="lie_b">
+    <div class="container">
+        <div class="one">
+            <a href="recharge.html">
+                <p class="biao"><span class="iconfont icon-chongzhi"></span>充值<i class="iconfont icon-jiantou"></i></p>
+            </a>
+        </div>
+        <div class="one" style="border-bottom:none;">
+            <a href="withdrawals.html">
+                <p class="biao"><span class="iconfont icon-tixian1"></span>提现<i class="iconfont icon-jiantou"></i></p>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="lie_b">
+    <div class="container">
+        <div class="one">
+            <a href="quota.html">
+                <p class="biao"><span class="iconfont icon-daikuanedu"></span>信用额度<i class="iconfont icon-jiantou"></i></p>
+            </a>
+        </div>
+        <div class="one" style="border-bottom:none;">
+            <a href="bank.html">
+                <p class="biao"><span class="iconfont icon-buoumaotubiao26"></span>银行卡<i class="iconfont icon-jiantou"></i></p>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="lie_b">
+    <div class="container">
+        <div class="one">
+            <a href="profit.html">
+                <p class="biao"><span class="iconfont icon-jilu"></span>分润记录<i class="iconfont icon-jiantou"></i></p>
+            </a>
+        </div>
+        <div class="one" style="border-bottom:none;">
+            <a href="bill.html">
+                <p class="biao"><span class="iconfont icon-zhangdan"></span>账单<i class="iconfont icon-jiantou"></i></p>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="lie_b">
+    <div class="container">
+        <div class="one">
+            <a data-href='{:url("phone/wallet/dev_control_move")}' href="javascript:void(0)">
+                <p class="biao"><span class="iconfont icon-jilu"></span>右移<i class="iconfont icon-jiantou"></i></p>
+            </a>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="lie_b">
+    <div class="container">
+        <div class="one">
+            <button type="submit" onclick="cmd_coins()" >
+                <p class="biao"><span class="iconfont icon-jilu"></span>投币<i class="iconfont icon-jiantou"></i></p>
+            </button>
+        </div>
+        <div class="one" style="border-bottom:none;">
+            <a data-href='{:url("phone/wallet/dev_control_fetch")}' href="javascript:void(0)">
+                <p class="biao"><span class="iconfont icon-zhangdan"></span>下抓<i class="iconfont icon-jiantou"></i></p>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="__STATIC__/plugs/phone/js/jquery.min.js" type="text/javascript"></script>
+
+<script src="__STATIC__/plugs/phone/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="__STATIC__/plugs/phone/js/index.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+    function cmd_coins(){
+        $.ajax('{:url("phone/wallet/dev_start")}', {
+            dataType: 'json', method: 'post', data: 'right', success: function (ret) {
+
+                console.log('返回 --> ' + ret);
+            }
+        });
+    }
+</script>
+
+{/block}

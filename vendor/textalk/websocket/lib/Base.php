@@ -91,6 +91,10 @@ class Base {
     // Just read the main fragment information first.
     $data = $this->read(2);
 
+      if(strlen($data) <= 0){
+          //no receive data
+          return '';
+      }
     // Is this the final fragment?  // Bit 0 in byte 0
     /// @todo Handle huge payloads with multiple fragments.
     $final = (boolean) (ord($data[0]) & 1 << 7);
@@ -188,16 +192,18 @@ class Base {
   protected function read($length) {
     $data = '';
     while (strlen($data) < $length) {
+        $bufLen = $length - strlen($data);
       $buffer = fread($this->socket, $length - strlen($data));
       if ($buffer === false) {
         $metadata = stream_get_meta_data($this->socket);
         throw new ConnectionException(
-          'Broken frame, read ' . strlen($payload_data) . ' of stated '
-          . $payload_length . ' bytes.  Stream state: '
+          'Broken frame, read ' . strlen($metadata) . ' of stated '
+          . $metadata . ' bytes.  Stream state: '
           . json_encode($metadata)
         );
       }
       if ($buffer === '') {
+          break;
         $metadata = stream_get_meta_data($this->socket);
         throw new ConnectionException(
           'Empty read; connection dead?  Stream state: ' . json_encode($metadata)

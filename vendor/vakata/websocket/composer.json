@@ -1,0 +1,44 @@
+{
+    "name": "vakata/websocket",
+    "description": "PHP websocket server and client",
+    "keywords": [
+        "vakata",
+        "websocket"
+    ],
+    "homepage": "https://github.com/vakata/websocket",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "vakata",
+            "email": "github@vakata.com",
+            "homepage": "http://www.vakata.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php" : ">=7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit" : "5.*",
+        "clean/phpdoc-md": "dev-master",
+        "phpstan/phpstan": "^0.8.0",
+        "squizlabs/php_codesniffer": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "vakata\\websocket\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "vakata\\websocket\\test\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "phpdoc": "phpdoc-md",
+        "phpstan": "phpstan analyze -l 6 src",
+        "phpcs": "phpcs --standard=PSR2 --extensions=php --ignore=*/vendor/* ./",
+        "phpcsfix": "phpcbf --standard=PSR2 --extensions=php --ignore=*/vendor/* ./"
+    }
+}

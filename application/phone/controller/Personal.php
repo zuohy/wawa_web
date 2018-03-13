@@ -14,10 +14,7 @@
 
 namespace app\phone\controller;
 
-use controller\BasicAdmin;
-use service\DataService;
-use service\NodeService;
-use service\ToolsService;
+use controller\BasicBaby;
 use think\Db;
 use think\View;
 
@@ -28,7 +25,7 @@ use think\View;
  * @author Anyon <zoujingli@qq.com>
  * @date 2017/02/15 10:41
  */
-class Personal extends BasicAdmin
+class Personal extends BasicBaby
 {
 
     /**
@@ -37,9 +34,7 @@ class Personal extends BasicAdmin
      */
     public function index()
     {
-        NodeService::applyAuthNode();
-        $list = (array) Db::name('SystemMenu')->where(['status' => '1'])->order('sort asc,id asc')->select();
-        //$menus = $this->_filterMenuData(ToolsService::arr2tree($list), NodeService::get(), !!session('user'));
+
         return view('', ['title' => '个人中心']);
     }
 

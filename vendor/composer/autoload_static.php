@@ -39,10 +39,18 @@ class ComposerStaticInitfe89c4b4846ee05aaf280a07388d870b
         array (
             'OSS\\' => 4,
         ),
+        'G' => 
+        array (
+            'GatewayClient\\' => 14,
+        ),
         'E' => 
         array (
             'Endroid\\QrCode\\' => 15,
         ),
+        'v' =>
+            array (
+                'vakata\\websocket\\' => 11,
+            ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -71,10 +79,14 @@ class ComposerStaticInitfe89c4b4846ee05aaf280a07388d870b
         array (
             0 => __DIR__ . '/..' . '/zoujingli/wechat-php-sdk/Wechat',
         ),
-        'WebSocket\\' => 
+        'WebSocket\\' =>
         array (
             0 => __DIR__ . '/..' . '/textalk/websocket/lib',
         ),
+        'vakata\\websocket\\' =>
+            array (
+                0 => __DIR__ . '/..' . '/vakata/websocket/src',
+            ),
         'Symfony\\Component\\OptionsResolver\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/options-resolver',
@@ -86,6 +98,10 @@ class ComposerStaticInitfe89c4b4846ee05aaf280a07388d870b
         'OSS\\' => 
         array (
             0 => __DIR__ . '/..' . '/aliyuncs/oss-sdk-php/src/OSS',
+        ),
+        'GatewayClient\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/workerman/gatewayclient',
         ),
         'Endroid\\QrCode\\' => 
         array (

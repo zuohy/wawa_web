@@ -24,7 +24,9 @@
     <body>
         {block name="header"}{/block}
         {block name="body"}{/block}
-        {block name="foot"}{/block}
+        {block name="foot"}
+        {include file="extra@phone/foot"}
+        {/block}
         {block name="script"}{/block}
     </body>
     {/block}
