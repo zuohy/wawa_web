@@ -77,16 +77,7 @@ class Index extends BasicBaby
      */
     public function main()
     {
- /*       WebsocketService::getWsUrl('1', '2', '3', 'true');
-        WebsocketService::sendCoinsData('16025821436281');
 
-        //WebsocketService::sendControlData('r');
-        //WebsocketService::sendControlData('rr');
-        sleep(1);
-        WebsocketService::sendControlData('g');
-        $retMsg = WebsocketService::getMsgData();
-        $retMsg = WebsocketService::getMsgData();
-        */
         return view('', ['mysql_ver' => '', 'title' => '首页']);
     }
 

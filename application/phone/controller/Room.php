@@ -17,56 +17,38 @@ namespace app\phone\controller;
 use controller\BasicBaby;
 use think\Db;
 use think\View;
-use service\WebsocketService;
+
 /**
- * 手机钱包信息
+ * 房间信息
  * Class Index
  * @package app\admin\controller
  * @author Anyon <zoujingli@qq.com>
  * @date 2017/02/15 10:41
  */
 
-class Wallet extends BasicBaby
+class Room extends BasicBaby
 {
 
     /**
-     * 个人钱包列表
+     * 房间列表
      * @return View
      */
     public function index()
     {
 
-        return view('', ['title' => '个人钱包']);
+        return view('', ['title' => '房间']);
     }
 
     /**
-     * 测试设备控制
+     * 房间
      * @return View
      */
-    public function dev_control_move()
+    public function room_frame()
     {
 
-        return ;
+        return view('', ['title' => '房间']);
     }
 
-    /**
-     * 测试设备控制
-     * @return View
-     */
-    public function dev_control_fetch()
-    {
 
-        return ;
-    }
-
-    /**
-     * 测试设备控制
-     * @return View
-     */
-    public function dev_start()
-    {
-
-        $this->success('投币成功！');
-    }
 
 }

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes"/>
+        <title>{block name="title"}{$title|default=''}{if !empty($title)} · {/if}{:sysconf('site_name')}{/block}</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <link rel="shortcut icon" href="{:sysconf('browser_icon')}" />
+        <link rel="stylesheet" href="__STATIC__/plugs/awesome/css/font-awesome.min.css?ver={:date('ymd')}">
+        <link rel="stylesheet" href="__STATIC__/plugs/bootstrap/css/bootstrap.min.css?ver={:date('ymd')}"/>
+        <link rel="stylesheet" href="__STATIC__/plugs/layui/css/layui.css?ver={:date('ymd')}"/>
+        <link rel="stylesheet" href="__STATIC__/theme/default/css/console.css?ver={:date('ymd')}">
+        <link rel="stylesheet" href="__STATIC__/theme/default/css/animate.css?ver={:date('ymd')}">
+
+        <!-- Initializer -->
+        <link rel="stylesheet" href="__STATIC__/plugs/proom/css/normalize.css?ver={:date('ymd')}">
+
+        <!-- Web fonts and Web Icons -->
+        <link rel="stylesheet" href="__STATIC__/plugs/proom/css/pageloader.css?ver={:date('ymd')}">
+        <link rel="stylesheet" href="__STATIC__/plugs/proom/fonts/opensans/stylesheet.css?ver={:date('ymd')}">
+        <link rel="stylesheet" href="__STATIC__/plugs/proom/fonts/asap/stylesheet.css?ver={:date('ymd')}">
+        <link rel="stylesheet" href="__STATIC__/plugs/proom/css/ionicons.min.css?ver={:date('ymd')}">
+
+        <!-- Vendor CSS style -->
+        <link rel="stylesheet" href="__STATIC__/plugs/proom/css/foundation.min.css?ver={:date('ymd')}">
+        <link rel="stylesheet" href="__STATIC__/plugs/proom/js/vendor/jquery.fullPage.css?ver={:date('ymd')}">
+        <link rel="stylesheet" href="__STATIC__/plugs/proom/js/vegas/vegas.min.css?ver={:date('ymd')}">
+
+        <!-- Main CSS files -->
+        <link rel="stylesheet" href="__STATIC__/plugs/proom/css/main.css?ver={:date('ymd')}">
+        <link rel="stylesheet" href="__STATIC__/plugs/proom/css/main_responsive.css?ver={:date('ymd')}">
+        <link rel="stylesheet" href="__STATIC__/plugs/proom/css/style-color1.css?ver={:date('ymd')}">
+
+        <script src="__STATIC__/plugs/require/require.js?ver={:date('ymd')}"></script>
+        <script src="__STATIC__/admin/app.js?ver={:date('ymd')}"></script>
+        <script src="__STATIC__/plugs/proom/js/vendor/modernizr-2.7.1.min.js?ver={:date('ymd')}"></script>
+
+        <script>window.ROOT_URL='__PUBLIC__';</script>
+    </head>
+    {block name="bodyTag"}
+    <body id="menu" class="alt-bg">
+        {block name="header"}{/block}
+        {block name="body"}{/block}
+        {block name="foot"}{/block}
+        {block name="script"}{/block}
+    </body>
+    {/block}
+</html>
