@@ -89,6 +89,7 @@
                width="640" height="360">
             <source src="__STATIC__/plugs/proom/vid/flower_loop.mp4" type="video/mp4">
         </video>
+
     </div>
     <!--END OF Static video bg-->
 
@@ -158,12 +159,21 @@
 
             <header class="header">
                 <div class="h-left">
-                    <h2>New <strong>Company</strong></h2>
+      <button url={$control_url|default=''} data-down='json={"type":"control","to":"r"}' data-up='json={"type":"control","to":"rr"}'>右移 <i class="ion ion-mouse"></i>
+      </button>
+                    <button url={$control_url|default=''} data-down='json={"type":"control","to":"l"}' data-up='json={"type":"control","to":"lr"}'>左移 <i class="ion ion-mouse"></i>
+                    </button>
+                    <button url={$control_url|default=''} data-down='json={"type":"control","to":"u"}' data-up='json={"type":"control","to":"ur"}'>前移 <i class="ion ion-mouse"></i>
+                    </button>
+                    <button url={$control_url|default=''} data-down='json={"type":"control","to":"d"}' data-up='json={"type":"control","to":"dr"}'>后移 <i class="ion ion-mouse"></i>
+                    </button>
                 </div>
                 <div class="h-right">
-                    <h3>Lorem <br>product</h3>
+                    <button url={$control_url|default=''} data-coins='json={"type":"publish","to":"abc"}'>投币 <i class="ion ion-mouse"></i> </button>
+                    <button url={$control_url|default=''} data-coins='json={"type":"control","to":"g"}'>下抓 <i class="ion ion-mouse"></i> </button>
                     <h4 class="subhead"><a href="#register">Available here soon</a></h4>
                 </div>
+
             </header>
         </section>
 
@@ -384,9 +394,7 @@
 <!-- Begin of site footer -->
 <footer class="page-footer">
     <div>
-        <a href="http://www.facebook.com/highhay" target="_blank"><i class="ion icon ion-social-facebook"></i></a>
-        <a href="http://www.instagram.com/miradontsoa" target="_blank"><i class="ion icon ion-social-instagram"></i></a>
-        <a href="http://twitter.com/miradontsoa" target="_blank"><i class="ion icon ion-social-twitter"></i></a>
+
     </div>
 </footer>
 <!-- End of site footer -->
@@ -396,37 +404,26 @@
 
 <!-- All Javascript plugins goes here -->
 <!--		<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>-->
-<script src="__STATIC__/plugs/proom/js/vendor/jquery-1.11.2.min.js"></script>
+
 <!-- All vendor scripts -->
-<script src="__STATIC__/plugs/proom/js/vendor/all.js"></script>
+
 
 <!-- Detailed vendor scripts -->
-<!--<script src="js/vendor/jquery.fullPage.min.js"></script>
-<script src="js/vendor/jquery.slimscroll.min.js"></script>
-<script src="js/vendor/jquery.knob.min.js"></script>
-<script src="js/vegas/vegas.min.js"></script>
-<script src="js/jquery.maximage.js"></script>
-<script src="js/okvideo.min.js"></script>-->
+<!--<script src="__STATIC__/plugs/proom/js/vendor/jquery.fullPage.min.js"></script>
+<script src="__STATIC__/plugs/proom/js/vendor/jquery.slimscroll.min.js"></script>
+<script src="__STATIC__/plugs/proom/js/vendor/jquery.knob.min.js"></script>
+<script src="__STATIC__/plugs/proom/js/vegas/vegas.min.js"></script>
+<script src="__STATIC__/plugs/proom/js/jquery.maximage.js"></script>
+<script src="__STATIC__/plugs/proom/js/okvideo.min.js"></script>-->
 
 <!-- Downcount JS -->
-<script src="__STATIC__/plugs/proom/js/jquery.downCount.js"></script>
+<script src="__STATIC__/plugs/proom/js/jquery.downCount.js?ver={:date('ymd')}"></script>
 
 <!-- Form script -->
-<script src="__STATIC__/plugs/proom/js/form_script.js"></script>
+<script src="__STATIC__/plugs/proom/js/form_script.js?ver={:date('ymd')}"></script>
 
 <!-- Javascript main files -->
-<script src="__STATIC__/plugs/proom/js/main.js"></script>
-
-
-<!-- Google Analytics: Uncomment and change UA-XXXXX-X to be your site"s ID. -->
-<!--<script>
-    (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
-    function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
-    e=o.createElement(i);r=o.getElementsByTagName(i)[0];
-    e.src="//www.google-analytics.com/analytics.js";
-    r.parentNode.insertBefore(e,r)}(window,document,"script","ga"));
-    ga("create","UA-XXXXX-X");ga("send","pageview");
-</script>-->
+<script src="__STATIC__/plugs/proom/js/main.js?ver={:date('ymd')}"></script>
 
 
 {/block}

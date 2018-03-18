@@ -196,7 +196,7 @@ class WebsocketService
         self::$_path = $path;
         self::$_origin = $origin;
 
-        $jsonRet = HttpService::get("http://api.open.wowgotcha.com/openapi/v1/websocket_url/?appid=wow04d608ed68hk73092za1&binding_id=3&room_id=3", [], 30, []);
+        $jsonRet = HttpService::get("", [], 30, []);
         $stRet = json_decode($jsonRet);
 
         if($stRet->errcode != 0){

@@ -36,7 +36,8 @@ class Room extends BasicBaby
     public function index()
     {
 
-        return view('', ['title' => '房间']);
+        $controlUrl = '';
+        return view('', ['title' => '房间', 'control_url' =>$controlUrl]);
     }
 
     /**

@@ -140,6 +140,112 @@ define(['jquery', 'admin.plugs'], function () {
         }), {boxShadow: 'none'});
     });
 
+
+    /* window.addEventListener('contextmenu', function(e){
+        e.preventDefault();
+    });
+    $('button').bind('contextmenu', function(e) {
+     e.preventDefault();
+     console.log('禁止长按弹出菜单');
+     })*/
+
+
+    var timeOutEvent=0;
+    function longPress(controlUrl, sendCmd){
+        clearTimeout(timeOutEvent);
+        timeOutEvent = 0;
+        console.log("长按事件触发");
+
+        //var sendCmd = $(this).attr('data-down');
+        $.ajax(controlUrl, {
+            dataType: 'json', method: 'post', data: sendCmd, success: function (ret) {
+
+                console.log('返回 --> ' + ret);
+            }
+        });
+        //alert("长按事件触发发");
+    }
+    this.$body.on('touchstart', '[data-down]', function (e) {
+
+        //alert( "处理程序touchstart11" );
+        var sendCmd = $(this).attr('data-down');
+        var controlUrl = $(this).attr('url');
+        //if (!timeOutEvent){
+            timeOutEvent = setTimeout(longPress(controlUrl, sendCmd),5000);
+        //}
+        e.preventDefault();
+        return false;
+
+    });
+    this.$body.on('touchmove', '[data-down]', function () {
+        //alert( "处理程序touchmove" );
+        clearTimeout(timeOutEvent);
+        timeOutEvent = 0;
+
+    });
+    this.$body.on('touchend', '[data-up]', function () {
+        //alert( "处理程序touchend" );
+        clearTimeout(timeOutEvent);
+
+        if(timeOutEvent!=0){
+            //alert("你这是点击，不是长按899");
+            timeOutEvent = 0;
+        }
+
+        var sendCmd = $(this).attr('data-up');
+        var controlUrl = $(this).attr('url');
+
+        $.ajax(controlUrl, {
+            dataType: 'json', method: 'post', data: sendCmd, success: function (ret) {
+
+                console.log('返回 --> ' + ret);
+            }
+        });
+
+        return false;
+    });
+
+
+    /*! 注册 data-down 事件行为 */
+    this.$body.on('click', '[data-coins]', function () {
+
+        var controlUrl = 'http://120.77.61.179:2100/';
+        var sendCmd = $(this).attr('data-coins')
+        $.ajax(controlUrl, {
+            dataType: 'json', method: 'post', data: sendCmd, success: function (ret) {
+
+                console.log('返回 --> ' + ret);
+            }
+        });
+    });
+
+    /*! 注册 data-down 事件行为 */
+    /*   this.$body.on('mousedown', '[data-down]', function () {
+
+
+     var controlUrl = 'http://120.77.61.179:2100/';
+     var sendCmd = $(this).attr('data-down')
+     $.ajax(controlUrl, {
+     dataType: 'json', method: 'post', data: sendCmd, success: function (ret) {
+
+     console.log('返回 --> ' + ret);
+     }
+     });
+     });*/
+    /*! 注册 data-up 事件行为 */
+    /*    this.$body.on('mouseup', '[data-up]', function () {
+
+     var controlUrl = 'http://120.77.61.179:2100/';
+     var sendCmd = $(this).attr('data-up')
+     $.ajax(controlUrl, {
+     dataType: 'json', method: 'post', data: sendCmd, success: function (ret) {
+
+     console.log('返回 --> ' + ret);
+     }
+     });
+     });
+     */
+
     /*! 后台菜单控制初始化 */
     $.menu.listen();
 
