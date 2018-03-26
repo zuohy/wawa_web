@@ -36,7 +36,7 @@ class Room extends BasicBaby
     public function index()
     {
 
-        $controlUrl = '';
+        $controlUrl = 'http://120.77.61.179:2100/';
         return view('', ['title' => '房间', 'control_url' =>$controlUrl]);
     }
 

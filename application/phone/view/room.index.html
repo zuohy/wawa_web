@@ -16,14 +16,8 @@
 <header class="header-top">
 
     <div class="menu clearfix">
-        <a href="#about-us">about</a>
+        <a href="#">退出<i class="ion ion-reply-all"></i></a>
 
-        <!--<div class="menu-cont">
-            <p class="text">Menu cont</p>
-            <ul class="sub-menu">
-                <li><a href="htp://page">My Page</a></li>
-            </ul>
-        </div>-->
         <!-- Add other menu similar to "about" here -->
         <a href="#contact">contact</a>
     </div>
@@ -38,6 +32,11 @@
         </a>
     </div>
     <ul id="qmenu" class="qmenu">
+        <li data-menuanchor="control">
+            <a href="#control" class=""><i class="icon ion ion-game-controller-b"></i>
+            </a>
+            <span class="title">Control</span>
+        </li>
         <li data-menuanchor="home">
             <a href="#home" class=""><i class="icon ion ion-home"></i>
             </a>
@@ -75,22 +74,26 @@
     <div class="cover-bg pos-abs full-size bg-img" data-image-src="__STATIC__/plugs/proom/img/bg-default.jpg"></div>
 
     <!-- BEGIN OF Slideshow Background -->
-    <!--<div class="cover-bg pos-abs full-size slide-show">
-        <i class='img' data-src='img/bg-slide1.jpg'></i>
-        <i class='img' data-src='img/bg-slide2.jpg'></i>
-        <i class='img' data-src='img/bg-slide3.jpg'></i>
-        <i class='img' data-src='img/bg-slide4.jpg'></i>
-    </div>-->
+    <!-- <div class="cover-bg pos-abs full-size slide-show">
+        <i class='img' data-src='__STATIC__/plugs/proom/img/bg-slide1.jpg'></i>
+        <i class='img' data-src='__STATIC__/plugs/proom/img/bg-slide2.jpg'></i>
+        <i class='img' data-src='__STATIC__/plugs/proom/img/bg-slide3.jpg'></i>
+        <i class='img' data-src='__STATIC__/plugs/proom/img/bg-slide4.jpg'></i>
+    </div> -->
     <!-- END OF Slideshow Background -->
+    <div id="test" class="cover-bg pos-abs full-size">
+        <video id="remoteVideo" autoplay="autoplay"></video>
+        <video id="localVideo" autoplay="autoplay" muted="muted" style="height: 100px; width: 100px"></video>
 
+    </div>
     <!--BEGIN OF Static video bg  - uncomment below to use Video as Background-->
-    <div id="container" class="video-container show-for-medium-up">
+    <!--<div id="container" class="video-container show-for-medium-up">
         <video autoplay="autoplay" loop="loop" autobuffer="autobuffer" muted="muted"
                width="640" height="360">
             <source src="__STATIC__/plugs/proom/vid/flower_loop.mp4" type="video/mp4">
         </video>
 
-    </div>
+    </div>-->
     <!--END OF Static video bg-->
 
     <!-- Solid color as background -->
@@ -111,34 +114,27 @@
                  data-date="10/30/2016 00:00:00"
                  data-date-timezone="+0"
                     ></div>
-            <div class="elem-center">
+            <div id="m_sec" style="display: none" class="elem-center">
                 <div class="digit">
-                    <span class="days">81</span>
-                    <span class="txt">days</span>
+                    <span class="days">30</span>
+                    <span class="txt">sec</span>
                 </div>
             </div>
-            <!-- Logo instead -->
-            <!--
-                                <div class="logo">
-                                    <a href="#">
-                                        <img src="img/logo_only.png">
-                                    </a>
-                                </div>
-            -->
+
 
             <div class="elem-bottom">
                 <div class="deco"></div>
 
-                <!--						<span class="days">12</span><span class="thin">D</span>-->
+                <!--<span class="days">12</span><span class="thin">D</span>-->
                 <span class="hours">18</span><span class="thin">H</span>
-                <span class="minutes">45</span><span class="thin">MN</span>
+                <span class="minutes">45</span><span class="thin">M</span>
                 <span class="seconds">36</span><span class="thin">S</span>
             </div>
         </div>
 
 
         <footer>
-            <p>Before we launch our <strong>new website</strong></p>
+
         </footer>
     </div>
 </div>
@@ -147,7 +143,113 @@
 <!-- BEGIN OF site main content content here -->
 <main class="page-main" id="mainpage">
 
+
+    <!-- Begin of Control page   -->
+    <div class="section page-contact page page-cent bg-color" data-bgcolor="rgba(95, 25, 208, 0.88)s" id="s-control">
+        <!-- Begin of contact information -->
+        <div class="slide" id="s-user" data-anchor="user">
+            <section class="content">
+                <header class="p-title">
+
+                    <h3><i class="ion ion-social-reddit-outline">
+                    </i>
+
+                    </h3>
+                    <ul class="buttons">
+                        <li>
+                            <a title="Contact" href="#control/none"><i class="ion ion-share"></i></a>
+                        </li>
+                    </ul>
+                </header>
+                <!-- Begin Of Page SubSction -->
+                <div class="contact" style="margin-top:10px;">
+
+                    <div class="contact" style="height: 60px">
+                       <div id="m_coins" class="contact" style="text-align:center; ">
+
+                           <a url={$control_url|default=''} data-coins='{"type":"publish","to":"abc"}' class="button button-glow button-rounded button-highlight">投币</a>
+                       </div>
+                       <div id="m_catch" class="contact" style="text-align:center; display: none">
+                           <a url={$control_url|default=''} data-coins='{"type":"control","to":"g"}' class="button button-glow button-border button-rounded button-primary">
+                               Go
+                           </a>
+                       </div>
+                   </div>
+
+                <div id="m_control" class="contact" style="text-align:center; display: none">
+
+                    <div class="row" >
+                        <button class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","to":"u"}' data-up='{"type":"control","to":"ur"}'>
+                            <img  id="top_1" src="__STATIC__/plugs/proom/img/m_up.png" alt="m_up">
+                            <img  id="top_2" style="display: none;" src="__STATIC__/plugs/proom/img/m_up.png" alt="m_up">
+                        </button>
+                    </div>
+                    <div class="row" >
+                        <button style="margin-left:0px;" class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","to":"l"}' data-up='{"type":"control","to":"lr"}'>
+                            <img  id="left_1" src="__STATIC__/plugs/proom/img/m_left.png" alt="m_left">
+                            <img  id="left_2" style="display: none;" src="__STATIC__/plugs/proom/img/m_left.png" alt="m_left">
+                        </button>
+                        <button style="margin-left:30px;" class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","to":"r"}' data-up='{"type":"control","to":"rr"}'>
+                            <img  id="right_1" src="__STATIC__/plugs/proom/img/m_right.png" alt="m_right">
+                            <img  id="right_2" style="display: none; " src="__STATIC__/plugs/proom/img/m_right.png" alt="m_right">
+                        </button>
+                    </div>
+                    <div class="row" >
+                        <button class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","to":"d"}' data-up='{"type":"control","to":"dr"}'>
+                    <img  id="bottom_1" src="__STATIC__/plugs/proom/img/m_down.png" alt="m_down">
+                    <img  id="bottom_2" style="display: none;" src="__STATIC__/plugs/proom/img/m_down.png" alt="m_down">
+                    </button>
+                    </div>
+
+                </div>
+
+
+                </div>
+                <!-- End of page SubSection -->
+            </section>
+
+            <footer >
+
+            </footer>
+
+        </div>
+        <!-- end of contact information -->
+
+        <!-- begin of contact message -->
+        <div class="slide" id="s-none" data-anchor="none">
+            <section class="content">
+                <header class="p-title">
+                    <h3> <i class="ion ion-email">
+                    </i>
+                    </h3>
+                    <ul class="buttons">
+                        <li>
+                            <a title="Contact" href="#control/none"><i class="ion ion-social-usd"></i></a>
+                        </li>
+                        <li>
+                            <a title="Contact" href="#control/none"><i class="ion ion-location"></i></a>
+                        </li>
+                        <li>
+                            <a title="Contact" href="#control/none"><i class="ion ion-share"></i></a>
+                        </li>
+                    </ul>
+                </header>
+                <!-- Begin Of Page SubSction -->
+
+                <div class="page-block c-right v-zoomIn">
+
+                </div>
+                <!-- End Of Page SubSction -->
+            </section>
+
+        </div>
+        <!-- End of contact message -->
+    </div>
+    <!-- End of Control page  -->
+
+
     <!-- Begin of home page -->
+
     <div class="section page-home page page-cent" id="s-home">
 
         <!-- Logo -->
@@ -155,41 +257,22 @@
             <img class="h-logo" src="img/logo_only.png" alt="Logo">
         </div>-->
         <!-- Content -->
+
         <section class="content">
 
             <header class="header">
                 <div class="h-left">
-      <button url={$control_url|default=''} data-down='json={"type":"control","to":"r"}' data-up='json={"type":"control","to":"rr"}'>右移 <i class="ion ion-mouse"></i>
-      </button>
-                    <button url={$control_url|default=''} data-down='json={"type":"control","to":"l"}' data-up='json={"type":"control","to":"lr"}'>左移 <i class="ion ion-mouse"></i>
-                    </button>
-                    <button url={$control_url|default=''} data-down='json={"type":"control","to":"u"}' data-up='json={"type":"control","to":"ur"}'>前移 <i class="ion ion-mouse"></i>
-                    </button>
-                    <button url={$control_url|default=''} data-down='json={"type":"control","to":"d"}' data-up='json={"type":"control","to":"dr"}'>后移 <i class="ion ion-mouse"></i>
-                    </button>
+
                 </div>
                 <div class="h-right">
-                    <button url={$control_url|default=''} data-coins='json={"type":"publish","to":"abc"}'>投币 <i class="ion ion-mouse"></i> </button>
-                    <button url={$control_url|default=''} data-coins='json={"type":"control","to":"g"}'>下抓 <i class="ion ion-mouse"></i> </button>
-                    <h4 class="subhead"><a href="#register">Available here soon</a></h4>
+
                 </div>
 
             </header>
         </section>
 
-        <!-- Scroll down button -->
-        <footer class="p-footer p-scrolldown">
-            <a href="#register">
-                <div class="arrow-d">
-                    <div class="before">Scroll</div>
-                    <div class="after">Down</div>
-                    <div class="circle"><i class="ion ion-mouse"></i></div>
-                </div>
-            </a>
-        </footer>
     </div>
     <!-- End of home page -->
-
 
 
     <!-- Begin of register page -->
@@ -197,33 +280,11 @@
         <section class="content">
             <header class="p-title">
                 <h3>Register <i class="ion ion-compose"></i></h3>
-                <h4 class="subhead">Register to get our latest news</h4>
+                <button onclick="joinVideoRoom()">打开视频 <i class="ion ion-mouse"></i> </button>
+                <button onclick="exitVideoRoom()">关闭视频 <i class="ion ion-mouse"></i> </button>
             </header>
-            <div>
-                <form id="mail-subscription" class="form magic send_email_form" method="get" action="ajaxserver/serverfile.php">
-                    <p class="invite">Please, write your email below to stay in touch with us :</p>
-                    <div class="fields clearfix">
-                        <div class="input">
-                            <label for="reg-email">Email </label>
-                            <input id="reg-email" class="email_f"  name="email" type="email" required placeholder="your@email.address" data-validation-type="email"></div>
-                        <div class="buttons">
-                            <button id="submit-email" class="button email_b" name="submit_email">Ok</button>
-                        </div>
-                    </div>
 
-                    <p class="email-ok invisible"><strong>Thank you</strong> for your subscription. We will inform you.</p>
-                </form>
-            </div>
         </section>
-        <footer class="p-footer p-scrolldown">
-            <a href="#about-us">
-                <div class="arrow-d">
-                    <div class="before">About</div>
-                    <div class="after">Lorem</div>
-                    <div class="circle"><i class="ion ion-mouse"></i></div>
-                </div>
-            </a>
-        </footer>
     </div>
     <!-- End of register page -->
 
@@ -236,20 +297,8 @@
                 </h3>
                 <h4 class="subhead">We <span class="bold">make</span> only <span class="bold">beautiful</span> things</h4>
             </header>
-            <article class="text">
-                <p>Lorem ipsum <strong>magicum </strong>dolor sit amet, consectetur adipiscing elit. Maecenas a sem ultrices neque vehicula fermentum a sit amet nulla.</p>
-                <p>Aenean ultricies odio at erat facilisis tincidunt. Fusce tempor auctor justo, nec facilisis quam vehicula vel. Aenean non mattis purus, eget lobortis odio. </p>
-            </article>
+
         </section>
-        <footer class="p-footer p-scrolldown">
-            <a href="#contact">
-                <div class="arrow-d">
-                    <div class="before">Contact</div>
-                    <div class="after">Message</div>
-                    <div class="circle"><i class="ion ion-mouse"></i></div>
-                </div>
-            </a>
-        </footer>
     </div>
     <!-- End of about us page -->
 
@@ -277,50 +326,7 @@
                 <!-- Begin Of Page SubSction -->
                 <div class="contact">
                     <div class="row">
-                        <div class="medium-6 columns left">
-                            <ul>
-                                <li>
-                                    <h4>Email</h4>
-                                    <p><a href="mailto://contact@mail.com">contactemail@mail.com</a></p>
-                                </li>
-                                <li>
-                                    <h4>Address</h4>
-                                    <p>99 Location Street
-                                        <br>Antartica SP</p>
-                                </li>
-                                <li>
-                                    <h4>Phone</h4>
-                                    <p>+999 123 456 89</p>
-                                </li>
-                            </ul>
-                        </div>
-                        <div class="medium-6 columns social-links right">
-                            <ul>
 
-                                <!-- legal notice -->
-                                <li class="show-for-medium-up">
-                                    <h4>Website</h4>
-                                    <p><a href="http://www.highhay.com">www.highhay.com</a></p>
-                                </li>
-                                <li  class="show-for-medium-up">
-                                    <h4>Find us on</h4>
-                                    <!-- Begin of Social links -->
-                                    <div class="socialnet">
-                                        <a href="#"><i class="ion ion-social-facebook"></i></a>
-                                        <a href="#"><i class="ion ion-social-instagram"></i></a>
-                                        <a href="#"><i class="ion ion-social-twitter"></i></a>
-                                        <a href="#"><i class="ion ion-social-pinterest"></i></a>
-                                        <a href="#"><i class="ion ion-social-tumblr"></i></a>
-                                    </div>
-                                    <!-- End of Social links -->
-                                </li>
-                                <li>
-                                    <p><img src="__STATIC__/plugs/proom/img/logo_large.png" alt="Logo" class="logo"></p>
-                                    <p class="small">Bientot by <strong><a href="http://highhay.com">Brand</a></strong>. All right reserved 2015</p>
-                                </li>
-                            </ul>
-
-                        </div>
                     </div>
                 </div>
                 <!-- End of page SubSection -->
@@ -342,42 +348,12 @@
                         <li>
                             <a title="Contact" href="#contact/information"><i class="ion ion-location"></i></a>
                         </li>
-                        <!--<li>
-                            <a title="Message" href="#contact/message"><i class="ion ion-email"></i></a>
-                        </li>-->
                     </ul>
                 </header>
                 <!-- Begin Of Page SubSction -->
 
                 <div class="page-block c-right v-zoomIn">
-                    <div class="wrapper">
-                        <div>
-                            <form class="message form send_message_form" method="get" action="ajaxserver/serverfile.php">
-                                <div class="fields clearfix">
-                                    <div class="input">
-                                        <label for="mes-name">Name </label>
-                                        <input id="mes-name" name="name" type="text" placeholder="Your Name" required></div>
-                                    <div class="buttons">
-                                        <button id="submit-message" class="button email_b" name="submit_message">Ok</button>
-                                    </div>
-                                </div>
-                                <div class="fields clearfix">
-                                    <div class="input">
-                                        <label for="mes-email">Email </label>
-                                        <input id="mes-email" type="email" placeholder="Email Address" name="email" required>
-                                    </div>
-                                </div>
-                                <div class="fields clearfix no-border">
-                                    <label for="mes-text">Message </label>
-                                    <textarea id="mes-text" placeholder="Message ..." name="message" required></textarea>
 
-                                    <div>
-                                        <p class="message-ok invisible">Your message has been sent, thank you.</p>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
                 </div>
                 <!-- End Of Page SubSction -->
             </section>
@@ -386,6 +362,8 @@
         <!-- End of contact message -->
     </div>
     <!-- End of Contact page  -->
+
+
 
 </main>
 
@@ -425,5 +403,122 @@
 <!-- Javascript main files -->
 <script src="__STATIC__/plugs/proom/js/main.js?ver={:date('ymd')}"></script>
 
+
+
+{/block}
+
+{block name="script"}
+<!-- Javascript video controller files -->
+<script src="__STATIC__/plugs/proom/js/wv_controller.js?ver={:date('ymd')}"></script>
+<script>
+    var Controller = null;
+    var roomName;
+    var serverUrl;
+    var serverPort;
+    var qvgaConstraints  = {
+        audio: true,
+        video: false,
+        video: {
+            mandatory: {
+                maxWidth: 352,
+                maxHeight: 288,
+                maxFrameRate: 35
+            }
+        }
+    };
+    var onErrorFun = function(errorCode, errorStr){
+
+        console.log("error reason:", errorStr);
+        if (errorCode != 0){
+            if (Controller != null){
+                Controller.ExitRoom();
+                Controller = null;
+            }
+
+        }
+
+    };
+
+    var joinVideoRoom = function(){
+        //start
+        var videoList = [];
+        var localPara = {};
+        var remotePara = {};
+
+        localPara.isLocal = true;
+        localPara.view = "localVideo";
+
+        videoList.push(localPara);
+
+        remotePara.isLocal = false;
+        remotePara.view = "remoteVideo";
+        videoList.push(remotePara);
+
+        if (Controller != null){
+            return;
+        }
+        Controller = videoController(qvgaConstraints);
+        Controller.VideoInit(videoList, function(onStatus, param){
+
+            switch (onStatus){
+                case "InitReady":
+                    console.log("InitReady");
+                    var roomName = 'wawa';
+                    var serverUrl = 'hqscs.com';
+                    var serverPort = '3004';
+                    var userType = '2';
+                    var userid = '001';
+                    var client_type = '1';
+                    var extramsg = {"userType":userType, "userId":userid, "client_type":client_type};
+                    console.log("extramsg: ", extramsg);
+
+                    Controller.JoinRoom(roomName, JSON.stringify(extramsg), serverUrl, serverPort, serverUrl, "3478", onErrorFun);
+
+                    break;
+
+                case"JoinRoom":
+                    console.log("JoinRoom");
+
+                    break;
+
+                case"PeerConnected":
+                    console.log("PeerConnected");
+
+                    break;
+
+                case"PeerMuteVideo":
+                    var isMute = param;
+                    console.log("PeerMuteVedio", isMute);
+                    break;
+
+                case"MuteVideo":
+                    var isMute = param;
+                    console.log("MuteVedio", isMute);
+                    break;
+
+                case"ExitRoom":
+                    console.log("ExitRoom");
+                    break;
+            }
+
+        });
+
+    };
+
+    var exitVideoRoom = function(){
+        if (Controller == null){
+            return;
+        }
+        Controller.ExitRoom();
+        Controller = null;
+
+    };
+
+
+
+    /////////////////////////////
+
+
+</script>
 
 {/block}

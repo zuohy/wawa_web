@@ -156,7 +156,7 @@ define(['jquery', 'admin.plugs'], function () {
         timeOutEvent = 0;
         console.log("长按事件触发");
 
-        //var sendCmd = $(this).attr('data-down');
+        var sendCmd = 'json=' + sendCmd;
         $.ajax(controlUrl, {
             dataType: 'json', method: 'post', data: sendCmd, success: function (ret) {
 
@@ -165,11 +165,78 @@ define(['jquery', 'admin.plugs'], function () {
         });
         //alert("长按事件触发发");
     }
+    function moveImg( sendCmd){
+
+        var cmdObj = JSON.parse(sendCmd);
+        //alert( "处理程序touchstart1: "+ sendCmd );
+        var moveTo = '';
+        var moveShow = '';
+        if(cmdObj.to == 'r'){
+            moveTo = 'right';
+        }else if(cmdObj.to == 'l'){
+            moveTo = 'left';
+        }else if(cmdObj.to == 'u'){
+            //moveShow = 'right: -60px';
+            moveTo = 'top';
+        }else if(cmdObj.to == 'd'){
+            //moveShow = 'left: -60px';
+            moveTo = 'bottom';
+        }
+
+        var imgMove = 'display: ; position:relative;' + moveTo + ':-20px;' + moveShow;
+        //alert( "处理程序touchstart1: "+ imgMove );
+        $('#' + moveTo + '_1').attr('style', 'display: none');
+        $('#' + moveTo + '_2').attr('style', imgMove);
+
+    }
+    function backImg( sendCmd){
+
+        var cmdObj = JSON.parse(sendCmd);
+
+        var moveTo = '';
+        if(cmdObj.to == 'rr'){
+            moveTo = 'right';
+        }else if(cmdObj.to == 'lr'){
+            moveTo = 'left';
+        }else if(cmdObj.to == 'ur'){
+            moveTo = 'top';
+        }else if(cmdObj.to == 'dr'){
+            moveTo = 'bottom';
+        }
+
+        var imgMove = 'display: ; position:relative;' + moveTo + ':10px;'
+        $('#' + moveTo + '_1').attr('style', 'display: ');
+        $('#' + moveTo + '_2').attr('style', 'display: none');
+
+    }
+    function controlShow( sendCmd){
+
+        var cmdObj = JSON.parse(sendCmd);
+        //alert( "处理程序controlShow: "+ sendCmd );
+
+        if(cmdObj.type == 'publish'){
+            $('#m_control').attr('style', 'text-align:center; display: ');
+            $('#m_catch').attr('style', 'text-align:center; display: ');
+            $('#m_coins').attr('style', 'display: none');
+            $('#m_sec').attr('style', 'display: ');
+        }else if(cmdObj.type == 'control'){
+            $('#m_control').attr('style', 'display: none');
+            $('#m_catch').attr('style', 'display: none');
+            $('#m_coins').attr('style', 'text-align:center; display: ');
+            $('#m_sec').attr('style', 'display: none');
+        }
+
+    }
+
     this.$body.on('touchstart', '[data-down]', function (e) {
 
         //alert( "处理程序touchstart11" );
         var sendCmd = $(this).attr('data-down');
         var controlUrl = $(this).attr('url');
+
+        //移动图片位置
+        moveImg(sendCmd);
+
         //if (!timeOutEvent){
             timeOutEvent = setTimeout(longPress(controlUrl, sendCmd),5000);
         //}
@@ -177,11 +244,13 @@ define(['jquery', 'admin.plugs'], function () {
         return false;
 
     });
-    this.$body.on('touchmove', '[data-down]', function () {
+    this.$body.on('touchmove', '[data-down]', function (e) {
         //alert( "处理程序touchmove" );
         clearTimeout(timeOutEvent);
         timeOutEvent = 0;
 
+        //让move 滚动失效
+        e.preventDefault();
     });
     this.$body.on('touchend', '[data-up]', function () {
         //alert( "处理程序touchend" );
@@ -194,7 +263,10 @@ define(['jquery', 'admin.plugs'], function () {
 
         var sendCmd = $(this).attr('data-up');
         var controlUrl = $(this).attr('url');
+        //恢复图片位置
+        backImg(sendCmd);
 
+        var sendCmd = 'json=' + sendCmd;
         $.ajax(controlUrl, {
             dataType: 'json', method: 'post', data: sendCmd, success: function (ret) {
 
@@ -210,17 +282,22 @@ define(['jquery', 'admin.plugs'], function () {
     this.$body.on('click', '[data-coins]', function () {
 
         var controlUrl = 'http://120.77.61.179:2100/';
-        var sendCmd = $(this).attr('data-coins')
+        var sendCmd = $(this).attr('data-coins');
+
+        controlShow(sendCmd);
+
+        sendCmd = 'json=' + sendCmd;
         $.ajax(controlUrl, {
             dataType: 'json', method: 'post', data: sendCmd, success: function (ret) {
 
+                //$('.m_control').attr('style', 'display: ');
                 console.log('返回 --> ' + ret);
             }
         });
     });
 
     /*! 注册 data-down 事件行为 */
-    /*   this.$body.on('mousedown', '[data-down]', function () {
+  /* this.$body.on('mousedown', '[data-down]', function () {
 
 
      var controlUrl = 'http://120.77.61.179:2100/';
@@ -233,7 +310,7 @@ define(['jquery', 'admin.plugs'], function () {
      });
      });*/
     /*! 注册 data-up 事件行为 */
-    /*    this.$body.on('mouseup', '[data-up]', function () {
+  /*this.$body.on('mouseup', '[data-up]', function () {
 
      var controlUrl = 'http://120.77.61.179:2100/';
      var sendCmd = $(this).attr('data-up')
@@ -244,7 +321,7 @@ define(['jquery', 'admin.plugs'], function () {
      }
      });
      });
-     */
+*/
 
     /*! 后台菜单控制初始化 */
     $.menu.listen();
