@@ -20,7 +20,7 @@ use service\NodeService;
 use service\ToolsService;
 use think\Db;
 use think\View;
-use service\WebsocketService;
+
 /**
  * 手机入口
  * Class Index
@@ -30,6 +30,12 @@ use service\WebsocketService;
  */
 class Index extends BasicBaby
 {
+
+    /**
+     * 指定当前数据表
+     * @var string
+     */
+    public $table = 'TRoomInfo';
 
     /**
      * 手机框架布局
@@ -77,10 +83,36 @@ class Index extends BasicBaby
      */
     public function main()
     {
+        $this->title = '首页';
+        $db = Db::name($this->table)->where(['is_deleted' => '0']);
 
-        return view('', ['mysql_ver' => '', 'title' => '首页']);
+        return parent::_list($db);
+
     }
 
+
+    /**
+     * 列表数据处理
+     * @param type $list
+     */
+    protected function _data_filter(&$list)
+    {
+
+        foreach ($list as &$vo) {
+            //转换为中文字符
+            if($vo['status'] == 0){
+                $vo['status_c'] = '空闲';
+            }else{
+                $vo['status_c'] = '游戏中';
+            }
+            if($vo['tag'] == 0){
+                $vo['tag_c'] = '普通模式';
+            }else{
+                $vo['tag_c'] = '英雄模式';
+            }
+        }
+
+    }
 
     /**
      * 主机登录
