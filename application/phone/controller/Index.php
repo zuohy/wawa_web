@@ -15,10 +15,13 @@
 namespace app\phone\controller;
 
 use controller\BasicBaby;
+use controller\BasicWechat;
 use service\DataService;
 use service\NodeService;
-use service\ToolsService;
+use service\HttpService;
+use service\WxBizDataCrypt;
 use think\Db;
+use think\session\driver\Memcache;
 use think\View;
 
 /**
@@ -44,7 +47,85 @@ class Index extends BasicBaby
     public function index()
     {
 
-        return view('', ['title' => '客户端']);
+        //获取session_key
+        $code = isset($_GET['code']) ? $_GET['code'] : '';
+        $sessionId = isset($_GET['sessionId']) ? $_GET['sessionId'] : '';
+        $encryptedData = isset($_GET['encryptedData']) ? $_GET['encryptedData'] : '';
+        $iv = isset($_GET['iv']) ? $_GET['iv'] : '';
+
+        $dataObj = null;
+
+        if($code != ''){
+            //登录消息
+            //获取session_key open_id
+            $appId = '?appid=' . 'wx543f399af45d82ba';
+            $secret = '&secret=' . '7b38dd5915b836b96eb41540d27972b9';
+            $jsCode = '&js_code=' . $code;
+            $type = '&grant_type=authorization_code';
+
+            //https://api.weixin.qq.com/sns/jscode2session?appid=APPID&secret=SECRET&js_code=JSCODE&grant_type=authorization_code
+            $reqUrl = 'https://api.weixin.qq.com/sns/jscode2session' .$appId . $secret . $jsCode . $type ;
+            $info = HttpService::get($reqUrl);
+
+            //写入缓存
+            $cacSeq = $this->_createTmpSeq();
+            $options = array('expire' => '60');
+            cache($cacSeq, $info, $options);
+
+            return $cacSeq;
+        }
+        if($sessionId != ''){
+            //用户信息
+            $list = cache($sessionId);
+            //$sessionKey = $list['session_key'];
+
+            if($list == false){
+                $list = 'not found session key';
+                return $list;
+            }
+
+            //解析union id openid
+            $appId = 'wx543f399af45d82ba';
+            $listObj = json_decode($list);
+            $sessionKey = $listObj->session_key;
+            $pc = new WXBizDataCrypt($appId, $sessionKey);
+            $errCode = $pc->decryptData($encryptedData, $iv, $data );
+
+            if($errCode != 0){
+                return $errCode;
+            }
+            $dataObj = json_decode($data);
+        }
+
+
+        //获取微信用户信息
+        if($dataObj->openId){
+            $unionId = isset($dataObj->unionId) ? $dataObj->unionId : '';
+            $userId = $this->newUser($unionId, $dataObj->openId, $dataObj->nickName, $dataObj->avatarUrl);
+
+        }
+
+        return $userId;
+
+
+    }
+
+    /**
+     * 生成缓存唯一序号 (失败返回 NULL )
+     * @param int $length 序号长度
+     * @return string
+     */
+    private function _createTmpSeq($length = 10)
+    {
+        $times = 0;
+        while ($times++ < 10) {
+            list($i, $sequence) = [0, ''];
+            while ($i++ < $length) {
+                $sequence .= ($i <= 1 ? rand(1, 9) : rand(0, 9));
+            }
+
+        }
+        return $sequence;
     }
 
     /**

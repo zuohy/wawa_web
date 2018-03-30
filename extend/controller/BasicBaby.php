@@ -135,4 +135,44 @@ class BasicBaby extends Controller
         return true;
     }
 
+
+    /**
+     * 新用户微信id 名称，头像
+     * @param string $unionId
+     * @param string $openId
+     * @param string $name
+     * @param string $pic
+     * @return bool
+     */
+    protected function newUser($unionId, $openId, $name, $pic)
+    {
+        //查询当前是否已经存在用户信息
+        $db_wx = Db::name('TUserWeixin');
+        $db_user = Db::name('TUserConfig');
+        $wxUser = '';
+        if($unionId){
+            $wxUser = $db_wx->where('union_id', $unionId)->find();
+            $openId = $unionId;
+        }else{
+            $wxUser = $db_wx->where('open_id', $openId)->find();
+        }
+
+        if($wxUser == ''){
+            //保存新用户信息
+            $seqNum = DataService::createSequence(10, 'WXUSER');
+            $userId = $seqNum;
+            $data_user = array('user_id'=> $seqNum, 'name' => $name, 'pic' => $pic);
+            $result = DataService::save($db_user, $data_user);
+
+            $data_wx = array('user_id'=> $seqNum, 'union_id' => $unionId, 'open_id' => $openId);
+            $result = DataService::save($db_wx, $data_wx);
+        }else{
+            $userId = $wxUser['user_id'];
+        }
+
+        session('openid', $openId);
+        session('user_id', $userId);
+        return $userId;
+    }
+
 }
