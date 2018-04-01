@@ -124,6 +124,7 @@ class PayService
      */
     public static function createWechatPrepayid(WechatPay $pay, $openid, $order_no, $fee, $title, $trade_type = 'JSAPI', $from = 'wechat')
     {
+        Log::notice("createWechatPrepayid start: 内部订单号{$order_no}");
         $map = ['order_no' => $order_no, 'is_pay' => '1', 'expires_in' => time(), 'appid' => $pay->appid, 'trade_type' => $trade_type];
         $where = 'appid=:appid and order_no=:order_no and (is_pay=:is_pay or expires_in>:expires_in) and trade_type=:trade_type';
         $prepayinfo = Db::name('WechatPayPrepayid')->where($where, $map)->find();
@@ -140,6 +141,7 @@ class PayService
                 return $prepayid;
             }
         }
+        Log::notice("createWechatPrepayid end: 内部订单号{$order_no}, 预支付单号{$prepayinfo['prepayid']}");
         return $prepayinfo['prepayid'];
     }
 

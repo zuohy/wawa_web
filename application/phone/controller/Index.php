@@ -23,7 +23,7 @@ use service\WxBizDataCrypt;
 use think\Db;
 use think\session\driver\Memcache;
 use think\View;
-
+use think\Log;
 /**
  * 手机入口
  * Class Index
@@ -58,8 +58,8 @@ class Index extends BasicBaby
         if($code != ''){
             //登录消息
             //获取session_key open_id
-            $appId = '?appid=' . 'wx543f399af45d82ba';
-            $secret = '&secret=' . '7b38dd5915b836b96eb41540d27972b9';
+            $appId = '?appid=' . sysconf('wechat_mini_appid'); //'wx543f399af45d82ba';
+            $secret = '&secret=' . sysconf('wechat_mini_appsecret'); //'7b38dd5915b836b96eb41540d27972b9';
             $jsCode = '&js_code=' . $code;
             $type = '&grant_type=authorization_code';
 
@@ -80,20 +80,23 @@ class Index extends BasicBaby
             //$sessionKey = $list['session_key'];
 
             if($list == false){
-                $list = 'not found session key';
+                $list = '';
                 return $list;
             }
 
             //解析union id openid
-            $appId = 'wx543f399af45d82ba';
+            $appId = sysconf('wechat_mini_appid'); //'wx543f399af45d82ba';
             $listObj = json_decode($list);
             $sessionKey = $listObj->session_key;
+            Log::info("index: sessionKey= " . $sessionKey);
+
             $pc = new WXBizDataCrypt($appId, $sessionKey);
             $errCode = $pc->decryptData($encryptedData, $iv, $data );
 
             if($errCode != 0){
                 return $errCode;
             }
+            Log::info("index: user info= " . $data);
             $dataObj = json_decode($data);
         }
 
@@ -101,7 +104,8 @@ class Index extends BasicBaby
         //获取微信用户信息
         if($dataObj->openId){
             $unionId = isset($dataObj->unionId) ? $dataObj->unionId : '';
-            $userId = $this->newUser($unionId, $dataObj->openId, $dataObj->nickName, $dataObj->avatarUrl);
+            $userId = $this->newUser($unionId, $dataObj->openId, $dataObj->nickName, $dataObj->avatarUrl,
+                $dataObj->gender, $dataObj->country, $dataObj->province, $dataObj->city);
 
         }
 
@@ -164,7 +168,12 @@ class Index extends BasicBaby
      */
     public function main()
     {
-        $this->title = '首页';
+        $userId = isset($_GET['userId']) ? $_GET['userId'] : '';
+        Log::info("main: userId= " . $userId);
+
+        $this->setOpenId($userId);
+
+        $this->title = '首页' . $userId;
         $db = Db::name($this->table)->where(['is_deleted' => '0']);
 
         return parent::_list($db);

@@ -72,6 +72,33 @@ function & load_wechat($type = '')
 }
 
 /**
+ * 获取微信小程序操作对象
+ * @param string $type
+ * @return \Wechat\WechatMedia|\Wechat\WechatMenu|\Wechat\WechatOauth|\Wechat\WechatPay|\Wechat\WechatReceive|\Wechat\WechatScript|\Wechat\WechatUser|\Wechat\WechatExtends|\Wechat\WechatMessage
+ * @throws Exception
+ */
+function & load_wx_mini($type = '')
+{
+    static $wechat = [];
+    $index = md5(strtolower($type));
+    if (!isset($wechat[$index])) {
+        $config = [
+            'token'          => sysconf('wechat_token'),
+            'appid'          => sysconf('wechat_mini_appid'),//'wx543f399af45d82ba',
+            'appsecret'      => sysconf('wechat_mini_appsecret'),//'7b38dd5915b836b96eb41540d27972b9',
+            'encodingaeskey' => sysconf('wechat_encodingaeskey'),
+            'mch_id'         => sysconf('wechat_mch_id'),
+            'partnerkey'     => sysconf('wechat_partnerkey'),
+            'ssl_cer'        => sysconf('wechat_cert_cert'),
+            'ssl_key'        => sysconf('wechat_cert_key'),
+            'cachepath'      => CACHE_PATH . 'wxpay' . DS,
+        ];
+        $wechat[$index] = Loader::get($type, $config);
+    }
+    return $wechat[$index];
+}
+
+/**
  * UTF8字符串加密
  * @param string $string
  * @return string

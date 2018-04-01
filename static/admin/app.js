@@ -43,6 +43,7 @@ require.config({
         'jquery.masonry': ['../plugs/jquery/masonry.min'],
         'jquery.cookies': ['../plugs/jquery/jquery.cookie'],
         'phone':['../plugs/phone/js/index'],
+        'phone.jweixin':['../plugs/phone/js/jweixin-1.3.2'],
         'proom':['../plugs/proom/js/main']
     },
     shim: {

@@ -18,7 +18,8 @@ use service\DataService;
 use think\Controller;
 use think\Db;
 use think\db\Query;
-
+use service\PayService;
+use think\Log;
 /**
  * 娃娃业务基础控制器
  * Class BasicBaby
@@ -144,7 +145,7 @@ class BasicBaby extends Controller
      * @param string $pic
      * @return bool
      */
-    protected function newUser($unionId, $openId, $name, $pic)
+    protected function newUser($unionId, $openId, $name, $pic, $gender, $country, $province, $city)
     {
         //查询当前是否已经存在用户信息
         $db_wx = Db::name('TUserWeixin');
@@ -161,7 +162,8 @@ class BasicBaby extends Controller
             //保存新用户信息
             $seqNum = DataService::createSequence(10, 'WXUSER');
             $userId = $seqNum;
-            $data_user = array('user_id'=> $seqNum, 'name' => $name, 'pic' => $pic);
+            $data_user = array('user_id'=> $seqNum, 'name' => $name, 'pic' => $pic,
+                                'gender' => $gender, 'country' => $country, 'province' => $province, 'city' => $city);
             $result = DataService::save($db_user, $data_user);
 
             $data_wx = array('user_id'=> $seqNum, 'union_id' => $unionId, 'open_id' => $openId);
@@ -173,6 +175,75 @@ class BasicBaby extends Controller
         session('openid', $openId);
         session('user_id', $userId);
         return $userId;
+    }
+
+    /**
+     * 设置open id 在session 中
+     * @param string $userId
+     * @return bool
+     */
+    protected function setOpenId($userId)
+    {
+        //查询openid
+        //查询当前是否已经存在用户信息
+        $db_wx = Db::name('TUserWeixin');
+        $wxUser = '';
+        $openId = '';
+        $unionId = '';
+        if($userId){
+            $wxUser = $db_wx->where('user_id', $userId)->find();
+            if($wxUser){
+                $openId = $wxUser['open_id'];
+                $unionId = $wxUser['union_id'];
+            }
+        }
+        session('user_id', $userId);
+        session('open_id', $openId);
+        session('union_id', $unionId);
+
+    }
+
+    /**
+     * 小程序支付请求 生成统一订单
+     * @param string $unionId
+     * @param string $openId
+     * @param string $name
+     * @param string $pic
+     * @return bool
+     */
+    protected function miniPay($openId, $total_fee)
+    {
+
+        //查询当前是否已经存在订单
+        $order_no = session('pay-mini-order-no');
+        Log::info("miniPay start: order_no= " . $order_no);
+        if (empty($order_no)) {
+            $order_no = DataService::createSequence(10, 'wechat-pay-mini');
+            session('pay-mini-order-no', $order_no);
+        }
+        if (PayService::isPay($order_no)) {
+            //清除已经支付完成的订单号缓存
+            $this->resetMiniPay();
+            return ['code' => 2, 'order_no' => $order_no];
+        }
+
+        $pay = load_wx_mini('pay');
+        $options = PayService::createWechatPayJsPicker($pay, $openId, $order_no, $total_fee, 'JSAPI支付测试2');
+        if ($options === false) {
+            $options = ['code' => 3, 'msg' => "创建支付失败，{$pay->errMsg}[$pay->errCode]"];
+        }
+        $options['order_no'] = $order_no;
+        Log::info("miniPay end: options= " . json_encode($options));
+        return $options;
+        //return json($options);
+
+    }
+    /**
+     * 小程序 支付完成 清除缓存订单
+     * @return bool
+     */
+    protected function resetMiniPay(){
+        session('pay-mini-order-no', null);
     }
 
 }
