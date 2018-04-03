@@ -29,13 +29,33 @@ class Personal extends BasicBaby
 {
 
     /**
-     * 后台框架布局
+     * 个人中心
      * @return View
      */
     public function index()
     {
 
         return view('', ['title' => '个人中心']);
+    }
+
+    /**
+     * 个人收藏
+     * @return View
+     */
+    public function collection()
+    {
+
+        return view('', ['title' => '我的收藏']);
+    }
+
+    /**
+     * 抓取记录
+     * @return View
+     */
+    public function gresult()
+    {
+
+        return view('', ['title' => '抓的娃娃']);
     }
 
 

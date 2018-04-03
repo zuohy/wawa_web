@@ -270,6 +270,20 @@ body{ background:#ececec;}
 .bank p{ font-size:1.714em; text-align:right; padding-right:1em; padding-bottom:1.143em; color:#fff;}
 .jia_t{ position:fixed; bottom:0; left:0; width:100%; background:#fff; height:3em; line-height:3em; display:block; text-align:center; font-size:1.143em; color:#222; border-top:1px solid #ccc;}
 
+/*充值优惠内容 recharge card*/
+.recharge{ background: #246fc0; width:48%; border-radius:6px; margin-top:2em;}
+.recharge span{ display:block; padding:1.143em; font-size:0.3em; color: #f4f0f5;}
+.recharge p{  font-size:0.8em; text-align:right; padding-right:1em;  color: #fbff30;}
+.rec_all{ width:100%; display:block; border-radius:6px; background:coral; height:2.286em; font-size:0.8em; line-height:2.286em; text-align:center; color:#fff; margin:1em 0 0.5em; clear:both;}
+
+/*充值头部 recharge card*/
+.rec_tou{ margin-top:3em; background:#246fc0; padding:1.429em 0 0.714em;}
+.rec_z{text-align:center;}
+.rec_z_r{ text-align:right;}
+.rec_z span{ display:block; text-align:center; color:#c4d4eb; font-size:1em; margin-top:0.286em;}
+.rec_z b{ color:#fff; font-size:2em; margin:0.286em auto 0.714em; border-bottom:1px dashed #91b8e3; font-weight:normal; display:inline-block;}
+.rec_z p{ font-size:1.571em; text-align:center; color:#dfe8f1;}
+
 /*账户子页*/
 
 .one p em{ float:right; font-size:1.714em; color:#999; margin-right:0.571em;}

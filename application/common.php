@@ -20,6 +20,11 @@ use service\SoapService;
 use think\Db;
 use Wechat\Loader;
 
+define('WAWA_PAY_SUCCESS', 1);
+define('WAWA_PAY_FAILED', 0);
+define('WAWA_COVER_TYPE_COIN', 1); //转换为金币(角)
+define('WAWA_COVER_TYPE_PAY', 2);   //转换为分 微信支付单位
+
 /**
  * 打印输出数据到文件
  * @param mixed $data

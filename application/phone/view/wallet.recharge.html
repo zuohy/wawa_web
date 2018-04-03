@@ -4,29 +4,124 @@
 
 <!--top-->
 <div class="top_c">
-    <a href="wallet.html" class="iconfont icon-jiantou-copy-copy" ></a>
+    <a data-href='{:url("phone/wallet/index")}' href="javascript:void(0)" class="iconfont icon-jiantou-copy-copy" ></a>
     <a href="detailed.html" class="ming">明细</a>
     <p class="titi">充值</p>
 </div>
+<div class="rec_tou"  style="height: 130px;">
+    <div style="float: left; height: 100%; width: 48%">
 
-
-<div class="cong">
-    <p>您的当前账户余额：<em>{$test_info}</em></p>
-    <div class="zhi">
-        <div class="container">
-            <span>金额</span>
-            <input type="text" name="address" size="60" maxlength="60" style="color:#ccc" value="请输入您的充值金额" onfocus="if(this.value=='请输入您的充值金额'){this.value=''};this.style.color='black';" onblur="if(this.value==''||this.value=='请输入您的充值金额'){this.value='请输入您的充值金额';this.style.color='#ccc';}">
-        </div>
+    <div class="rec_z">
+        <span>剩余金币</span>
+        <b>80 </b>
     </div>
-    <div class="container">
-        <a href="payment.html" class="deng" style="margin-top:3em;">充 值</a>
+    </div>
+
+    <div style="float: left; height: 100%; width: 48%">
+    <div class="rec_z" >
+        <span>剩余娃娃币</span>
+        <b>10 </b>
+    </div>
     </div>
 </div>
 
+<div class="product">
+
+    <!--内容-->
+    <div class="container" style="background: #f2dede">
+        {foreach $list as $key=>$vo}
+        {if $key%2 eq 0}
+        <div class="recharge" style="float: left">
+        {else}
+        <div class="recharge" style="float: right">
+        {/if}
+            <a onclick="mini_send('{$vo.icons_type}')">
+            <span>{$vo.icons_name}</span>
+            <p>充￥{$vo.pay_value}元 </p>
+            <p>送 {$vo.free_value}个娃娃币</p>
+            </a>
+            <a class="rec_all">共{$vo.pay_value}*10个金币 {$vo.free_value}个娃娃币</a>
+        </div>
+            {/foreach}
+    </div>
+</div>
+
+</div>
 
 
-<script src="js/jquery.min.js" type="text/javascript"></script>
+{/block}
 
-<script src="js/index.js" type="text/javascript"></script>
+{block name="script"}
+<script src="__STATIC__/plugs/phone/js/jquery.min.js" type="text/javascript"></script>
+<script src="__STATIC__/plugs/phone/js/index.js" type="text/javascript"></script>
+
+<script>
+
+    var  mini_send = function(payType){
+
+        var perOrderPara = '';
+        var perObj = '';
+        $.ajax("{:url('phone/wallet/payment')}", {
+            dataType: 'json', method: 'post', data:{icons_type:payType},
+            success: function (ret) {
+
+                //预订单参数
+                perOrderPara = ret;
+
+                if( perOrderPara.length <= 0 ){
+                    alert('order para is null');
+                    perObj = 'order para is null';
+                }else{
+                    //alert('order =' + perOrderPara);
+                    var perObj = JSON.parse(perOrderPara);
+                }
+                console.log('payment info: ' + perOrderPara)
+                //异常判断 处理
+                /* if( !perObj.code){
+                 if(perObj.code == 2){
+
+                 }
+
+                 return;
+                 }*/
+
+                require(['phone.jweixin'], function (wx) {
+                    console.log(wx)
+                    wx.miniProgram.getEnv(function(res) {
+                                var isMini =  res.miniprogram;
+
+                                console.log(isMini) // true
+                            }
+                    );
+                    //点击微信支付后，调取统一下单接口生成微信小程序支付需要的支付参数
+
+                    var params = '?prePayId=' + perObj.prepayId + '&order_no=' + perObj.order_no
+                            + '&timestamp=' + perObj.timeStamp + '&nonceStr=' + perObj.nonceStr
+                            + '&signType=' + perObj.signType + '&paySign=' + perObj.paySign;
+
+
+                    var path = '/pages/wxpay/wxpay' + params;
+                    wx.miniProgram.navigateTo({
+                        url: path,
+                        success: function(){
+                            console.log('navigateTo wxpay success')
+                        },
+                        fail: function(){
+                            console.log('fail');
+                        },
+                        complete:function(){
+                            console.log('navigateTo wxpay complete');
+                        }
+
+                    });
+
+                })
+
+            }
+        });
+
+    }
+
+</script>
 
 {/block}
