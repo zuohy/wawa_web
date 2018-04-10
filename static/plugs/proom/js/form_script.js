@@ -5,8 +5,8 @@
  * external URL such as:  url: 'http://www.example.com/avenir/ajaxserver/server.php'
  * depending to your requirements
  */
-var email_server_url = './ajaxserver/serverfile.php';
-var message_server_url = './ajaxserver/serverfile.php';
+var email_server_url = "{:url('phone/apiwawa/index')}";
+var message_server_url = "{:url('phone/apiwawa/index')}";
 //Check if action attribute (which indicates server) of form tag is set, then choose it (low 
 if($('.send_email_form').attr('action') && ($('.send_email_form').attr('action')) != ''){
     email_server_url = $('.send_email_form').attr('action');
@@ -84,7 +84,10 @@ $(function () {
                 form_data[this.name] = $(this).val(); 
             });
             console.log(form_data);
-            
+
+            //input.value.replace(/"/g, '\\"').replace(/\n/g,'\\n').replace(/\r/g, '\\r')
+            form_data['type'] = 'chat_msg'
+            var reqData = {json: form_data}
             $.ajax(
                 {
                     /*
@@ -95,8 +98,8 @@ $(function () {
                      */
                     url: message_server_url,
                     // url: $('.send_message_form').attr('action'),
-                    type: 'get',
-                    data: form_data,
+                    type: 'post',
+                    data: reqData,
                     dataType: 'json',
 
                     /* CALLBACK FOR SENDING EMAIL GOEAS HERE */
@@ -118,7 +121,7 @@ $(function () {
                     },
                     /* show error message */
                     error: function (jqXHR, textStatus, errorThrown) {
-                        $('.message').html('Error when sending email.');
+                        //$('.message').html('Error when sending email.');
                     }
                     /* END EMAIL SENDING CALLBACK */
             });

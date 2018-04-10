@@ -104,12 +104,12 @@ class Index extends BasicBaby
         //获取微信用户信息
         if($dataObj->openId){
             $unionId = isset($dataObj->unionId) ? $dataObj->unionId : '';
-            $userId = $this->newUser($unionId, $dataObj->openId, $dataObj->nickName, $dataObj->avatarUrl,
+            $retMsg = $this->newUser($unionId, $dataObj->openId, $dataObj->nickName, $dataObj->avatarUrl,
                 $dataObj->gender, $dataObj->country, $dataObj->province, $dataObj->city);
 
         }
 
-        return $userId;
+        return $retMsg;
 
 
     }

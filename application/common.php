@@ -25,6 +25,9 @@ define('WAWA_PAY_FAILED', 0);
 define('WAWA_COVER_TYPE_COIN', 1); //转换为金币(角)
 define('WAWA_COVER_TYPE_PAY', 2);   //转换为分 微信支付单位
 
+define('WAWA_COIN_TYPE_REG1', 1);   //充值类型1
+define('WAWA_COIN_TYPE_REG2', 2);   //充值类型2
+define('WAWA_COIN_TYPE_SHARE', 20);   //分享类型
 /**
  * 打印输出数据到文件
  * @param mixed $data

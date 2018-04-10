@@ -165,8 +165,11 @@ class BasicBaby extends Controller
             //保存新用户信息
             $seqNum = DataService::createSequence(10, 'WXUSER');
             $userId = $seqNum;
+            $seqCode = DataService::createSequence(11, 'WXUSER-CODE');
+            $code = $seqCode;
+
             $data_user = array('user_id'=> $seqNum, 'name' => $name, 'pic' => $pic,
-                                'gender' => $gender, 'country' => $country, 'province' => $province, 'city' => $city);
+                                'gender' => $gender, 'country' => $country, 'province' => $province, 'city' => $city, 'code'=> $code);
             $result = DataService::save($db_user, $data_user);
 
             $data_wx = array('user_id'=> $seqNum, 'union_id' => $unionId, 'open_id' => $openId);
@@ -175,9 +178,18 @@ class BasicBaby extends Controller
             $userId = $wxUser['user_id'];
         }
 
+        $userInfo = $db_user->where('user_id', $userId)->find();
+        if($userInfo && $userInfo['user_id'] == $userId){
+            $retData = array('user_id' => $userInfo['user_id'], 'code' => $userInfo['code'], );
+            $retMsgArr = array('code' => '0', 'type' => '', 'msg' => 'ok', 'data' => $retData);
+        }else{
+            $retMsgArr = array('code' => '-1', 'type' => '', 'msg' => 'error', 'data' => '');
+        }
+
+        $retMsg = json_encode($retMsgArr);
         session('openid', $openId);
         session('user_id', $userId);
-        return $userId;
+        return $retMsg;
     }
 
     /**
@@ -349,6 +361,25 @@ class BasicBaby extends Controller
     }
 
     ///////////////////////////////////////////////////////////////////
+
+    /**
+     * 生成缓存唯一序号 (失败返回 NULL )
+     * @param int $length 序号长度
+     * @return string
+     */
+    protected function createTmpSeq($length = 10)
+    {
+        $times = 0;
+        while ($times++ < 10) {
+            list($i, $sequence) = [0, ''];
+            while ($i++ < $length) {
+                $sequence .= ($i <= 1 ? rand(1, 9) : rand(0, 9));
+            }
+
+        }
+        return $sequence;
+    }
+
     /**
      * 小程序支付请求 生成统一订单
      * @param string $unionId
@@ -536,6 +567,37 @@ class BasicBaby extends Controller
             Log::error("rechargeUserCoin: end failed order_no= " . $orderNo .  "userId=" . $userId);
         }
         return $retBool;
+    }
+
+    /**
+     * 优惠 奖励用户金币 娃娃币
+     * @param string $freeType
+     * @return bool
+     */
+    protected function freeUserCoin($userId, $freeType){
+
+        //获取充值优惠
+        $receiptFreeInfo = $this->getPayValue($freeType);
+        $lastFreeValue = isset($receiptFreeInfo['free_value']) ? $receiptFreeInfo['free_value'] : 0;
+
+        Log::info("freeUserCoin:  lastFreeValue= " . $lastFreeValue);
+
+        $db_user = Db::name('TUserConfig');
+
+        $userInfo = $db_user->where('user_id', $userId)->find();
+        if($userInfo && ($userInfo['user_id'] == $userId ) ){
+
+            $saveFree = $userInfo['free_coin'] + $lastFreeValue;
+            $data_userCoin = array('id'=> $userInfo['id'], 'free_coin'=> $saveFree);
+            $retBool = DataService::save($db_user, $data_userCoin);
+        }
+
+        if($retBool){
+            Log::info("freeUserCoin: end ok userId= " . $userId);
+        }else{
+            Log::error("freeUserCoin: end failed userId= " . $userId);
+        }
+
     }
 
 }

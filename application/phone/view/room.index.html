@@ -1,5 +1,12 @@
 {extend name="extra@proom/main"}
 
+{block name="header"}
+
+<script src="__STATIC__/plugs/proom/js/vendor/jquery-1.11.2.min.js?ver={:date('ymd')}"></script>
+<script src="__STATIC__/plugs/proom/js/vendor/all.js?ver={:date('ymd')}"></script>
+
+{/block}
+
 {block name="body"}
 
 
@@ -17,7 +24,7 @@
 <header class="header-top">
 
     <div class="menu clearfix">
-        <a href="#">退出<i class="ion ion-reply-all"></i></a>
+        <a data-href='{:url("phone/index/main")}' href="javascript:void(0)">退出<i class="ion ion-reply-all"></i></a>
 
         <!-- Add other menu similar to "about" here -->
         <a href="#contact">contact</a>
@@ -32,7 +39,26 @@
             <img src="__STATIC__/plugs/proom/img/logo_only.png" alt="Logo Brand">
         </a>
     </div>
+    <ul  class="quser">
+        <li data-menuanchor="">
+            <a href="#" class=""><i class="icon ion ion-game-controller-b"></i>
+            </a>
+            <span class="title">User1</span>
+        </li>
+        <li data-menuanchor="">
+            <a href="#" class=""><i class="icon ion ion-home"></i>
+            </a>
+            <span class="title">User2</span>
+        </li>
+        <li data-menuanchor="">
+            <a href="#" class=""><i class="icon ion ion-more"></i>
+            </a>
+            <span class="title">more</span>
+        </li>
+    </ul>
+
     <ul id="qmenu" class="qmenu">
+
         <li data-menuanchor="control">
             <a href="#control" class=""><i class="icon ion ion-game-controller-b"></i>
             </a>
@@ -110,12 +136,12 @@
 <div class="pane-when " id="s-when">
     <div class="content">
         <!-- Clock -->
-        <div class="clock clock-countdown">
+        <div class="clock clock-countdown" id="m_sec" style="display: none">
             <div class="site-config"
                  data-date="10/30/2016 00:00:00"
                  data-date-timezone="+0"
                     ></div>
-            <div id="m_sec" style="display: none" class="elem-center">
+            <div  class="elem-center">
                 <div class="digit">
                     <span class="days">30</span>
                     <span class="txt">sec</span>
@@ -148,7 +174,6 @@
     <!-- Begin of Control page   -->
     <div class="section page-contact page page-cent bg-color" data-bgcolor="rgba(95, 25, 208, 0.88)s" id="s-control">
         <!-- Begin of contact information -->
-        <div class="slide" id="s-user" data-anchor="user">
             <section class="content">
                 <header class="p-title">
 
@@ -158,7 +183,7 @@
                     </h3>
                     <ul class="buttons">
                         <li>
-                            <a title="Contact" href="#control/none"><i class="ion ion-share"></i></a>
+                            <a title="Contact" href="#"><i class="ion ion-share"></i></a>
                         </li>
                     </ul>
                 </header>
@@ -209,42 +234,9 @@
                 <!-- End of page SubSection -->
             </section>
 
-            <footer >
-
-            </footer>
-
-        </div>
         <!-- end of contact information -->
 
-        <!-- begin of contact message -->
-        <div class="slide" id="s-none" data-anchor="none">
-            <section class="content">
-                <header class="p-title">
-                    <h3> <i class="ion ion-email">
-                    </i>
-                    </h3>
-                    <ul class="buttons">
-                        <li>
-                            <a title="Contact" href="#control/none"><i class="ion ion-social-usd"></i></a>
-                        </li>
-                        <li>
-                            <a title="Contact" href="#control/none"><i class="ion ion-location"></i></a>
-                        </li>
-                        <li>
-                            <a title="Contact" href="#control/none"><i class="ion ion-share"></i></a>
-                        </li>
-                    </ul>
-                </header>
-                <!-- Begin Of Page SubSction -->
 
-                <div class="page-block c-right v-zoomIn">
-
-                </div>
-                <!-- End Of Page SubSction -->
-            </section>
-
-        </div>
-        <!-- End of contact message -->
     </div>
     <!-- End of Control page  -->
 
@@ -258,18 +250,22 @@
             <img class="h-logo" src="img/logo_only.png" alt="Logo">
         </div>-->
         <!-- Content -->
-
         <section class="content">
-
-            <header class="header">
-                <div class="h-left">
-
-                </div>
-                <div class="h-right">
-
-                </div>
+            <header class="p-title">
 
             </header>
+
+            <div class="contact" style="margin-top:10px;">
+                <ul class="chat_msg">
+                    <li>
+                        <span >18</span>
+                    </li>
+
+                </ul>
+
+
+            </div>
+
         </section>
 
     </div>
@@ -284,6 +280,7 @@
                 <button onclick="joinVideoRoom()">打开视频 <i class="ion ion-mouse"></i> </button>
                 <button onclick="exitVideoRoom()">关闭视频 <i class="ion ion-mouse"></i> </button>
             </header>
+
 
         </section>
     </div>
@@ -304,7 +301,7 @@
     <!-- End of about us page -->
 
     <!-- Begin of Contact page   -->
-    <div class="section page-contact page page-cent  bg-color" data-bgcolor="rgba(95, 25, 208, 0.88)s" id="s-contact">
+    <div class="section page-contact page page-cent  bg-color test_show" data-bgcolor="rgba(95, 25, 208, 0.88)s" id="s-contact">
         <!-- Begin of contact information -->
         <div class="slide" id="s-information" data-anchor="information">
             <section class="content">
@@ -316,9 +313,6 @@
                         <li class="show-for-medium-up">
                             <a title="About" href="#about-us" ><i class="ion ion-android-information"></i></a>
                         </li>
-                        <!--<li>
-                            <a title="Contact" href="#contact/information"><i class="ion ion-location"></i></a>
-                        </li>-->
                         <li>
                             <a title="Message" href="#contact/message"><i class="ion ion-email"></i></a>
                         </li>
@@ -327,7 +321,18 @@
                 <!-- Begin Of Page SubSction -->
                 <div class="contact">
                     <div class="row">
+                            <form id="mail-subscription" class="form message magic send_message_form" method="post" action="{:url('phone/apiwawa/index')}">
 
+                                <div class="fields clearfix">
+                                    <div class="input">
+                                        <label for="content">say </label>
+                                        <input id="content" class="email_f"  name="content"  required placeholder="message" ></div>
+                                    <div class="buttons">
+                                        <button id="submit-msg" class="button email_b" name="submit_msg">Ok</button>
+                                    </div>
+                                </div>
+                            </form>
+                        <button class="button " style="display: none" onclick="testFun()">111</button>
                     </div>
                 </div>
                 <!-- End of page SubSection -->
@@ -393,6 +398,11 @@
 <script src="__STATIC__/plugs/proom/js/jquery.maximage.js"></script>
 <script src="__STATIC__/plugs/proom/js/okvideo.min.js"></script>-->
 
+<!-- Javascript barrager files -->
+<link rel="stylesheet" href="__STATIC__/plugs/proom/js/izibarrager/barrager.css?ver={:date('ymd')}">
+
+<script src="__STATIC__/plugs/proom/js/izibarrager/jquery.barrager.min.js?ver={:date('ymd')}"></script>
+
 <!-- Downcount JS -->
 <script src="__STATIC__/plugs/proom/js/jquery.downCount.js?ver={:date('ymd')}"></script>
 
@@ -403,10 +413,10 @@
 <script src="__STATIC__/plugs/proom/js/main.js?ver={:date('ymd')}"></script>
 
 
-
 {/block}
 
 {block name="script"}
+
 <!-- Javascript video controller files -->
 <script src="__STATIC__/plugs/proom/js/wv_controller.js?ver={:date('ymd')}"></script>
 <script>
@@ -425,6 +435,144 @@
             }
         }
     };
+    var ws_chat, name, client_list={};
+var testFun;
+    $(function(){
+
+        // 提交弹幕
+        function onRunBarrager() {
+            var item={
+                img:'__STATIC__/plugs/proom/img/wawa/test1.jpg', //图片
+                info:'弹幕文字信息', //文字
+                href:'', //链接
+                close:true, //显示关闭按钮
+                speed:6, //延迟,单位秒,默认6
+                bottom:200, //距离底部高度,单位px,默认随机
+                color:'#fff', //颜色,默认白色
+                old_ie_color:'#000000' //ie低版兼容色,不能与网页背景相同,默认黑色
+            }
+            $('body').barrager(item);
+
+
+        }
+        onRunBarrager()
+
+
+        var reqData = {type:'room_servers'}
+        $.ajax("{:url('phone/apiwawa/index')}", {
+            dataType: 'json', method: 'post', data: {json: reqData},
+            success: function (ret) {
+                console.log("servers:", ret);
+                var retObj = $.parseJSON(ret)
+                console.log("servers: code= ", retObj.code);
+                if(retObj.code == 0){
+                    var retData = retObj.data
+                    chatStart(retData.wa_chat_url, retData.wa_chat_port)
+                }
+            }
+        });
+
+
+    });
+
+    testFun = function (){
+
+    var item={
+        img:'__STATIC__/plugs/proom/img/wawa/test1.jpg', //图片
+        info:'弹幕文字信息', //文字
+        href:'', //链接
+        close:true, //显示关闭按钮
+        speed:6, //延迟,单位秒,默认6
+        //bottom:200, //距离底部高度,单位px,默认随机
+        color:'#fff', //颜色,默认白色
+        old_ie_color:'#000000' //ie低版兼容色,不能与网页背景相同,默认黑色
+    }
+    $('body').barrager(item);
+
+    }
+
+    var chatMsgShow = function(msg){
+
+        var item={
+            img:'__STATIC__/plugs/proom/img/wawa/test1.jpg', //图片
+            info:msg, //文字
+            href:'', //链接
+            close:true, //显示关闭按钮
+            speed:6, //延迟,单位秒,默认6
+            //bottom:200, //距离底部高度,单位px,默认随机
+            color:'#fff', //颜色,默认白色
+            old_ie_color:'#000000' //ie低版兼容色,不能与网页背景相同,默认黑色
+        }
+        $('body').barrager(item);
+
+        var m_span = '<span >' + msg + '</span>';
+        var m_li = '<li>' + m_span + '</li>';
+        var showMsg = m_li;
+        return showMsg;
+    }
+
+    var chatStart = function(serverUrl, serverPort){
+        var chatServer = "ws://" + serverUrl + ":" + serverPort;
+        ws_chat = new WebSocket(chatServer);
+        // 服务端主动推送消息时会触发这里的onmessage
+
+        // 当socket连接打开
+        //ws_chat.onopen = onopen;
+
+        ws_chat.onmessage = chat_onmessage;
+
+        ws_chat.onclose = function() {
+            console.log("连接关闭，定时重连");
+
+        };
+        ws_chat.onerror = function() {
+            console.log("出现错误");
+        };
+
+
+    }
+
+    //聊天室消息处理函数
+    function chat_onmessage(e) {
+        // json数据转换成js对象
+        var data = eval("("+e.data+")");
+        var type = data.type || '';
+        switch(type){
+            // Events.php中返回的init类型的消息，将client_id发给后台进行uid绑定
+            case 'init':
+                // 利用jquery发起ajax请求，将client_id发给后端进行uid绑定
+                console.log("init: client_id= ", data.client_id);
+
+                var reqData = {type:'chat_bind', client_id: data.client_id}
+                $.post("{:url('phone/apiwawa/index')}", {json: reqData}, function(data){
+                    alert(data);
+                }, 'json');
+                break;
+            case 'chat_msg':
+                //显示信息在页面控件
+                var msgList = chatMsgShow(data.content);
+                $('.chat_msg').append(msgList);
+
+                brreak;
+            case 'ping':
+                //忽略心跳消息
+                break;
+
+            // 当mvc框架调用GatewayClient发消息时直接alert出来
+            default :
+                alert(e.data);
+        }
+
+    }
+
+
+    var controlStart = function(serverUrl, serverPort){
+
+    }
+    var videoStart = function(serverUrl, serverPort){
+
+    }
+
     var onErrorFun = function(errorCode, errorStr){
 
         console.log("error reason:", errorStr);

@@ -30,13 +30,15 @@ class Room extends BasicBaby
 {
 
     /**
-     * 房间列表
+     * 房间
      * @return View
      */
     public function index()
     {
 
-        $controlUrl = 'http://120.77.61.179:2100/';
+        $controlAddress = sysconf('wa_control_url');
+        $controlPort = sysconf('wa_control_port');
+        $controlUrl = 'http://' . $controlAddress . ':' . $controlPort;
         return view('', ['title' => '房间', 'control_url' =>$controlUrl]);
     }
 

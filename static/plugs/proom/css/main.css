@@ -591,8 +591,15 @@ strong,
 .quick-link .qmenu{
 	position: relative;
 	position: absolute;
-	top: 50%;
+	top: 70%;
 }
+
+.quick-link .quser{
+    position: relative;
+    position: absolute;
+    top: 10%;
+}
+
 .quick-link li{
 	list-style: none;
 	list-style-position: outside;

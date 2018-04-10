@@ -50,7 +50,7 @@ class Wallet extends BasicBaby
         //$this->getReceiptList();
         $this->title = '充值';
         $db = Db::name('TUserReceiptFree');
-        $db->whereBetween('icons_type', ["0", "20"]);
+        $db->whereBetween('icons_type', ["0", "19"]);
         return parent::_list($db);
     }
 
