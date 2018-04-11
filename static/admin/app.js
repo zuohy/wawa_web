@@ -44,7 +44,9 @@ require.config({
         'jquery.cookies': ['../plugs/jquery/jquery.cookie'],
         'phone':['../plugs/phone/js/index'],
         'phone.jweixin':['../plugs/phone/js/jweixin-1.3.2'],
-        'proom':['../plugs/proom/js/main']
+        'proom':['../plugs/proom/js/main'],
+        'proom.toast':['../plugs/proom/js/izitoast/iziToast'],
+        'proom.barrager':['../plugs/proom/js/izibarrager/jquery.barrager']
     },
     shim: {
         'layui': {deps: ['jquery']},
@@ -58,7 +60,8 @@ require.config({
         'jquery.ztree': {deps: ['jquery', 'css!' + _root + '../plugs/ztree/zTreeStyle/zTreeStyle.css']},
         'jquery.cookies': {deps: ['jquery']},
         'jquery.masonry': {deps: ['jquery']},
-        'phone': {deps: ['jquery', 'bootstrap']}
+        'phone': {deps: ['jquery', 'bootstrap']},
+        'proom.barrager': {deps: ['jquery']}
     },
     // deps: [],
     // 开启debug模式，不缓存资源

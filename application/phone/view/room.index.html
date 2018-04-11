@@ -2,8 +2,7 @@
 
 {block name="header"}
 
-<script src="__STATIC__/plugs/proom/js/vendor/jquery-1.11.2.min.js?ver={:date('ymd')}"></script>
-<script src="__STATIC__/plugs/proom/js/vendor/all.js?ver={:date('ymd')}"></script>
+
 
 {/block}
 
@@ -316,6 +315,9 @@
                         <li>
                             <a title="Message" href="#contact/message"><i class="ion ion-email"></i></a>
                         </li>
+                        <li><a href="#" class="trigger-info" data-iziToast>Info</a></li>
+                        <li><a href="#" class="trigger-custom2" data-iziToast>custom2</a></li>
+
                     </ul>
                 </header>
                 <!-- Begin Of Page SubSction -->
@@ -332,7 +334,7 @@
                                     </div>
                                 </div>
                             </form>
-                        <button class="button " style="display: none" onclick="testFun()">111</button>
+                        <button class="button " style="display: " onclick="testFun()">111</button>
                     </div>
                 </div>
                 <!-- End of page SubSection -->
@@ -398,10 +400,13 @@
 <script src="__STATIC__/plugs/proom/js/jquery.maximage.js"></script>
 <script src="__STATIC__/plugs/proom/js/okvideo.min.js"></script>-->
 
+<!-- Javascript toast files -->
+<link rel="stylesheet" href="__STATIC__/plugs/proom/js/izitoast/iziToast.css?ver={:date('ymd')}">
+<script src="__STATIC__/plugs/proom/js/izitoast/iziToastHandle.js?ver={:date('ymd')}"></script>
+
 <!-- Javascript barrager files -->
 <link rel="stylesheet" href="__STATIC__/plugs/proom/js/izibarrager/barrager.css?ver={:date('ymd')}">
-
-<script src="__STATIC__/plugs/proom/js/izibarrager/jquery.barrager.min.js?ver={:date('ymd')}"></script>
+<script src="__STATIC__/plugs/proom/js/izibarrager/jquery.barrager.js?ver={:date('ymd')}"></script>
 
 <!-- Downcount JS -->
 <script src="__STATIC__/plugs/proom/js/jquery.downCount.js?ver={:date('ymd')}"></script>
@@ -475,21 +480,27 @@ var testFun;
 
     });
 
-    testFun = function (){
+    require(['proom.barrager'], function (barrager) {
 
-    var item={
-        img:'__STATIC__/plugs/proom/img/wawa/test1.jpg', //图片
-        info:'弹幕文字信息', //文字
-        href:'', //链接
-        close:true, //显示关闭按钮
-        speed:6, //延迟,单位秒,默认6
-        //bottom:200, //距离底部高度,单位px,默认随机
-        color:'#fff', //颜色,默认白色
-        old_ie_color:'#000000' //ie低版兼容色,不能与网页背景相同,默认黑色
-    }
-    $('body').barrager(item);
+        testFun = function (){
 
-    }
+            var item={
+                img:'__STATIC__/plugs/proom/img/wawa/test1.jpg', //图片
+                info:'弹幕文字信息', //文字
+                href:'', //链接
+                close:true, //显示关闭按钮
+                speed:6, //延迟,单位秒,默认6
+                //bottom:200, //距离底部高度,单位px,默认随机
+                color:'#fff', //颜色,默认白色
+                old_ie_color:'#000000' //ie低版兼容色,不能与网页背景相同,默认黑色
+            }
+
+            $('body').barrager(item);
+
+        }
+
+    });
+
 
     var chatMsgShow = function(msg){
 
