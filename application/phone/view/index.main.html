@@ -99,7 +99,7 @@
 <div class="product">
     {foreach $list as $key=>$vo}
     <div class="sp_pr">
-        <a data-href='{:url("phone/room/index")}' href="javascript:void(0)">
+        <a data-href='{:url("phone/room/index")}?room_id={$vo.room_id}' href="javascript:void(0)">
 
             {if $vo.room_pic eq ''}
             <img src="__STATIC__/plugs/proom/img/bg-default.jpg">

@@ -18,7 +18,9 @@ use controller\BasicBaby;
 use think\Db;
 use think\Log;
 use service\DataService;
-use GatewayClient\Gateway;
+use service\ErrorCode;
+use service\RoomService;
+//use GatewayClient\Gateway;
 /**
  * 手机接口
  * Class Index
@@ -39,8 +41,8 @@ class Apiwawa extends BasicBaby
         $this->_initRetMsg();
 
         if (!$this->request->isPost()) {
-            $this->retMsg['code'] = '-1';
-            $this->retMsg['msg'] = 'no post msg';
+            $this->retMsg['code'] = ErrorCode::CODE_NOT_POST;
+            $this->retMsg['msg'] = ErrorCode::$ERR_MSG[ErrorCode::CODE_NOT_POST]; //'no post msg';
             $retMsg = json_encode($this->retMsg);
             Log::info("index: http msg retMsg= " . $retMsg);
             return $retMsg;
@@ -57,7 +59,7 @@ class Apiwawa extends BasicBaby
             case 'share_login':
                 //分享者登录
                 $retStatus = $this->_buildShareRel( $jPack['user_id'], $jPack['code_father']);
-                if(0 == $retStatus){
+                if(ErrorCode::CODE_OK == $retStatus){
                     $this->freeUserCoin($jPack['user_id'], WAWA_COIN_TYPE_SHARE);
 
                     $db_user = Db::name('TUserConfig');
@@ -82,45 +84,120 @@ class Apiwawa extends BasicBaby
                     'wa_chat_port' => sysconf('wa_chat_port')
                 );
                 $this->retMsg['data'] = $retData;
+
                 break;
             case 'chat_bind':
-                Gateway::$registerAddress = '127.0.0.1:1236';
+                //Gateway::$registerAddress = '127.0.0.1:1236';
                 $userId = session('user_id');
-                $roomId = '11';
+                $roomId = session('room_id');
 
-                // client_id与uid绑定
-                Gateway::bindUid($jPack['client_id'], $userId);
-                // 加入某个群组（可调用多次加入多个群组）
-                Gateway::joinGroup($jPack['client_id'], $roomId);
+                $retStatus = RoomService::runRoom($roomId, $userId, $jPack['client_id']);
+                $tmpMembers = RoomService::$memberList;
+                $tmpRoomInfo = RoomService::$roomInfo;
+                $tmpGift = RoomService::$giftInfo;
+                if($retStatus != ErrorCode::CODE_OK){
+                    $this->retMsg['code'] = $retStatus;
+                    $this->retMsg['msg'] = ErrorCode::$ERR_MSG[$retStatus];
+                    Log::error("index: join room error retMsg= " . $this->retMsg['msg']);
+                    break;
+                }
 
-                // 向任意uid的网站页面发送数据
+                $retData = array(
+                    'room_info' => $tmpRoomInfo,
+                    'member_list' => $tmpMembers,
+                    'gift_show' => $tmpGift['gift_pic_show'],
+                    'cur_member' =>  $tmpMembers[$userId]
+                );
+                $this->retMsg['data'] = $retData;
+
+                //绑定gateway 长连接
+                RoomService::gateWayBind($roomId, $userId, $jPack['client_id']);
+
+                $userName = $tmpMembers[$userId]['name'];
+                $userPic = $tmpMembers[$userId]['pic'];
+                $noteMsg = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_INFO, ErrorCode::I_USER_JOIN_ROOM); //ErrorCode::$INFO_MSG[ErrorCode::I_USER_JOIN_ROOM];
+                // 向uid的网站页面发送数据
                 $chatArr = array(
                     'type' => 'chat_msg',
-                    'content' => 'bind ok'
+                    'content' => $userName . ': ' . $noteMsg,
+                    'pic' => $userPic
                 );
                 $chatData = json_encode($chatArr);
-                Gateway::sendToUid($userId, $chatData);
+                RoomService::gateWaySendMsg($roomId, '', $chatData);
                 break;
             case 'chat_msg':
+                $roomId = session('room_id');
+                $userId = session('user_id');
+                $userInfo = $this->getUserInfo($userId);
+                $name = isset($userInfo['name']) ? $userInfo['name'] : '';
+                $pic = isset($userInfo['pic']) ? $userInfo['pic'] : '';
+
                 $chatArr = array(
                     'type' => 'chat_msg',
-                    'content' => $jPack['content']
+                    'content' => $jPack['content'],
+                    'pic' => $pic
                 );
                 // 向任意群组的网站页面发送数据
                 $chatData = json_encode($chatArr);
-                Gateway::sendToGroup('11', $chatData);
+                RoomService::gateWaySendMsg($roomId, '', $chatData);
+                break;
+            case 'exit_room':
+                $roomId = session('room_id');
+                $userId = session('user_id');
+                $userInfo = $this->getUserInfo($userId);
+                $name = isset($userInfo['name']) ? $userInfo['name'] : '';
+                $pic = isset($userInfo['pic']) ? $userInfo['pic'] : '';
+                $showMsg = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_INFO, ErrorCode::I_USER_EXIT_ROOM);
+                $chatArr = array(
+                    'type' => 'chat_msg',
+                    'content' => $name . $showMsg,
+                    'pic' => $pic
+                );
+                $chatData = json_encode($chatArr);
+                RoomService::gateWaySendMsg($roomId, '', $chatData);
+                break;
+            case 'dev_user_auth':
+                //baby_control 设备服务器 认证用户信息消息
+                $userId = isset($jPack['user_id']) ? $jPack['user_id'] : '';
+                $roomId = isset($jPack['room_id']) ? $jPack['room_id'] : '';
+                $price = isset($jPack['price']) ? $jPack['price'] : 0;
+                $retStatus = $this->_dev_authUser($roomId, $userId, $price);
+                if($retStatus != ErrorCode::CODE_OK){
+                    $this->retMsg['code'] = $retStatus;
+                    $this->retMsg['msg'] = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_CLIENT_ERROR, $retStatus);
+                    Log::error("index: join room error retMsg= " . $this->retMsg['msg']);
+
+                }
+
+                //通知房间所有用户 不能投币操作
 
                 break;
+            case 'dev_notify_coins':
+                $userId = isset($jPack['user_id']) ? $jPack['user_id'] : '';
+                $roomId = isset($jPack['room_id']) ? $jPack['room_id'] : '';
+                $coinsStatus = isset($jPack['status']) ? $jPack['status'] : ErrorCode::E_DEV_COINS_STATUS_ERROR;
+                if($coinsStatus != ErrorCode::CODE_OK){
+                    //投币失败 通知用户
+                    break;
+                }
 
+                //投币成功 更新房间成员状态，房间状态，扣除用户金币 娃娃币
+
+                //通知所有用户当前不能投币
+
+                //通知当前用户可以操作游戏
+
+
+                break;
             default:
-                $this->retMsg['code'] = '-2';
-                $this->retMsg['msg'] = 'no support msg';
+                $this->retMsg['code'] = ErrorCode::CODE_NOT_SUPPORT;
+                $this->retMsg['msg'] = ErrorCode::$ERR_MSG[ErrorCode::CODE_NOT_SUPPORT];
                 break;
         }
 
         $this->retMsg['type'] = $cmdType;
         $retMsg = json_encode($this->retMsg);
-        Log::info("index: http msg retMsg= " . $retMsg);
+        Log::info("index: return http msg retMsg= " . $retMsg);
         return $retMsg;
 
     }
@@ -131,9 +208,9 @@ class Apiwawa extends BasicBaby
      */
     private function _initRetMsg()
     {
-        $retMsg['code'] = '0';
+        $retMsg['code'] = ErrorCode::CODE_OK;
         $retMsg['type'] = '';
-        $retMsg['msg'] = 'ok';
+        $retMsg['msg'] = ErrorCode::$ERR_MSG[ErrorCode::CODE_OK];
         $retMsg['data'] = '';
         return $this->retMsg;
     }
@@ -237,6 +314,62 @@ class Apiwawa extends BasicBaby
         return $isShare;
 
     }
+
+
+    /////////////////////////start baby_coontrol 设备服务器消息处理//////////////////////////////////////////////////
+    /**
+     * 设备服务器认证用户信息
+     * @return int
+     */
+    private function _dev_authUser($roomId, $userId, $price){
+
+        //获取房间信息 判断房间是否为游戏状态
+        $tmpRoom = RoomService::getRoomInfo($roomId);
+        $roomStatus = isset($tmpRoom['status']) ? $tmpRoom['status'] : '';
+        $roomPrice = isset($tmpRoom['price']) ? $tmpRoom['price'] : '';
+        if(BABY_ROOM_STATUS_ON != $roomStatus){
+            //房间状态不正确
+            Log::error("_dev_authUser: room_id= " . $roomId . ' status= '. $roomStatus
+                . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_ROOM_STATUS_ERROR]);
+            return ErrorCode::E_ROOM_STATUS_ERROR;
+        }
+        if($price != $roomPrice){
+            //投币金额不正确
+            Log::error("_dev_authUser: room_id= " . $roomId . ' user_id= '. $userId
+                . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_USER_INSERT_COIN_ERROR]);
+            return ErrorCode::E_USER_INSERT_COIN_ERROR;
+        }
+
+        //获取房间成员信息 状态是否为正常状态
+        $tmpMember = RoomService::getMemberInfo($roomId, $userId);
+        $memberStatus = isset($tmpMember['user_status']) ? $tmpMember['user_status'] : '';
+        if(BABY_ROOM_MEMBER_STATUS_IN != $memberStatus){
+            //房间成员状态不正确
+            Log::error("_dev_authUser: room_id= " . $roomId . ' user_id= '. $userId
+                . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_ROOM_USER_STATUS_ERROR]);
+            return ErrorCode::E_ROOM_USER_STATUS_ERROR;
+        }
+
+        //获取用户金币 娃娃币余额是否充足
+        $tmpUser = $this->getUserInfo($userId);
+        $userCoin = isset($tmpUser['coin']) ? $tmpUser['coin'] : 0;
+        $userFreeCoin = isset($tmpUser['free_coin']) ? $tmpUser['free_coin'] : 0;
+        if($roomPrice > $userFreeCoin){
+            //用户娃娃币不足
+            Log::error("_dev_authUser: user_id= " . $userId
+                . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_USER_FREE_COIN_LACK]);
+            return ErrorCode::E_USER_FREE_COIN_LACK;
+        }elseif($roomPrice > $userCoin){
+            //用金币不足
+            Log::error("_dev_authUser: user_id= " . $userId
+                . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_USER_COIN_LACK]);
+            return ErrorCode::E_USER_COIN_LACK;
+        }
+
+        return ErrorCode::CODE_OK;
+    }
+    ///////////////////////////////////////////////////////////////////////////
+
 
 
     /**

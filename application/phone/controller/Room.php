@@ -17,7 +17,7 @@ namespace app\phone\controller;
 use controller\BasicBaby;
 use think\Db;
 use think\View;
-
+use service\RoomService;
 /**
  * 房间信息
  * Class Index
@@ -36,10 +36,31 @@ class Room extends BasicBaby
     public function index()
     {
 
+        $roomId = $this->request->get('room_id');
+
+        //获取房间信息
+        $tmpRoom = RoomService::getRoomInfo($roomId);
+
+        //获取房间成员信息
+        //$tmpUser = RoomService::getTopMemberList($roomId, '');
+        //获取用户信息
+        $userId = session('user_id');
+        $tmpUser = $this->getUserInfo($userId);
+
+        $price = isset($tmpRoom['price']) ? $tmpRoom['price'] : '';
+        $coin = isset($tmpUser['coin']) ? $tmpUser['coin'] : '';
+        $free_coin = isset($tmpUser['free_coin']) ? $tmpUser['free_coin'] : '';
+
+        //保存房间信息到session
+        session('room_id', $roomId);
+
+        //获取设备控制服务器信息
         $controlAddress = sysconf('wa_control_url');
         $controlPort = sysconf('wa_control_port');
         $controlUrl = 'http://' . $controlAddress . ':' . $controlPort;
-        return view('', ['title' => '房间', 'control_url' =>$controlUrl]);
+
+        return view('', ['title' => '房间', 'control_url' =>$controlUrl,
+                     'price' =>$price, 'coin' => $coin, 'free_coin' => $free_coin, 'room_id' => $roomId, 'user_id' => $userId,]);
     }
 
     /**

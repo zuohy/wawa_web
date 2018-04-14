@@ -1,17 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------
-// | ThinkAdmin
-// +----------------------------------------------------------------------
-// | 版权所有 2014~2017 广州楚才信息科技有限公司 [ http://www.cuci.cc ]
-// +----------------------------------------------------------------------
-// | 官方网站: http://think.ctolog.com
-// +----------------------------------------------------------------------
-// | 开源协议 ( https://mit-license.org )
-// +----------------------------------------------------------------------
-// | github开源项目：https://github.com/zoujingli/ThinkAdmin
-// +----------------------------------------------------------------------
-
 namespace controller;
 
 use service\DataService;
@@ -217,7 +205,32 @@ class BasicBaby extends Controller
         session('union_id', $unionId);
 
     }
+    ////////////////////////////////////start 用户管理 相关函数////////////////////////////////////
+    /**
+     * 新用户微信id 名称，头像
+     * @param string $unionId
+     * @param string $openId
+     * @param string $name
+     * @param string $pic
+     * @return array
+     */
+    protected function getUserInfo($userId){
+        //获取用户信息
+        $db_user = Db::name('TUserConfig');
+        $userInfo = $db_user->where('user_id', $userId)->find();
+        if($userInfo && ($userInfo['user_id'] == $userId ) ){
+            return $userInfo;
+        }
 
+        return '';
+
+    }
+
+
+    ////////////////////////////////////end 用户管理 相关函数////////////////////////////////////
+
+
+    ////////////////////////////////////start 支付 金币 相关函数////////////////////////////////////
     /**
      * 充值金额转换
      * @param int $coverType 1 单位元 转换为 金币数量， 2 单位元 转换为 分
@@ -599,5 +612,7 @@ class BasicBaby extends Controller
         }
 
     }
+
+    ////////////////////////////////////end 支付 金币 相关函数 ////////////////////////////////////
 
 }

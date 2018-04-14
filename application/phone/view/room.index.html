@@ -23,7 +23,7 @@
 <header class="header-top">
 
     <div class="menu clearfix">
-        <a data-href='{:url("phone/index/main")}' href="javascript:void(0)">退出<i class="ion ion-reply-all"></i></a>
+        <a onclick="chat_send('exit_room')" data-href='{:url("phone/index/main")}' href="javascript:void(0)">退出<i class="ion ion-reply-all"></i></a>
 
         <!-- Add other menu similar to "about" here -->
         <a href="#contact">contact</a>
@@ -39,16 +39,6 @@
         </a>
     </div>
     <ul  class="quser">
-        <li data-menuanchor="">
-            <a href="#" class=""><i class="icon ion ion-game-controller-b"></i>
-            </a>
-            <span class="title">User1</span>
-        </li>
-        <li data-menuanchor="">
-            <a href="#" class=""><i class="icon ion ion-home"></i>
-            </a>
-            <span class="title">User2</span>
-        </li>
         <li data-menuanchor="">
             <a href="#" class=""><i class="icon ion ion-more"></i>
             </a>
@@ -176,11 +166,14 @@
             <section class="content">
                 <header class="p-title">
 
-                    <h3><i class="ion ion-social-reddit-outline">
-                    </i>
-
+                    <h3><i class="ion ion-social-reddit-outline">{$coin}</i>
+                        <a ><i class="ion ion-happy">{$free_coin}</i></a>
                     </h3>
+
                     <ul class="buttons">
+                        <li>
+                            <a title="Contact" href="#"><i class="ion ion-social-usd-outline"></i></a>
+                        </li>
                         <li>
                             <a title="Contact" href="#"><i class="ion ion-share"></i></a>
                         </li>
@@ -192,7 +185,7 @@
                     <div class="contact" style="height: 60px">
                        <div id="m_coins" class="contact" style="text-align:center; ">
 
-                           <a url={$control_url|default=''} data-coins='{"type":"publish","to":"abc"}' class="button button-glow button-rounded button-highlight">投币</a>
+                           <a url={$control_url|default=''} data-coins='{"type":"publish","room_id":{$room_id},"user_id":{$user_id}, "price":{$price}, "to":"abc"}' class="button button-glow button-rounded button-highlight">投币<br>({$price}个)</a>
                        </div>
                        <div id="m_catch" class="contact" style="text-align:center; display: none">
                            <a url={$control_url|default=''} data-coins='{"type":"control","to":"g"}' class="button button-glow button-border button-rounded button-primary">
@@ -334,7 +327,7 @@
                                     </div>
                                 </div>
                             </form>
-                        <button class="button " style="display: " onclick="testFun()">111</button>
+                        <button class="button " style="display: none" onclick="testFun()">111</button>
                     </div>
                 </div>
                 <!-- End of page SubSection -->
@@ -425,6 +418,8 @@
 <!-- Javascript video controller files -->
 <script src="__STATIC__/plugs/proom/js/wv_controller.js?ver={:date('ymd')}"></script>
 <script>
+
+    //房间视频服务全局变量
     var Controller = null;
     var roomName;
     var serverUrl;
@@ -440,19 +435,32 @@
             }
         }
     };
-    var ws_chat, name, client_list={};
-var testFun;
+
+    //房间信息全局变量
+    var b_roomInfo = null;   //房间信息对象
+    var b_memberList = null;  //房间成员列表 top5
+    var b_giftInfo = null;  //房间商品信息
+    var b_giftShow = null;  //房间商品展示图，作为房间背景图片
+    var b_curMember = null;  //房间当前用户信息
+    var b_maxShowMember = 3;  //top 成员最大个数
+
+    //房间长连接全局变量
+    var ws_chat=null, name, client_list={};
+
+    var testFun;
+
+
     $(function(){
 
         // 提交弹幕
         function onRunBarrager() {
             var item={
                 img:'__STATIC__/plugs/proom/img/wawa/test1.jpg', //图片
-                info:'弹幕文字信息', //文字
+                info:'欢迎加入房间', //文字
                 href:'', //链接
                 close:true, //显示关闭按钮
                 speed:6, //延迟,单位秒,默认6
-                bottom:200, //距离底部高度,单位px,默认随机
+                bottom:300, //距离底部高度,单位px,默认随机
                 color:'#fff', //颜色,默认白色
                 old_ie_color:'#000000' //ie低版兼容色,不能与网页背景相同,默认黑色
             }
@@ -471,6 +479,7 @@ var testFun;
                 var retObj = $.parseJSON(ret)
                 console.log("servers: code= ", retObj.code);
                 if(retObj.code == 0){
+                    //返回房间服务器信息
                     var retData = retObj.data
                     chatStart(retData.wa_chat_url, retData.wa_chat_port)
                 }
@@ -502,26 +511,6 @@ var testFun;
     });
 
 
-    var chatMsgShow = function(msg){
-
-        var item={
-            img:'__STATIC__/plugs/proom/img/wawa/test1.jpg', //图片
-            info:msg, //文字
-            href:'', //链接
-            close:true, //显示关闭按钮
-            speed:6, //延迟,单位秒,默认6
-            //bottom:200, //距离底部高度,单位px,默认随机
-            color:'#fff', //颜色,默认白色
-            old_ie_color:'#000000' //ie低版兼容色,不能与网页背景相同,默认黑色
-        }
-        $('body').barrager(item);
-
-        var m_span = '<span >' + msg + '</span>';
-        var m_li = '<li>' + m_span + '</li>';
-        var showMsg = m_li;
-        return showMsg;
-    }
-
     var chatStart = function(serverUrl, serverPort){
         var chatServer = "ws://" + serverUrl + ":" + serverPort;
         ws_chat = new WebSocket(chatServer);
@@ -533,13 +522,34 @@ var testFun;
         ws_chat.onmessage = chat_onmessage;
 
         ws_chat.onclose = function() {
-            console.log("连接关闭，定时重连");
+            console.log("连接关闭");
 
         };
         ws_chat.onerror = function() {
             console.log("出现错误");
         };
 
+
+    }
+
+    function chat_send(msgType){
+        console.log("chat_send: msg type= ", msgType);
+        if(null == ws_chat){
+            console.log("chat_send: ws_chat is null");
+            return;
+        }
+        switch (msgType){
+            case 'exit_room':
+                var reqData = {type:'exit_room'}
+                $.post("{:url('phone/apiwawa/index')}", {json: reqData}, function(ret){
+                    console.log(ret);
+
+                }, 'json');
+
+                break;
+            default :
+                break;
+        }
 
     }
 
@@ -555,16 +565,27 @@ var testFun;
                 console.log("init: client_id= ", data.client_id);
 
                 var reqData = {type:'chat_bind', client_id: data.client_id}
-                $.post("{:url('phone/apiwawa/index')}", {json: reqData}, function(data){
-                    alert(data);
+                $.post("{:url('phone/apiwawa/index')}", {json: reqData}, function(ret){
+                    console.log(ret);
+                    var retObj = $.parseJSON(ret)
+                    //返回房间信息， 房间top 成员列表
+                    if(retObj.code == 0){
+                        //返回房间服务器信息
+                        var retData = retObj.data
+                        initRoomInfo(retData)
+                    }
+
                 }, 'json');
                 break;
             case 'chat_msg':
                 //显示信息在页面控件
-                var msgList = chatMsgShow(data.content);
-                $('.chat_msg').append(msgList);
+                var msgList = chatMsgShow(data.content, data.pic);
 
-                brreak;
+
+                break;
+            case 'exit_room':
+                    //在chat_msg 中处理
+                break;
             case 'ping':
                 //忽略心跳消息
                 break;
@@ -574,6 +595,86 @@ var testFun;
                 alert(e.data);
         }
 
+    }
+
+
+    //初始化房间服务器信息
+    var initRoomServers = function( retData ){
+
+    }
+
+    //初始化房间信息变量
+    var initRoomInfo = function( retData ){
+        b_roomInfo = retData.room_info
+        b_giftShow = retData.gift_show
+        b_memberList = retData.member_list
+        b_curMember = retData.cur_member
+
+        console.log('b_roomInfo:')
+        console.log(b_roomInfo)
+        console.log('b_memberList:')
+        console.log(b_memberList)
+        console.log('b_giftShow:')
+        console.log(b_giftShow)
+        console.log('b_curMember:')
+        console.log(b_curMember)
+
+        //刷新用户列表
+        updateMembersShow(b_memberList, b_curMember)
+    }
+    //更新房间成员列表top5
+    var updateMembersShow = function( memberList, curUser){
+
+        var showMembers = '';
+        var index = 0;
+
+        for(var userId in memberList){
+            if(index >= b_maxShowMember){
+                break;
+            }
+            var m_info = memberList[userId];
+            var m_name = m_info.name;
+            var m_pic = m_info.pic
+            var m_status = m_info.user_status;
+            if(m_pic.length <=0 ){
+                m_pic = '__STATIC__/plugs/proom/img/wawa/test1.jpg';
+            }
+
+            var m_span = '<span class="title">' + m_name + '</span>';
+            var m_img = '<img src=' + m_pic + '>';
+            var m_a = '<a >' + m_img + '</a>';
+            var m_li = '<li data-menuanchor="">' + m_a + m_span + '</li>';
+
+            showMembers = showMembers + m_li;
+            index = index + 1;
+
+        }
+
+        $('.quser').append(showMembers);
+    }
+
+    //消息弹幕显示
+    var chatMsgShow = function(msg, pic){
+
+        var item={
+            //img:'https://wx.qlogo.cn/mmopen/vi_32/59N1W94GAWc0WBiaT4IsS9CTvI5Pa08icWpeCogH86zmedYW8GrTDxZK3Z9lD8Yoqb7ibHCGafGo4EyfOVTwFyPRA/0', //图片
+            img: pic,
+            info:msg, //文字
+            href:'', //链接
+            close:true, //显示关闭按钮
+            speed:6, //延迟,单位秒,默认6
+            //bottom:200, //距离底部高度,单位px,默认随机
+            color:'#fff', //颜色,默认白色
+            old_ie_color:'#000000' //ie低版兼容色,不能与网页背景相同,默认黑色
+        }
+        $('body').barrager(item);
+
+        var m_span = '<span >' + msg + '</span>';
+        var m_li = '<li>' + m_span + '</li>';
+        var showMsg = m_li;
+
+        $('.chat_msg').append(showMsg);
+        return showMsg;
     }
 
 

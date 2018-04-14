@@ -190,12 +190,17 @@ class Index extends BasicBaby
 
         foreach ($list as &$vo) {
             //转换为中文字符
-            if($vo['status'] == 0){
+            if($vo['status'] == BABY_ROOM_STATUS_BUILD){
+                $vo['status_c'] = '修建中';
+            }elseif($vo['status'] == BABY_ROOM_STATUS_ON){
                 $vo['status_c'] = '空闲';
-            }else{
-                $vo['status_c'] = '游戏中';
+            }elseif($vo['status'] == BABY_ROOM_STATUS_BUSY){
+                $vo['status_c'] = '正在游戏';
+            }elseif($vo['status'] == BABY_ROOM_STATUS_OFF){
+                $vo['status_c'] = '维护';
             }
-            if($vo['tag'] == 0){
+
+            if($vo['tag'] == BABY_ROOM_MODEL_COM){
                 $vo['tag_c'] = '普通模式';
             }else{
                 $vo['tag_c'] = '英雄模式';
