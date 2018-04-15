@@ -3,6 +3,7 @@
 namespace controller;
 
 use service\DataService;
+use service\ErrorCode;
 use think\Controller;
 use think\Db;
 use think\db\Query;
@@ -226,6 +227,44 @@ class BasicBaby extends Controller
 
     }
 
+    /**
+     * 更新用户信息 更新用户金额
+     * @param string $userId 用户ID
+     * @param arrary $userInfo
+     * @return int
+     */
+    public static function updateUserInfo($userId, $userInfo){
+        Log::info("updateUserInfo: start user_id= " . $userId);
+
+        $db_user = Db::name('TUserConfig');
+        $data_user = array();
+
+        $userArr = $db_user->where('user_id', $userId)->find();
+        if($userArr && ($userArr['user_id'] == $userId ) ){
+            $data_user['id'] = $userArr['id'];
+
+            foreach($userArr as $key => $value){
+                if( isset($userInfo[$key]) ){
+                    $data_user[$key] = $userInfo[$key];
+                }
+            }
+            $jsonData = json_encode($data_user);
+            Log::info("updateUserInfo: update userInfo= " . $jsonData );
+            $result = DataService::save($db_user, $data_user);
+
+        }
+
+        if($result){
+            Log::info("updateUserInfo: end ok user_id= " . $userId );
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("updateUserInfo: end failed user_id= " . $userId );
+            $result = ErrorCode::E_ROOM_UPDATE_FAIL;
+        }
+
+        return $result;
+
+    }
 
     ////////////////////////////////////end 用户管理 相关函数////////////////////////////////////
 
@@ -611,6 +650,188 @@ class BasicBaby extends Controller
             Log::error("freeUserCoin: end failed userId= " . $userId);
         }
 
+    }
+
+    /**
+     * 消费用户金币 娃娃币
+     * @param string $userId   用户ID
+     * @param int $num   金币数量
+     * @param int $coinType  金币类型  默认消耗娃娃币
+     * @param string $orderId   消费订单ID 返回参数
+     * @return int
+     */
+    protected function employUserCoin($userId, $num, $reason='', $remark='', $coinType=ErrorCode::BABY_EMPLOY_TYPE_FREE, &$orderId){
+        Log::info("employUserCoin: start user_id=" . $userId . ' num=' . $num);
+
+        //金币数量检查
+        if( !is_numeric($num) ){
+            Log::error("employUserCoin: coin num is not int num=" . $num);
+            return ErrorCode::E_USER_EMPLOY_COIN_ERROR;
+        }
+        if( $num <= 0 ){
+            Log::error("employUserCoin: coin num too low num=" . $num);
+            return ErrorCode::E_USER_EMPLOY_COIN_ERROR;
+        }
+
+        //获取用户信息
+        $userInfo = self::getUserInfo($userId);
+        if( empty($userInfo) ){
+            Log::error("employUserCoin: user info not found user_id=" . $userId);
+            return ErrorCode::E_USER_NOT_FOUND;
+        }
+
+        Log::info("employUserCoin: user_id= " . $userId
+            . ' coin= ' . $userInfo['coin'] . ' free_coin= ' . $userInfo['free_coin']);
+
+        $userCoin = isset($userInfo['coin']) ? $userInfo['coin'] : 0;
+        $userFreeCoin = isset($userInfo['free_coin']) ? $userInfo['free_coin'] : 0;
+
+        $userAllCoins = $userCoin + $userFreeCoin;  //总金额
+        $tmpUseCoin = 0;   //临时消耗金额 用于娃娃币不足的情况
+        $lastCoin = $userCoin;                //扣费后的金币  初始值为当前用户数量
+        $lastFreeCoin = $userFreeCoin;        //扣费后的娃娃币  初始值为当前用户数量
+
+        if($userAllCoins < $num){
+            Log::error("employUserCoin: all coin not more num=" . $num . ' all coin=' . $userAllCoins);
+            return ErrorCode::E_USER_EMPLOY_COIN_ERROR;
+        }
+
+        if(ErrorCode::BABY_EMPLOY_TYPE_FREE == $coinType){
+            //消费娃娃币
+            if($userFreeCoin < $num){
+                //娃娃币不足
+                $lastFreeCoin = 0;
+                $tmpUseCoin = $num - $userFreeCoin;
+
+                Log::info("employUserCoin: tmpUseCoin= " . $tmpUseCoin
+                    . ' info= ' . ErrorCode::$ERR_MSG[ErrorCode::E_USER_FREE_COIN_LACK]);
+
+                if($userCoin < $tmpUseCoin){
+                    //一般不会进入此分支 金币不足的情况
+                    Log::error("employUserCoin: ???!!!why pull this error!!!??? tmpUseCoin= " . $tmpUseCoin . ' userCoin=' . $userCoin
+                        . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_USER_COIN_LACK]);
+                    return ErrorCode::E_USER_COIN_LACK;
+                }
+
+                $lastCoin = $userCoin - $tmpUseCoin;    //扣除 娃娃币剩下的金币
+
+            }else{
+                //娃娃币充足 直接扣费
+                $lastFreeCoin = $userFreeCoin - $num;
+            }
+
+
+        }elseif( ErrorCode::BABY_EMPLOY_TYPE_COIN == $coinType ){
+            //只消费金币
+            if($userCoin < $num){
+                Log::error("employUserCoin: num= " . $num . ' userCoin=' . $userCoin
+                    . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_USER_COIN_LACK]);
+                return ErrorCode::E_USER_COIN_LACK;
+            }
+
+            $lastCoin = $userCoin - $num;
+
+        }else{
+            //暂时不支持的消费模式
+            Log::error("employUserCoin: num= " . $num . ' userCoin=' . $userCoin
+                . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_NOT_SUPPORT]);
+            return ErrorCode::E_NOT_SUPPORT;
+        }
+
+        //检查扣费是否正确
+        $downNum = ($userCoin + $userFreeCoin) - $lastCoin - $lastFreeCoin;
+        Log::info("employUserCoin: num= " . $num . ' downNum=' . $downNum
+            . ' userCoin=' . $userCoin  . ' userFreeCoin=' . $userFreeCoin
+            . ' lastCoin=' . $lastCoin  . ' lastFreeCoin=' . $lastFreeCoin);
+
+        if($downNum != $num){
+            //扣费金额计算错误
+            Log::error("employUserCoin: num= " . $num . ' downNum=' . $downNum
+                . ' userCoin=' . $userCoin  . ' userFreeCoin=' . $userFreeCoin
+                . ' lastCoin=' . $lastCoin  . ' lastFreeCoin=' . $lastFreeCoin
+                . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_USER_COUNT_COIN_ERROR]);
+            return ErrorCode::E_USER_COUNT_COIN_ERROR;
+        }
+
+        $data_user = array();
+        $billCoin = 0;       //消费订单记录 金币数量
+        $billFreeCoin = 0;   //消费订单记录 娃娃币数量
+        //扣费 保存数组
+        if( $userFreeCoin > $lastFreeCoin ){
+            //更新娃娃币
+            $data_user['free_coin'] = $lastFreeCoin;
+            $billFreeCoin = $userFreeCoin - $lastFreeCoin;
+        }
+        if( $userCoin > $lastCoin ){
+            //更新金币
+            $data_user['coin'] = $lastCoin;
+            $billCoin = $userCoin - $lastCoin;
+        }
+
+        if( count($data_user) <= 0){
+            Log::error("employUserCoin: data_user error! num= " . $num . ' downNum=' . $downNum
+                . ' userCoin=' . $userCoin  . ' userFreeCoin=' . $userFreeCoin
+                . ' lastCoin=' . $lastCoin  . ' lastFreeCoin=' . $lastFreeCoin
+                . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_USER_COUNT_COIN_ERROR]);
+            return ErrorCode::E_USER_COUNT_COIN_ERROR;
+        }
+
+        //扣费 更新数据库
+        $result = self::updateUserInfo($userId, $data_user);
+        if(ErrorCode::CODE_OK != $result){
+            Log::error("employUserCoin: update user coin error num=" . $num . ' all coin=' . $userAllCoins);
+            return $result;
+        }
+
+        //保存消费记录
+        $orderId = self::createTmpSeq(12);
+        self::updateUserBill($userId, $orderId, $billCoin, $billFreeCoin, $reason, $remark);
+
+        if(ErrorCode::CODE_OK == $result){
+            Log::info("employUserCoin: end ok user_id= " . $userId );
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("employUserCoin: end failed user_id= " . $userId );
+            $result = ErrorCode::E_USER_EMPLOY_COIN_ERROR;
+        }
+
+        return $result;
+    }
+
+    /**
+     * 更新消费订单表
+     * @param string $userId   用户ID
+     * @param int $coinType  金币类型  默认消耗娃娃币
+     * @param int $num   金币数量
+     * @return bool
+     */
+    protected function updateUserBill($userId, $orderId, $coin, $freeCoin, $reason, $remark){
+        Log::info("updateUserBill: start user_id= " . $userId);
+
+        $db_bill = Db::name('TUserBill');
+        $data_bill = array(
+            'user_id' => $userId,
+            'order_id' => $orderId,
+            'coin' => $coin,
+            'free_coin' => $freeCoin,
+            'reason' => $reason,
+            'remark' => $remark,
+        );
+
+        $jsonData = json_encode($data_bill);
+        Log::info("updateUserBill: update user bill= " . $jsonData );
+        $result = DataService::save($db_bill, $data_bill);
+
+
+
+        if($result){
+            Log::info("updateUserBill: end ok user_id= " . $userId );
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("updateUserBill: end failed user_id= " . $userId );
+            $result = ErrorCode::E_ROOM_UPDATE_FAIL;
+        }
+        return $result;
     }
 
     ////////////////////////////////////end 支付 金币 相关函数 ////////////////////////////////////

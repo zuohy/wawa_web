@@ -101,6 +101,45 @@ class RoomService
     }
 
     /**
+     * 更新房间状态 房间成员状态
+     * @param string $roomId 房间ID
+     * @param arrary $roomInfo
+     * @return int
+     */
+    public static function updateRoomInfo($roomId, $roomInfo){
+        Log::info("updateRoomInfo: start room_id= " . $roomId);
+
+        $db_room = Db::name('TRoomInfo');
+        $data_room = array();
+
+        $roomArr = $db_room->where('room_id', $roomId)->find();
+        if($roomArr && ($roomArr['room_id'] == $roomId ) ){
+            $data_room['id'] = $roomArr['id'];
+
+            foreach($roomArr as $key => $value){
+                if( isset($roomInfo[$key]) ){
+                    $data_room[$key] = $roomInfo[$key];
+                }
+            }
+            $jsonData = json_encode($data_room);
+            Log::info("updateRoomInfo: update roomInfo= " . $jsonData );
+            $result = DataService::save($db_room, $data_room);
+
+        }
+
+        if($result){
+            Log::info("updateRoomInfo: end ok room_id= " . $roomId );
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("updateRoomInfo: end failed room_id= " . $roomId );
+            $result = ErrorCode::E_ROOM_UPDATE_FAIL;
+        }
+
+        return $result;
+
+    }
+
+    /**
      * 获取房间成员信息
      * @param string $roomId 房间ID
      * @return bool|string
@@ -122,6 +161,46 @@ class RoomService
     }
 
     /**
+     * 更新房间成员信息 房间成员状态
+     * @param string $roomId 房间ID
+     * @param arrary $roomInfo
+     * @return int
+     */
+    public static function updateMemberInfo($roomId, $userId, $memberInfo){
+        Log::info("updateMemberInfo: start room_id= " . $roomId . ' user_id=' . $userId);
+
+        $db_member = Db::name('TRoomMemberInfo');
+        $data_member = array();
+
+        $memberArr = $db_member->where('user_id', $userId)->find();
+        if($memberArr && ($memberArr['user_id'] == $userId ) ){
+            $data_member['id'] = $memberArr['id'];
+
+            foreach($memberArr as $key => $value){
+                if( isset($memberInfo[$key]) ){
+                    $data_member[$key] = $memberInfo[$key];
+                }
+            }
+            $jsonData = json_encode($data_member);
+            Log::info("updateMemberInfo: update memberInfo= " . $jsonData );
+            $result = DataService::save($db_member, $data_member);
+
+        }
+
+        if($result){
+            Log::info("updateMemberInfo: end ok user_id= " . $userId );
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("updateMemberInfo: end failed user_id= " . $userId );
+            $result = ErrorCode::E_ROOM_UPDATE_FAIL;
+        }
+
+        return $result;
+
+    }
+
+
+    /**
      * 获取房间信息
      * @param string $roomId 房间ID
      * @param string $userId 当前成员ID
@@ -132,7 +211,7 @@ class RoomService
     {
         $db_member = Db::name('TRoomMemberInfo');
 
-        $memberArr = $db_member->where('room_id', $roomId)->where('user_status>'. BABY_ROOM_MEMBER_STATUS_OUT)
+        $memberArr = $db_member->where('room_id', $roomId)->where('user_status>'. ErrorCode::BABY_ROOM_MEMBER_STATUS_OUT)
             ->order('user_status desc')              //正在游戏的成员排在第一位
             ->order('update_at desc')                //按最晚进入房间排序
             ->select();
@@ -151,7 +230,7 @@ class RoomService
 
         //获取当前成员信息
         if($userId){
-            $memberInfo = $db_member->where('room_id', $roomId)->where('user_status>'. BABY_ROOM_MEMBER_STATUS_OUT)
+            $memberInfo = $db_member->where('room_id', $roomId)->where('user_status>'. ErrorCode::BABY_ROOM_MEMBER_STATUS_OUT)
                 ->where('user_id', $userId)
                 ->find();
             $isFound = false;
@@ -215,7 +294,7 @@ class RoomService
             'user_id'=> $userId,
             'name'=> $userInfo['name'],
             'pic'=> $userInfo['pic'],
-            'user_status'=> BABY_ROOM_MEMBER_STATUS_IN,
+            'user_status'=> ErrorCode::BABY_ROOM_MEMBER_STATUS_IN,
             'c_client_id' => $clientId,
             'update_at'=> date('Y-m-d H:m:s')
         );
@@ -226,9 +305,9 @@ class RoomService
             //找到用户信息 查看是否更换房间
             if($roomId != $memberArr['room_id']){
                 //更换房间
-                if(BABY_ROOM_MEMBER_STATUS_RUN == $memberArr['user_status']){
+                if(ErrorCode::BABY_ROOM_MEMBER_STATUS_RUN == $memberArr['user_status']){
                     //异常情况 记录log
-                    Log::error("joinRoom: user is gaming status= " . BABY_ROOM_MEMBER_STATUS_RUN. ' user_id= ' . $userId . ' room_id= ' . $roomId);
+                    Log::error("joinRoom: user is gaming status= " . ErrorCode::BABY_ROOM_MEMBER_STATUS_RUN. ' user_id= ' . $userId . ' room_id= ' . $roomId);
                 }
                 Log::info("joinRoom: user change room from room_id= " . $memberArr['room_id'] . ' to room_id= ' . $roomId);
             }
@@ -269,6 +348,98 @@ class RoomService
         return self::$roomInfo;
     }
 
+
+    /**
+     * 更新房间状态 房间成员状态
+     * @param string $roomId 房间ID
+     * @param string $userId 房间ID
+     * @param int $status 房间状态
+     * @return int
+     */
+    public static function updateGameStatus($roomId, $userId, $roomStatus){
+        Log::info("updateGameStatus: start room_id= " . $roomId . ' user_id= ' . $userId . ' roomStatus=' . $roomStatus);
+
+        if( ErrorCode::BABY_ROOM_STATUS_ON == $roomStatus ){
+            $roomInfo['status'] = ErrorCode::BABY_ROOM_STATUS_ON;
+            $memberInfo['user_status'] = ErrorCode::BABY_ROOM_MEMBER_STATUS_IN;
+        }elseif ( ErrorCode::BABY_ROOM_STATUS_BUSY == $roomStatus ){
+            $roomInfo['status'] = ErrorCode::BABY_ROOM_STATUS_BUSY;
+            $memberInfo['user_status'] = ErrorCode::BABY_ROOM_MEMBER_STATUS_RUN;
+        }else{
+            Log::error("updateGameStatus: end failed not support status= " . $roomStatus . ' room_id' . $roomId . ' user_id= ' . $userId);
+            $result = ErrorCode::E_ROOM_STATUS_UPDATE_ERROR;
+            return $result;
+        }
+
+        //更新房间状态 成员状态
+        $result = self::updateRoomInfo($roomId, $roomInfo);
+        if($result != ErrorCode::CODE_OK){
+            Log::error("updateGameStatus: end failed room_id= " . $roomId . ' user_id= ' . $userId);
+            $result = ErrorCode::E_ROOM_STATUS_UPDATE_ERROR;
+            return $result;
+        }
+
+        $result = self::updateMemberInfo($roomId, $userId, $memberInfo);
+        if($result != ErrorCode::CODE_OK){
+            Log::error("updateGameStatus: end failed room_id= " . $roomId . ' user_id= ' . $userId);
+            $result = ErrorCode::E_ROOM_STATUS_UPDATE_ERROR;
+            return $result;
+        }
+
+        if($result == ErrorCode::CODE_OK){
+            Log::info("updateGameStatus: end ok room_id= " . $roomId . ' user_id= ' . $userId);
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("updateGameStatus: end failed room_id= " . $roomId . ' user_id= ' . $userId);
+            $result = ErrorCode::E_ROOM_STATUS_UPDATE_ERROR;
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * 更新抓取结果
+     * @param string $roomId 房间ID
+     * @param string $userId 房间ID
+     * @param int $status 房间状态
+     * @return int
+     */
+    public static function updateGameResult($roomId, $userId, $isCatch, $orderId){
+        Log::info("updateGameResult: start room_id= " . $roomId
+            . 'user_id=' . $userId . ' order_id=' . $orderId  . ' is_catch=' . $isCatch);
+
+        $tmpRoom = self::getRoomInfo($roomId);
+        $giftId = isset($tmpRoom['gift_id']) ? $tmpRoom['gift_id'] : '';
+        $tmpMember = self::getMemberInfo($roomId, $userId);
+        $memberName = isset($tmpMember['name']) ? $tmpMember['name'] : '';
+        $memberPic = isset($tmpMember['pic']) ? $tmpMember['pic'] : '';
+
+        $db_result = Db::name('TRoomGameResult');
+        $data_result = array(
+            'order_id' => $orderId,
+            'room_id' => $roomId,
+            'user_id' => $userId,
+            'name' => $memberName,
+            'pic' => $memberPic,
+            'gift_id' => $giftId,
+            'result' => $isCatch,
+            //'status' => '1',  //默认为寄存中
+
+        );
+
+        $result = DataService::save($db_result, $data_result);
+        if($result){
+            Log::info("updateGameResult: end ok room_id= " . $roomId
+                . ' user_id=' . $userId . ' order_id=' . $orderId  . ' is_catch=' . $isCatch);
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("updateGameResult: end failed room_id= " . $roomId
+                . ' user_id=' . $userId . ' order_id=' . $orderId  . ' is_catch=' . $isCatch);
+            $result = ErrorCode::E_ROOM_UPDATE_FAIL;
+        }
+        return $result;
+    }
 
     private function _generateRandomString($length = 10, $addSpaces = true, $addNumbers = true)
     {
@@ -330,6 +501,28 @@ class RoomService
         }
 
 
+    }
+
+    /**
+     * gateWayBuildMsg   构造gateway 消息
+     * @param string $type 消息类型
+     * @param string $content 消息内容
+     * @param array $para 消息参数
+     * @return bool|string
+     */
+    public static function gateWayBuildMsg($type, $content, $para=array()){
+
+        //保证参数中一定有 code
+        $para['code'] = isset($para['code']) ? $para['code'] : ErrorCode::CODE_OK;
+
+        $chatArr = array(
+            'type' => $type,
+            'content' => $content,
+            'para' => $para
+        );
+        // 向网站页面发送数据
+        $chatData = json_encode($chatArr);
+        return $chatData;
     }
 
     //////////////////////////end gateway function//////////////////////////////////////////

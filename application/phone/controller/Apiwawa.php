@@ -52,6 +52,8 @@ class Apiwawa extends BasicBaby
         $cmdType = isset($jPack['type']) ? $jPack['type'] : '';
 
         Log::info("index: http rev msg type= " . $cmdType);
+        $logRevMsg = json_encode($jPack);
+        Log::info("index: http rev msg= " . $logRevMsg);
 
 
         // 处理接口消息
@@ -165,28 +167,129 @@ class Apiwawa extends BasicBaby
                 if($retStatus != ErrorCode::CODE_OK){
                     $this->retMsg['code'] = $retStatus;
                     $this->retMsg['msg'] = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_CLIENT_ERROR, $retStatus);
-                    Log::error("index: join room error retMsg= " . $this->retMsg['msg']);
-
-                }
-
-                //通知房间所有用户 不能投币操作
-
-                break;
-            case 'dev_notify_coins':
-                $userId = isset($jPack['user_id']) ? $jPack['user_id'] : '';
-                $roomId = isset($jPack['room_id']) ? $jPack['room_id'] : '';
-                $coinsStatus = isset($jPack['status']) ? $jPack['status'] : ErrorCode::E_DEV_COINS_STATUS_ERROR;
-                if($coinsStatus != ErrorCode::CODE_OK){
-                    //投币失败 通知用户
+                    Log::error("index: dev_user_auth error retMsg= " . $this->retMsg['msg']);
                     break;
                 }
 
-                //投币成功 更新房间成员状态，房间状态，扣除用户金币 娃娃币
+                //通知房间所有用户 不能投币操作
+                $showMsg = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_INFO, ErrorCode::I_USER_INSERT_COINS_FROZEN);
+                $paraArr = array(
+                    'notify_type' => 'insert_coins_frozen',
+                );
+                $chatData = RoomService::gateWayBuildMsg('notify_msg', $showMsg, $paraArr);
+                RoomService::gateWaySendMsg($roomId, '', $chatData);
+                break;
+            case 'dev_notify_coins':
+                //设备投币是否成功，并通知房间用户，页面更新控件显示
+                $userId = isset($jPack['user_id']) ? $jPack['user_id'] : '';
+                $roomId = isset($jPack['room_id']) ? $jPack['room_id'] : '';
+                $price = isset($jPack['price']) ? $jPack['price'] : 0;
+                $coinsStatus = isset($jPack['status']) ? $jPack['status'] : ErrorCode::E_DEV_COINS_STATUS_ERROR;
+
+                if($coinsStatus != ErrorCode::CODE_OK){
+                    //投币失败 通知用户
+                    $paraArr = array(
+                        'notify_type' => 'dev_notify_coins',
+                        'code' => $coinsStatus
+                    );
+                    $showMsg = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_CLIENT_ERROR, ErrorCode::E_DEV_COINS_STATUS_ERROR);
+                    $chatData = RoomService::gateWayBuildMsg('notify_msg', $showMsg, $paraArr);
+                    RoomService::gateWaySendMsg('', $userId, $chatData);
+
+                    $this->retMsg['code'] = $coinsStatus;
+                    $this->retMsg['msg'] = ErrorCode::$ERR_MSG[$coinsStatus];
+                    Log::error("index: dev_notify_coins error retMsg= " . $this->retMsg['msg']);
+                    break;
+                }
+
+                //投币成功 更新房间成员状态，房间状态
+                $retStatus = RoomService::updateGameStatus($roomId, $userId, ErrorCode::BABY_ROOM_STATUS_BUSY);
+                if($retStatus != ErrorCode::CODE_OK){
+                    $this->retMsg['code'] = $retStatus;
+                    $this->retMsg['msg'] = ErrorCode::$ERR_MSG[$retStatus];
+                    Log::error("index: dev_notify_coins error retMsg= " . $this->retMsg['msg']);
+                    break;
+                }
+
+                $tmpRoomInfo = RoomService::getRoomInfo($roomId);
+                $needCoin = isset($tmpRoomInfo['price']) ? $tmpRoomInfo['price'] : 0;
+                if($needCoin != $price){
+                    $this->retMsg['code'] = ErrorCode::E_USER_INSERT_COIN_ERROR;
+                    $this->retMsg['msg'] = ErrorCode::$ERR_MSG[ErrorCode::E_USER_INSERT_COIN_ERROR];
+                    Log::error("index: dev_notify_coins error retMsg= " . $this->retMsg['msg'] . ' needCoin=' . $needCoin . ' price=' .$price);
+                    break;
+                }
+                //扣除用户金币 娃娃币
+                $orderId = '';
+                $retStatus = $this->employUserCoin($userId, $needCoin, ErrorCode::BABY_EMPLOY_REASON_1, '普通消费', ErrorCode::BABY_EMPLOY_TYPE_FREE, $orderId);
+                if($retStatus != ErrorCode::CODE_OK){
+                    $this->retMsg['code'] = $retStatus;
+                    $this->retMsg['msg'] = ErrorCode::$ERR_MSG[$retStatus];
+                    Log::error("index: dev_notify_coins error retMsg= " . $this->retMsg['msg']);
+                    break;
+                }
+
+                //消费订单ID 返回设备服务器
+                $retData = array(
+                    'order_id' => $orderId,
+                );
+                $this->retMsg['data'] = $retData;
 
                 //通知所有用户当前不能投币
+                $showMsg = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_INFO, ErrorCode::I_USER_INSERT_COINS_FROZEN);
+                $paraArr = array(
+                    'notify_type' => 'insert_coins_frozen',
+                );
+                $chatData = RoomService::gateWayBuildMsg('notify_msg', $showMsg, $paraArr);
+                RoomService::gateWaySendMsg($roomId, '', $chatData);
 
                 //通知当前用户可以操作游戏
+                $paraArr = array(
+                    'notify_type' => 'dev_notify_coins',
+                );
+                $showMsg = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_CLIENT_ERROR, ErrorCode::CODE_OK);
+                $chatData = RoomService::gateWayBuildMsg('notify_msg', $showMsg, $paraArr);
+                RoomService::gateWaySendMsg('', $userId, $chatData);
 
+                break;
+            case 'dev_notify_result':
+                //收到设备服务器抓取结果
+                $userId = isset($jPack['user_id']) ? $jPack['user_id'] : '';
+                $roomId = isset($jPack['room_id']) ? $jPack['room_id'] : '';
+                $orderId = isset($jPack['order_id']) ? $jPack['order_id'] : '';
+                $isCatch = isset($jPack['is_catch']) ? $jPack['is_catch'] : ErrorCode::BABY_CATCH_FAIL;
+
+                //更新抓取结果记录
+                $retStatus = RoomService::updateGameResult($roomId, $userId, $isCatch, $orderId);
+                if($retStatus != ErrorCode::CODE_OK){
+                    $this->retMsg['code'] = $retStatus;
+                    $this->retMsg['msg'] = ErrorCode::$ERR_MSG[$retStatus];
+                    Log::error("index: dev_notify_result error retMsg= " . $this->retMsg['msg']);
+                }
+
+                $retStatus = RoomService::updateGameStatus($roomId, $userId, ErrorCode::BABY_ROOM_STATUS_ON);
+                if($retStatus != ErrorCode::CODE_OK){
+                    $this->retMsg['code'] = $retStatus;
+                    $this->retMsg['msg'] = ErrorCode::$ERR_MSG[$retStatus];
+                    Log::error("index: dev_notify_result error retMsg= " . $this->retMsg['msg']);
+                }
+
+                //通知用户抓取结果
+                if( ErrorCode::BABY_CATCH_SUCCESS == $isCatch){
+                    $showMsg = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_INFO, ErrorCode::I_USER_CATCH_SUCCESS);
+                }else{
+                    $showMsg = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_INFO, ErrorCode::I_USER_CATCH_FAIL);
+                }
+                $paraArr = array(
+                    'notify_type' => 'dev_notify_result',
+                );
+
+                $chatData = RoomService::gateWayBuildMsg('notify_msg', $showMsg, $paraArr);
+                RoomService::gateWaySendMsg('', $userId, $chatData);
+
+                //通知房间所有用户 抓取结果
+                $chatData = RoomService::gateWayBuildMsg('chat_msg', $showMsg);
+                RoomService::gateWaySendMsg($roomId, '', $chatData);
 
                 break;
             default:
@@ -327,7 +430,7 @@ class Apiwawa extends BasicBaby
         $tmpRoom = RoomService::getRoomInfo($roomId);
         $roomStatus = isset($tmpRoom['status']) ? $tmpRoom['status'] : '';
         $roomPrice = isset($tmpRoom['price']) ? $tmpRoom['price'] : '';
-        if(BABY_ROOM_STATUS_ON != $roomStatus){
+        if(ErrorCode::BABY_ROOM_STATUS_ON != $roomStatus){
             //房间状态不正确
             Log::error("_dev_authUser: room_id= " . $roomId . ' status= '. $roomStatus
                 . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_ROOM_STATUS_ERROR]);
@@ -343,7 +446,7 @@ class Apiwawa extends BasicBaby
         //获取房间成员信息 状态是否为正常状态
         $tmpMember = RoomService::getMemberInfo($roomId, $userId);
         $memberStatus = isset($tmpMember['user_status']) ? $tmpMember['user_status'] : '';
-        if(BABY_ROOM_MEMBER_STATUS_IN != $memberStatus){
+        if(ErrorCode::BABY_ROOM_MEMBER_STATUS_IN != $memberStatus){
             //房间成员状态不正确
             Log::error("_dev_authUser: room_id= " . $roomId . ' user_id= '. $userId
                 . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_ROOM_USER_STATUS_ERROR]);
@@ -354,6 +457,14 @@ class Apiwawa extends BasicBaby
         $tmpUser = $this->getUserInfo($userId);
         $userCoin = isset($tmpUser['coin']) ? $tmpUser['coin'] : 0;
         $userFreeCoin = isset($tmpUser['free_coin']) ? $tmpUser['free_coin'] : 0;
+        $userAllCoins = $userCoin + $userFreeCoin;  //总金额
+
+        if($userAllCoins < $roomPrice){
+            Log::error("_dev_authUser: all coin not more roomPrice=" . $roomPrice . ' all coin=' . $userAllCoins
+                . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_USER_FREE_COIN_LACK]);
+            return ErrorCode::E_USER_FREE_COIN_LACK;
+        }
+/*
         if($roomPrice > $userFreeCoin){
             //用户娃娃币不足
             Log::error("_dev_authUser: user_id= " . $userId
@@ -364,7 +475,7 @@ class Apiwawa extends BasicBaby
             Log::error("_dev_authUser: user_id= " . $userId
                 . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_USER_COIN_LACK]);
             return ErrorCode::E_USER_COIN_LACK;
-        }
+        }*/
 
         return ErrorCode::CODE_OK;
     }

@@ -308,7 +308,7 @@
                         <li>
                             <a title="Message" href="#contact/message"><i class="ion ion-email"></i></a>
                         </li>
-                        <li><a href="#" class="trigger-info" data-iziToast>Info</a></li>
+                        <li><a id="notify_info" href="#" class="trigger-info" data-iziToast>Info</a></li>
                         <li><a href="#" class="trigger-custom2" data-iziToast>custom2</a></li>
 
                     </ul>
@@ -583,6 +583,15 @@
 
 
                 break;
+            case 'notify_msg':
+                var notifyMsg = data.content;
+                var notifyData = data.para;
+                var notifyType = notifyData.notify_type;
+                var notifyCode = notifyData.code;
+
+                handleNotifyMsg(notifyType, notifyCode, notifyMsg);
+
+                break;
             case 'exit_room':
                     //在chat_msg 中处理
                 break;
@@ -597,6 +606,14 @@
 
     }
 
+    //处理 notify_msg 消息 页面控件处理
+    var handleNotifyMsg= function(notifyType, $notifyCode, $notifyMsg){
+        $('#notify_info').click();
+        $('.trigger-info').click();
+        alert('type:'+ notifyType + ' code:' + $notifyCode + ' msg:' + $notifyMsg);
+
+
+    }
 
     //初始化房间服务器信息
     var initRoomServers = function( retData ){

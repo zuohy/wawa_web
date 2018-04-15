@@ -29,17 +29,17 @@ define('WAWA_COIN_TYPE_REG1', 1);   //充值类型1
 define('WAWA_COIN_TYPE_REG2', 2);   //充值类型2
 define('WAWA_COIN_TYPE_SHARE', 20);   //分享类型
 
-define('BABY_ROOM_MEMBER_STATUS_OUT', 1);   //未进入房间
-define('BABY_ROOM_MEMBER_STATUS_IN', 2);   //进入房间
-define('BABY_ROOM_MEMBER_STATUS_RUN', 3);   //正在游戏
+//define('BABY_ROOM_MEMBER_STATUS_OUT', 1);   //未进入房间
+//define('BABY_ROOM_MEMBER_STATUS_IN', 2);   //进入房间
+//define('BABY_ROOM_MEMBER_STATUS_RUN', 3);   //正在游戏
 
-define('BABY_ROOM_STATUS_BUILD', 0);   //修建中
-define('BABY_ROOM_STATUS_ON', 1);   //空闲
-define('BABY_ROOM_STATUS_BUSY', 2);   //忙碌 游戏
-define('BABY_ROOM_STATUS_OFF', 3);   //下线 维护
+//define('BABY_ROOM_STATUS_BUILD', 0);   //修建中
+//define('BABY_ROOM_STATUS_ON', 1);   //空闲
+//define('BABY_ROOM_STATUS_BUSY', 2);   //忙碌 游戏
+//define('BABY_ROOM_STATUS_OFF', 3);   //下线 维护
 
-define('BABY_ROOM_MODEL_COM', 0);   //普通模式
-define('BABY_ROOM_MODEL_HERO', 1);   //英雄模式
+//define('BABY_ROOM_MODEL_COM', 0);   //普通模式
+//define('BABY_ROOM_MODEL_HERO', 1);   //英雄模式
 /**
  * 打印输出数据到文件
  * @param mixed $data
