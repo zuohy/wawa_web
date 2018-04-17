@@ -117,14 +117,15 @@ class Apiwawa extends BasicBaby
 
                 $userName = $tmpMembers[$userId]['name'];
                 $userPic = $tmpMembers[$userId]['pic'];
-                $noteMsg = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_INFO, ErrorCode::I_USER_JOIN_ROOM); //ErrorCode::$INFO_MSG[ErrorCode::I_USER_JOIN_ROOM];
+                $showMsg = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_INFO, ErrorCode::I_USER_JOIN_ROOM); //ErrorCode::$INFO_MSG[ErrorCode::I_USER_JOIN_ROOM];
                 // 向uid的网站页面发送数据
-                $chatArr = array(
-                    'type' => 'chat_msg',
-                    'content' => $userName . ': ' . $noteMsg,
+                $paraArr = array(
+                    'notify_type' => 'join_room',
+                    'move_member' =>  $tmpMembers[$userId],   //进入房间的用户信息 通知房间所有人
+                    'name' => $userName,
                     'pic' => $userPic
                 );
-                $chatData = json_encode($chatArr);
+                $chatData = RoomService::gateWayBuildMsg('chat_msg', $showMsg, $paraArr);
                 RoomService::gateWaySendMsg($roomId, '', $chatData);
                 break;
             case 'chat_msg':
@@ -133,14 +134,14 @@ class Apiwawa extends BasicBaby
                 $userInfo = $this->getUserInfo($userId);
                 $name = isset($userInfo['name']) ? $userInfo['name'] : '';
                 $pic = isset($userInfo['pic']) ? $userInfo['pic'] : '';
+                $showMsg = isset($jPack['content']) ? $jPack['content'] : '';
 
-                $chatArr = array(
-                    'type' => 'chat_msg',
-                    'content' => $jPack['content'],
+                $paraArr = array(
+                    'name' => $name,
                     'pic' => $pic
                 );
                 // 向任意群组的网站页面发送数据
-                $chatData = json_encode($chatArr);
+                $chatData = RoomService::gateWayBuildMsg('chat_msg', $showMsg, $paraArr);
                 RoomService::gateWaySendMsg($roomId, '', $chatData);
                 break;
             case 'exit_room':
@@ -149,13 +150,18 @@ class Apiwawa extends BasicBaby
                 $userInfo = $this->getUserInfo($userId);
                 $name = isset($userInfo['name']) ? $userInfo['name'] : '';
                 $pic = isset($userInfo['pic']) ? $userInfo['pic'] : '';
+
+                //更新房间成员状态
+                RoomService::updateMemberStatus($roomId, $userId, ErrorCode::BABY_ROOM_MEMBER_STATUS_OUT);
+
                 $showMsg = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_INFO, ErrorCode::I_USER_EXIT_ROOM);
-                $chatArr = array(
-                    'type' => 'chat_msg',
-                    'content' => $name . $showMsg,
-                    'pic' => $pic
+                $paraArr = array(
+                    'notify_type' => 'exit_room',
+                    'name' => $name,
+                    'pic' => $pic,
+                    'move_member' =>  $userInfo,   //退出房间的用户信息 通知房间所有人
                 );
-                $chatData = json_encode($chatArr);
+                $chatData = RoomService::gateWayBuildMsg('chat_msg', $showMsg, $paraArr);
                 RoomService::gateWaySendMsg($roomId, '', $chatData);
                 break;
             case 'dev_user_auth':
@@ -168,6 +174,14 @@ class Apiwawa extends BasicBaby
                     $this->retMsg['code'] = $retStatus;
                     $this->retMsg['msg'] = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_CLIENT_ERROR, $retStatus);
                     Log::error("index: dev_user_auth error retMsg= " . $this->retMsg['msg']);
+                    //通知当前用户 投币失败
+                    $showMsg = $this->retMsg['msg']; //ErrorCode::buildMsg(ErrorCode::MSG_TYPE_INFO, ErrorCode::I_USER_INSERT_COINS_FROZEN);
+                    $paraArr = array(
+                        'code' => $retStatus,
+                        'notify_type' => 'dev_user_auth',
+                    );
+                    $chatData = RoomService::gateWayBuildMsg('notify_msg', $showMsg, $paraArr);
+                    RoomService::gateWaySendMsg('', $userId, $chatData);
                     break;
                 }
 
@@ -236,9 +250,14 @@ class Apiwawa extends BasicBaby
                 $this->retMsg['data'] = $retData;
 
                 //通知所有用户当前不能投币
+                $tmpMemberInfo = $this->getUserInfo($userId);
+                $name = isset($tmpMemberInfo['name']) ? $tmpMemberInfo['name'] : '';
+                $pic = isset($tmpMemberInfo['pic']) ? $tmpMemberInfo['pic'] : '';
                 $showMsg = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_INFO, ErrorCode::I_USER_INSERT_COINS_FROZEN);
                 $paraArr = array(
                     'notify_type' => 'insert_coins_frozen',
+                    'name' => $name,
+                    'pic' => $pic,
                 );
                 $chatData = RoomService::gateWayBuildMsg('notify_msg', $showMsg, $paraArr);
                 RoomService::gateWaySendMsg($roomId, '', $chatData);
@@ -246,6 +265,8 @@ class Apiwawa extends BasicBaby
                 //通知当前用户可以操作游戏
                 $paraArr = array(
                     'notify_type' => 'dev_notify_coins',
+                    'name' => $name,
+                    'pic' => $pic,
                 );
                 $showMsg = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_CLIENT_ERROR, ErrorCode::CODE_OK);
                 $chatData = RoomService::gateWayBuildMsg('notify_msg', $showMsg, $paraArr);
@@ -280,15 +301,23 @@ class Apiwawa extends BasicBaby
                 }else{
                     $showMsg = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_INFO, ErrorCode::I_USER_CATCH_FAIL);
                 }
+
                 $paraArr = array(
                     'notify_type' => 'dev_notify_result',
                 );
-
                 $chatData = RoomService::gateWayBuildMsg('notify_msg', $showMsg, $paraArr);
                 RoomService::gateWaySendMsg('', $userId, $chatData);
 
                 //通知房间所有用户 抓取结果
-                $chatData = RoomService::gateWayBuildMsg('chat_msg', $showMsg);
+                $tmpMemberInfo = $this->getUserInfo($userId);
+                $name = isset($tmpMemberInfo['name']) ? $tmpMemberInfo['name'] : '';
+                $pic = isset($tmpMemberInfo['pic']) ? $tmpMemberInfo['pic'] : '';
+                $paraArr = array(
+                    'notify_type' => 'dev_notify_result',
+                    'name' => $name,
+                    'pic' => $pic,
+                );
+                $chatData = RoomService::gateWayBuildMsg('chat_msg', $showMsg, $paraArr);
                 RoomService::gateWaySendMsg($roomId, '', $chatData);
 
                 break;

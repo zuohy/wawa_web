@@ -1,13 +1,7 @@
 {extend name="extra@phone/main"}
 
 {block name="body"}
-<style>
 
-    body{
-        background: #f4f5f8;
-        background: url('__STATIC__/plugs/phone//images/cover_bg.jpg');
-    }
-</style>
 
 <!--banner-->
 <div id="carousel-example-generic" class="carousel slide banner" data-ride="carousel">
@@ -99,7 +93,12 @@
 <div class="product">
     {foreach $list as $key=>$vo}
     <div class="sp_pr">
+        {if $vo.status eq '0' || $vo.status eq '3'}
+        <a href="#">
+        {else}
         <a data-href='{:url("phone/room/index")}?room_id={$vo.room_id}' href="javascript:void(0)">
+        {/if}
+
 
             {if $vo.room_pic eq ''}
             <img src="__STATIC__/plugs/proom/img/bg-default.jpg">
@@ -131,6 +130,7 @@
             {/if}
 
         </a>
+        </a>
     </div>
     {/foreach}
 
@@ -151,7 +151,7 @@
             var g_shu=$(".scroll a").length;
             var u_shu=g_shu*t_shu+g_shu*28+'px';
             $(".scroll").css({width:u_shu});
-            var Scroll = new iScroll('wrapper',{hScrollbar:false, vScrollbar:false,hScroll:true,vScroll:false,});
+            var Scroll = new iScroll('wrapper',{hScrollbar:false, vScrollbar:false,hScroll:true,vScroll:false});
         })
 
     </script>

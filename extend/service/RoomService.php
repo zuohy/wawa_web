@@ -218,8 +218,8 @@ class RoomService
         if($memberArr){
 
             foreach($memberArr as $key => $user){
-                if($key >= 5){
-                    //只需要最新的5条记录
+                if($key >= 4){
+                    //只需要最新的3条记录
                     break;
                 }
                 $memKey = $user['user_id'];
@@ -348,6 +348,47 @@ class RoomService
         return self::$roomInfo;
     }
 
+    /**
+     * 更新 房间成员状态
+     * @param string $roomId 房间ID
+     * @param string $userId 房间成员ID
+     * @param int $status 房间成员状态
+     * @return int
+     */
+    public static function updateMemberStatus($roomId, $userId, $memberStatus){
+        Log::info("updateMemberStatus: start room_id= " . $roomId . ' user_id= ' . $userId . ' memberStatus=' . $memberStatus);
+
+        if( ErrorCode::BABY_ROOM_MEMBER_STATUS_IN == $memberStatus ){
+            $memberInfo['user_status'] = ErrorCode::BABY_ROOM_MEMBER_STATUS_IN;
+        }elseif ( ErrorCode::BABY_ROOM_MEMBER_STATUS_RUN == $memberStatus ){
+            $memberInfo['user_status'] = ErrorCode::BABY_ROOM_MEMBER_STATUS_RUN;
+        }elseif ( ErrorCode::BABY_ROOM_MEMBER_STATUS_OUT == $memberStatus ){
+            $memberInfo['user_status'] = ErrorCode::BABY_ROOM_MEMBER_STATUS_OUT;
+        }else{
+            Log::error("updateMemberStatus: end failed not support status= " . $memberStatus . ' room_id' . $roomId . ' user_id= ' . $userId);
+            $result = ErrorCode::E_ROOM_USER_STATUS_ERROR;
+            return $result;
+        }
+
+        //更新房间成员状态
+        $result = self::updateMemberInfo($roomId, $userId, $memberInfo);
+        if($result != ErrorCode::CODE_OK){
+            Log::error("updateMemberStatus: end failed room_id= " . $roomId . ' user_id= ' . $userId);
+            $result = ErrorCode::E_ROOM_USER_STATUS_ERROR;
+            return $result;
+        }
+
+        if($result == ErrorCode::CODE_OK){
+            Log::info("updateMemberStatus: end ok room_id= " . $roomId . ' user_id= ' . $userId);
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("updateMemberStatus: end failed room_id= " . $roomId . ' user_id= ' . $userId);
+            $result = ErrorCode::E_ROOM_USER_STATUS_ERROR;
+        }
+
+        return $result;
+
+    }
 
     /**
      * 更新房间状态 房间成员状态

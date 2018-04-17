@@ -23,7 +23,7 @@
 <header class="header-top">
 
     <div class="menu clearfix">
-        <a onclick="chat_send('exit_room')" data-href='{:url("phone/index/main")}' href="javascript:void(0)">退出<i class="ion ion-reply-all"></i></a>
+        <a id="exit_room" onclick="chat_send('exit_room')" data-href='{:url("phone/index/main")}' href="javascript:void(0)">退出<i class="ion ion-reply-all"></i></a>
 
         <!-- Add other menu similar to "about" here -->
         <a href="#contact">contact</a>
@@ -125,7 +125,7 @@
 <div class="pane-when " id="s-when">
     <div class="content">
         <!-- Clock -->
-        <div class="clock clock-countdown" id="m_sec" style="display: none">
+        <div class="clock clock-countdown hidden" id="m_sec" >
             <div class="site-config"
                  data-date="10/30/2016 00:00:00"
                  data-date-timezone="+0"
@@ -184,17 +184,19 @@
 
                     <div class="contact" style="height: 60px">
                        <div id="m_coins" class="contact" style="text-align:center; ">
-
                            <a url={$control_url|default=''} data-coins='{"type":"publish","room_id":{$room_id},"user_id":{$user_id}, "price":{$price}, "to":"abc"}' class="button button-glow button-rounded button-highlight">投币<br>({$price}个)</a>
                        </div>
-                       <div id="m_catch" class="contact" style="text-align:center; display: none">
+                        <div id="m_coins_none" class="contact hidden" style="text-align:center;">
+                            <a class="button disabled button-glow button-rounded button-highlight">请等待<br>({$price}个)</a>
+                        </div>
+                       <div id="m_catch" class="contact hidden" style="text-align:center;">
                            <a url={$control_url|default=''} data-coins='{"type":"control","to":"g"}' class="button button-glow button-border button-rounded button-primary">
                                Go
                            </a>
                        </div>
                    </div>
 
-                <div id="m_control" class="contact" style="text-align:center; display: none">
+                <div id="m_control" class="contact hidden" style="text-align:center;">
 
                     <div class="row" >
                         <button class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","to":"u"}' data-up='{"type":"control","to":"ur"}'>
@@ -298,7 +300,7 @@
         <div class="slide" id="s-information" data-anchor="information">
             <section class="content">
                 <header class="p-title">
-                    <h3>Contact<i class="ion ion-location">
+                    <h3>发言<i class="ion ion-location">
                     </i>
                     </h3>
                     <ul class="buttons">
@@ -308,8 +310,6 @@
                         <li>
                             <a title="Message" href="#contact/message"><i class="ion ion-email"></i></a>
                         </li>
-                        <li><a id="notify_info" href="#" class="trigger-info" data-iziToast>Info</a></li>
-                        <li><a href="#" class="trigger-custom2" data-iziToast>custom2</a></li>
 
                     </ul>
                 </header>
@@ -320,14 +320,14 @@
 
                                 <div class="fields clearfix">
                                     <div class="input">
-                                        <label for="content">say </label>
+                                        <label for="content">说 </label>
                                         <input id="content" class="email_f"  name="content"  required placeholder="message" ></div>
                                     <div class="buttons">
                                         <button id="submit-msg" class="button email_b" name="submit_msg">Ok</button>
                                     </div>
                                 </div>
                             </form>
-                        <button class="button " style="display: none" onclick="testFun()">111</button>
+                        <button class="button"   onclick="testFun()">111</button>
                     </div>
                 </div>
                 <!-- End of page SubSection -->
@@ -395,7 +395,7 @@
 
 <!-- Javascript toast files -->
 <link rel="stylesheet" href="__STATIC__/plugs/proom/js/izitoast/iziToast.css?ver={:date('ymd')}">
-<script src="__STATIC__/plugs/proom/js/izitoast/iziToastHandle.js?ver={:date('ymd')}"></script>
+<!-- <script src="__STATIC__/plugs/proom/js/izitoast/iziToastHandle.js?ver={:date('ymd')}"></script>  -->
 
 <!-- Javascript barrager files -->
 <link rel="stylesheet" href="__STATIC__/plugs/proom/js/izibarrager/barrager.css?ver={:date('ymd')}">
@@ -447,29 +447,10 @@
     //房间长连接全局变量
     var ws_chat=null, name, client_list={};
 
-    var testFun;
+    var chat_send, testFun;
 
-
+    require(['proom.toast', 'proom.barrager'], function (iziToast) {
     $(function(){
-
-        // 提交弹幕
-        function onRunBarrager() {
-            var item={
-                img:'__STATIC__/plugs/proom/img/wawa/test1.jpg', //图片
-                info:'欢迎加入房间', //文字
-                href:'', //链接
-                close:true, //显示关闭按钮
-                speed:6, //延迟,单位秒,默认6
-                bottom:300, //距离底部高度,单位px,默认随机
-                color:'#fff', //颜色,默认白色
-                old_ie_color:'#000000' //ie低版兼容色,不能与网页背景相同,默认黑色
-            }
-            $('body').barrager(item);
-
-
-        }
-        onRunBarrager()
-
 
         var reqData = {type:'room_servers'}
         $.ajax("{:url('phone/apiwawa/index')}", {
@@ -486,27 +467,6 @@
             }
         });
 
-
-    });
-
-    require(['proom.barrager'], function (barrager) {
-
-        testFun = function (){
-
-            var item={
-                img:'__STATIC__/plugs/proom/img/wawa/test1.jpg', //图片
-                info:'弹幕文字信息', //文字
-                href:'', //链接
-                close:true, //显示关闭按钮
-                speed:6, //延迟,单位秒,默认6
-                //bottom:200, //距离底部高度,单位px,默认随机
-                color:'#fff', //颜色,默认白色
-                old_ie_color:'#000000' //ie低版兼容色,不能与网页背景相同,默认黑色
-            }
-
-            $('body').barrager(item);
-
-        }
 
     });
 
@@ -532,7 +492,7 @@
 
     }
 
-    function chat_send(msgType){
+        chat_send = function(msgType){
         console.log("chat_send: msg type= ", msgType);
         if(null == ws_chat){
             console.log("chat_send: ws_chat is null");
@@ -546,6 +506,9 @@
 
                 }, 'json');
 
+                $('#exit_room').attr('data-href' , '{:url("phone/index/main")}')
+                $('#exit_room').attr('href' , 'javascript:void(0)')
+                //data-href='{:url("phone/index/main")}' href="javascript:void(0)"
                 break;
             default :
                 break;
@@ -579,8 +542,31 @@
                 break;
             case 'chat_msg':
                 //显示信息在页面控件
-                var msgList = chatMsgShow(data.content, data.pic);
+                var chatData = data.para;
+                var pic = chatData.pic;
+                var name = chatData.name;
+                var chatMsg =  name + ':' + data.content;
+                var msgList = chatMsgShow( chatMsg, pic );
 
+                var notifyType = chatData.notify_type;
+                if(notifyType == 'dev_notify_result'){
+                    //收到抓取结果 投币按钮
+                    showCoinsPage();
+
+                    //清除游戏用户头像
+                    updateMemberPic('game_down', '', '');
+
+                }else if(notifyType == 'join_room'){
+                   var tmpMember = chatData.move_member;
+
+                    //刷新用户列表
+                    updateMembersShow(b_memberList, b_curMember, tmpMember, 'join_room')
+                }else if(notifyType == 'exit_room'){
+                    var tmpMember = chatData.move_member;
+
+                    //刷新用户列表
+                    updateMembersShow(b_memberList, b_curMember, tmpMember, 'exit_room')
+                }
 
                 break;
             case 'notify_msg':
@@ -589,8 +575,11 @@
                 var notifyType = notifyData.notify_type;
                 var notifyCode = notifyData.code;
 
-                handleNotifyMsg(notifyType, notifyCode, notifyMsg);
+                handleNotifyMsg(notifyType, notifyCode, notifyMsg, notifyData);
 
+                break;
+            case 'join_room':
+                //在chat_msg 中处理
                 break;
             case 'exit_room':
                     //在chat_msg 中处理
@@ -607,13 +596,87 @@
     }
 
     //处理 notify_msg 消息 页面控件处理
-    var handleNotifyMsg= function(notifyType, $notifyCode, $notifyMsg){
-        $('#notify_info').click();
-        $('.trigger-info').click();
-        alert('type:'+ notifyType + ' code:' + $notifyCode + ' msg:' + $notifyMsg);
+    var handleNotifyMsg= function(notifyType, notifyCode, notifyMsg, notifyData){
+        console.log('type:'+ notifyType + ' code:' + notifyCode + ' msg:' + notifyMsg);
+
+        switch (notifyType){
+            case 'dev_user_auth':
+                if(notifyCode != 0){
+                    //投币失败
+                    toastInfo('topCenter', '投币失败', notifyMsg);
+                    showCoinsPage();
+                    break;
+                }
+                break;
+            case 'insert_coins_frozen':
+                    //用户认证中 认证成功 投币按钮失效 所有用户
+                if(notifyCode != 0){
+                    //投币失败
+                    //toastInfo('topCenter', '投币失败', notifyMsg);
+                    showCoinsPage();
+                    break;
+                }
+                    showWaitPage();
+
+                    //显示游戏用户头像
+                    updateMemberPic('game_up', notifyData.name, notifyData.pic);
+                break;
+            case 'dev_notify_coins':
+                    //投币成功 显示控制按钮  当前用户
+                    if(notifyCode != 0){
+                        //投币失败
+                        toastInfo('topCenter', '投币失败', notifyMsg);
+                        showCoinsPage();
+                        break;
+                    }
+                    showControlPage();
+
+                    //显示游戏用户头像
+                    updateMemberPic('game_up', notifyData.name, notifyData.pic);
+
+                break;
+            case 'dev_notify_result':
+                    //收到抓取结果 投币按钮
+                showCoinsPage();
+                toastInfo('center', '抓取结果', notifyMsg);
+
+                    //清除游戏用户头像
+                    updateMemberPic('game_down', '', '');
+                break;
+            default :
+                break;
+        }
 
 
     }
+
+        var showCoinsPage = function(){
+            $('#m_coins').removeClass('hidden');
+
+            $('#m_coins_none').addClass('hidden');
+            $('#m_catch').addClass('hidden');
+            $('#m_control').addClass('hidden');
+            $('#m_sec').addClass('hidden');
+
+
+        }
+        var showControlPage = function(){
+            $('#m_sec').removeClass('hidden');
+            $('#m_catch').removeClass('hidden');
+            $('#m_control').removeClass('hidden');
+
+            $('#m_coins_none').addClass('hidden');
+            $('#m_coins').addClass('hidden');
+        }
+        var showWaitPage = function(){
+            $('#m_coins_none').removeClass('hidden');
+
+            $('#m_coins').addClass('hidden');
+            $('#m_catch').addClass('hidden');
+            $('#m_control').addClass('hidden');
+            $('#m_sec').addClass('hidden');
+
+        }
 
     //初始化房间服务器信息
     var initRoomServers = function( retData ){
@@ -636,29 +699,85 @@
         console.log('b_curMember:')
         console.log(b_curMember)
 
+        onRunBarrager(1, '', '欢迎加入房间');
+
+        //根据房间状态 控制按钮显示
+        if(b_roomInfo.status != 1){
+            //不在空闲状态
+            showWaitPage();
+        }
+
         //刷新用户列表
-        updateMembersShow(b_memberList, b_curMember)
+        updateMembersShow(b_memberList, b_curMember, '', '')
     }
+
+        //设置 或清除游戏用户头像
+    var updateMemberPic = function(type, userName, userPic){
+
+        //更新头像
+        if('game_up' == type){
+            var imgSrc = userPic;
+
+        }else{
+            imgSrc = '__STATIC__/plugs/proom/img/logo_only.png';
+        }
+
+        var m_span = '<span class="title">' + userName + '</span>';
+        var m_img = '<img src=' + imgSrc + '>';
+        var m_a = '<a >' + m_img + '</a>';
+
+        var showGamePic = m_a + m_span;
+
+        $('.logo').html(showGamePic);
+    }
+
     //更新房间成员列表top5
-    var updateMembersShow = function( memberList, curUser){
+    var updateMembersShow = function( memberList, curUser, movUser, type){
 
         var showMembers = '';
         var index = 0;
+
+        if( null == memberList &&  '' == memberList ){
+            return;
+        }
+
+        if(movUser){
+            //新加入房间用户 将此用户放在第一位
+            if( 'join_room' == type ){
+                memberList[movUser.user_id] = movUser;
+
+            }
+
+        }
 
         for(var userId in memberList){
             if(index >= b_maxShowMember){
                 break;
             }
-            var m_info = memberList[userId];
-            var m_name = m_info.name;
-            var m_pic = m_info.pic
-            var m_status = m_info.user_status;
-            if(m_pic.length <=0 ){
-                m_pic = '__STATIC__/plugs/proom/img/wawa/test1.jpg';
+
+            var u_info = memberList[userId];
+            var u_name = u_info.name;
+            var u_pic = u_info.pic
+            var u_status = u_info.user_status;
+            if(u_pic.length <=0 ){
+                u_pic = '__STATIC__/' + b_roomInfo.room_pic;
             }
 
-            var m_span = '<span class="title">' + m_name + '</span>';
-            var m_img = '<img src=' + m_pic + '>';
+            if(movUser){
+                //退出房间用户 将此用户删除
+               if( 'exit_room' == type ){
+                    var movUserId = movUser.user_id;
+                    if(userId == movUserId){
+                        delete memberList[userId]
+                        continue;
+                    }
+
+                }
+                //
+            }
+
+            var m_span = '<span class="title">' + u_name + '</span>';
+            var m_img = '<img src=' + u_pic + '>';
             var m_a = '<a >' + m_img + '</a>';
             var m_li = '<li data-menuanchor="">' + m_a + m_span + '</li>';
 
@@ -667,24 +786,13 @@
 
         }
 
-        $('.quser').append(showMembers);
+        $('.quser').html(showMembers);
     }
 
     //消息弹幕显示
     var chatMsgShow = function(msg, pic){
 
-        var item={
-            //img:'https://wx.qlogo.cn/mmopen/vi_32/59N1W94GAWc0WBiaT4IsS9CTvI5Pa08icWpeCogH86zmedYW8GrTDxZK3Z9lD8Yoqb7ibHCGafGo4EyfOVTwFyPRA/0', //图片
-            img: pic,
-            info:msg, //文字
-            href:'', //链接
-            close:true, //显示关闭按钮
-            speed:6, //延迟,单位秒,默认6
-            //bottom:200, //距离底部高度,单位px,默认随机
-            color:'#fff', //颜色,默认白色
-            old_ie_color:'#000000' //ie低版兼容色,不能与网页背景相同,默认黑色
-        }
-        $('body').barrager(item);
+        onRunBarrager(0, pic, msg);
 
         var m_span = '<span >' + msg + '</span>';
         var m_li = '<li>' + m_span + '</li>';
@@ -702,6 +810,120 @@
 
     }
 
+    /////////
+    iziToast.settings({
+        timeout: 3000,
+        // position: 'center',
+        // imageWidth: 50,
+        pauseOnHover: true,
+        // resetOnHover: true,
+        close: true,
+        progressBar: true
+        // layout: 1,
+        // balloon: true,
+        // target: '.target',
+        // icon: 'material-icons',
+        // iconText: 'face',
+        // animateInside: false,
+        // transitionIn: 'flipInX',
+        // transitionOut: 'flipOutX',
+    });
+        var toastInfo = function(position, title, msg){
+            iziToast.info({
+                title: title,
+                message: msg,
+                // imageWidth: 70,
+                position: position, //'topCenter',
+                //position: 'bottomLeft',
+                transitionIn: 'bounceInRight',
+                // rtl: true,
+                //iconText: 'star',
+                onOpen: function(){
+                    console.log('callback abriu! info');
+                },
+                onClose: function(){
+                    console.log("callback fechou! info");
+                }
+            });
+        }
+
+        var toastCustom2 = function(position, pic, title, msg){
+
+            if( pic.length <= 0){
+                pic = '__STATIC__/' + b_roomInfo.room_pic;
+            }
+            iziToast.show({
+                class: 'test',
+                color: 'dark',
+                icon: 'icon-contacts',
+                title: title,
+                message: msg,
+                position: position, //'topCenter',
+                transitionIn: 'flipInX',
+                transitionOut: 'flipOutX',
+                progressBarColor: 'rgb(0, 255, 184)',
+                image: pic,
+                imageWidth: 70,
+                layout:2,
+                onClose: function(){
+                    console.info('onClose');
+                },
+                iconColor: 'rgb(0, 255, 184)'
+            });
+        }
+
+        var onRunBarrager = function(posType, pic, msg){
+            // 提交弹幕
+            var pos = 300;   //固定距离底部高度300px
+
+            if( pic.length <= 0){
+                pic = '__STATIC__/' + b_roomInfo.room_pic;
+            }
+            var item={
+                img: pic, //图片
+                info: msg, //文字
+                href:'', //链接
+                close:true, //显示关闭按钮
+                speed:6, //延迟,单位秒,默认6
+                //bottom:300, //距离底部高度,单位px,默认随机
+                color:'#fff', //颜色,默认白色
+                old_ie_color:'#000000' //ie低版兼容色,不能与网页背景相同,默认黑色
+            }
+            if(posType){
+                item.bottom = pos;
+            }
+            $('body').barrager(item);
+
+        }
+
+        testFun = function (){
+
+            var item={
+                img:'__STATIC__/plugs/proom/img/wawa/test1.jpg', //图片
+                info:'弹幕文字信息', //文字
+                href:'', //链接
+                close:true, //显示关闭按钮
+                speed:6, //延迟,单位秒,默认6
+                //bottom:200, //距离底部高度,单位px,默认随机
+                color:'#fff', //颜色,默认白色
+                old_ie_color:'#000000' //ie低版兼容色,不能与网页背景相同,默认黑色
+            }
+
+            $('body').barrager(item);
+
+            toastInfo('center', 'test title', 'test msg');
+            toastCustom2('topCenter', '', 'test title', 'test custom msg');
+
+
+        }
+        /////////
+
+
+    }); //require(['proom.toast', 'proom.barrager'], function (iziToast) {
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     var onErrorFun = function(errorCode, errorStr){
 
         console.log("error reason:", errorStr);

@@ -215,15 +215,16 @@ define(['jquery', 'admin.plugs'], function () {
         //alert( "处理程序controlShow: "+ sendCmd );
 
         if(cmdObj.type == 'publish'){
-            $('#m_control').attr('style', 'text-align:center; display: ');
-            $('#m_catch').attr('style', 'text-align:center; display: ');
-            $('#m_coins').attr('style', 'display: none');
-            $('#m_sec').attr('style', 'display: ');
+
+            $('#m_coins').addClass('hidden');
+            $('#m_coins_none').removeClass('hidden');
+
         }else if(cmdObj.type == 'control'){
-            $('#m_control').attr('style', 'display: none');
-            $('#m_catch').attr('style', 'display: none');
-            $('#m_coins').attr('style', 'text-align:center; display: ');
-            $('#m_sec').attr('style', 'display: none');
+
+            $('#m_coins_none').removeClass('hidden');
+            $('#m_sec').addClass('hidden');
+            $('#m_control').addClass('hidden');
+            $('#m_catch').addClass('hidden');
         }
 
     }
