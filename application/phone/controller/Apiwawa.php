@@ -253,6 +253,8 @@ class Apiwawa extends BasicBaby
                 $tmpMemberInfo = $this->getUserInfo($userId);
                 $name = isset($tmpMemberInfo['name']) ? $tmpMemberInfo['name'] : '';
                 $pic = isset($tmpMemberInfo['pic']) ? $tmpMemberInfo['pic'] : '';
+                $coin = isset($tmpMemberInfo['coin']) ? $tmpMemberInfo['coin'] : '';
+                $free_coin = isset($tmpMemberInfo['free_coin']) ? $tmpMemberInfo['free_coin'] : '';
                 $showMsg = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_INFO, ErrorCode::I_USER_INSERT_COINS_FROZEN);
                 $paraArr = array(
                     'notify_type' => 'insert_coins_frozen',
@@ -267,6 +269,8 @@ class Apiwawa extends BasicBaby
                     'notify_type' => 'dev_notify_coins',
                     'name' => $name,
                     'pic' => $pic,
+                    'coin' => $coin,
+                    'free_coin' => $free_coin,
                 );
                 $showMsg = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_CLIENT_ERROR, ErrorCode::CODE_OK);
                 $chatData = RoomService::gateWayBuildMsg('notify_msg', $showMsg, $paraArr);

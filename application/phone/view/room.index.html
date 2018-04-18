@@ -162,8 +162,8 @@
                 <header class="p-title">
 
                     <h3>
-                        <a title="金币"><i class="ion ion-social-reddit-outline">{$coin}</i></a>
-                        <a title="娃娃币"><i class="ion ion-happy">{$free_coin}</i></a>
+                        <a title="金币"><i id="u_coin" class="ion ion-social-reddit-outline">{$coin}</i></a>
+                        <a title="娃娃币"><i id="u_free_coin" class="ion ion-happy">{$free_coin}</i></a>
                     </h3>
 
                     <ul class="buttons">
@@ -650,6 +650,9 @@
                     }
                     showControlPage();
                     myCountDown()
+                    //更新用户金币
+                    $('#u_coin').text(notifyData.coin);
+                    $('#u_free_coin').text(notifyData.free_coin);
                     //显示游戏用户头像
                     updateMemberPic('game_up', notifyData.name, notifyData.pic);
 
