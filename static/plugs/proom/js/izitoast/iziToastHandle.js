@@ -62,7 +62,7 @@ require(['proom.toast'], function (iziToast) {
             iconColor: 'rgb(0, 255, 184)'
         });
     });
-    
+
 });
 
 //

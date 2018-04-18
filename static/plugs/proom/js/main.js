@@ -26,7 +26,7 @@ $(window).load(function(){
 
 
 /* 1. Clock attribute */
-
+/*
 var dateReadableText = 'Upcoming date';
     if($('.site-config').attr('data-date-readable') && ($('.site-config').attr('data-date-readable') != '')){
         $('.timeout-day').text('');
@@ -35,18 +35,22 @@ var dateReadableText = 'Upcoming date';
     }
 $('.clock-countdown').downCount({
     date: $('.site-config').attr('data-date'),
-    offset: +10
+    offset: +18
 }, function () {
     //callback here if finished
-    //alert('YES, done!');
+    alert('YES, done!');
     var zerodayText = 'An upcoming date';
     if($('.site-config').attr('data-zeroday-text') && ($('.site-config').attr('data-zeroday-text') != '')){
         $('.timeout-day').text('');
         zerodayText = $('.site-config').attr('data-zeroday-text'); 
     }
     $('.timeout-day').text(zerodayText);
+    $('.days').text('00');
+    $('.hours').text('00');
+    $('.minutes').text('00');
+    $('.seconds').text('00');
 });
-
+*/
 
 /* 2. Background for page / section */
 
@@ -136,7 +140,7 @@ $(document).ready(function() {
 	/** Init fullpage.js */
     $('#mainpage').fullpage({
 		menu: '#qmenu',
-		anchors: ['control', 'home',  'register', 'about-us', 'contact'],
+		anchors: ['control', 'home', 'contact'],
 //        verticalCentered: false,
 //        resize : false,
 //		responsive: 900,
