@@ -38,6 +38,7 @@ class RoomService
     );
     public static $memberInfo = array(    //当前成员信息
         'room_id' => '',
+        'dev_room_id' => '',
         'user_id' => '',
         'name' => '',
         'pic' => '',
@@ -66,10 +67,10 @@ class RoomService
      * @param string $clientId 当前用户长连接 workman 的客户ID
      * @return bool|string
      */
-    public static function runRoom($roomId, $userId, $clientId){
+    public static function runRoom($roomId, $userId, $clientId, $devRoomId){
 
         $tmpRoom = self::getRoomInfo($roomId);
-        $ret = self::joinRoom($roomId, $userId, $clientId);
+        $ret = self::joinRoom($roomId, $userId, $clientId, $devRoomId);
         if( !empty($tmpRoom) ){
             self::getGiftInfo($tmpRoom['gift_id']);
         }
@@ -111,6 +112,7 @@ class RoomService
 
         $db_room = Db::name('TRoomInfo');
         $data_room = array();
+        $result = ErrorCode::E_ROOM_UPDATE_FAIL;
 
         $roomArr = $db_room->where('room_id', $roomId)->find();
         if($roomArr && ($roomArr['room_id'] == $roomId ) ){
@@ -171,6 +173,7 @@ class RoomService
 
         $db_member = Db::name('TRoomMemberInfo');
         $data_member = array();
+        $result = ErrorCode::E_ROOM_UPDATE_FAIL;
 
         $memberArr = $db_member->where('user_id', $userId)->find();
         if($memberArr && ($memberArr['user_id'] == $userId ) ){
@@ -276,9 +279,10 @@ class RoomService
      * @param string $roomId 房间ID
      * @param string $userId 房间ID
      * @param string $clientId 当前用户长连接 workman 的客户ID
+     * @param string $devRoomId 房间设备ID
      * @return int
      */
-    public static function joinRoom($roomId, $userId, $clientId)
+    public static function joinRoom($roomId, $userId, $clientId, $devRoomId)
     {
         //获取用户信息
         $db_user = Db::name('TUserConfig');
@@ -291,6 +295,7 @@ class RoomService
         }
 
         $data_member = array('room_id'=> $roomId,
+            'dev_room_id'=> $devRoomId,
             'user_id'=> $userId,
             'name'=> $userInfo['name'],
             'pic'=> $userInfo['pic'],

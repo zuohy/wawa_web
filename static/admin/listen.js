@@ -282,7 +282,7 @@ define(['jquery', 'admin.plugs'], function () {
     /*! 注册 data-down 事件行为 */
     this.$body.on('click', '[data-coins]', function () {
 
-        var controlUrl = 'http://120.77.61.179:2100/';
+        var controlUrl = $(this).attr('url'); //'http://120.77.61.179:2100/';
         var sendCmd = $(this).attr('data-coins');
 
         controlShow(sendCmd);

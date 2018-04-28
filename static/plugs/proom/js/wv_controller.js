@@ -87,7 +87,7 @@ videoController = function (config) {
     
     var SendSubscribe = function(stream){
         if(stream.role != USER_TYPE_PUBLISHER){
-            log.info("Not need to subscribe:", stream.role);
+            console.log("Not need to subscribe:", stream.role);
             return;
         }
         wsSocket.send(JSON.stringify({
@@ -95,7 +95,7 @@ videoController = function (config) {
                                      "stream": stream
                                      }), function(error){
                       if(error){
-                      log.info("Send message error:", error);
+                          console.log("Send message error:", error);
                       }
                       });
        	
@@ -120,7 +120,7 @@ videoController = function (config) {
                                          "streamid": localst.streamid
                                          }), function(error){
                           if(error){
-                          log.info("Send message error:", error);
+                              console.log("Send message error:", error);
                           }
                           });
             
@@ -137,7 +137,7 @@ videoController = function (config) {
                                          "streamid": localst.streamid
                                          }), function(error){
                           if(error){
-                          log.info("Send message error:", error);
+                              console.log("Send message error:", error);
                           }
                           });
         }
@@ -277,7 +277,7 @@ videoController = function (config) {
                                        "extramsg":extramsgobj
                                        }), function(error){
                       if(error){
-                      log.info("Send message error:", error);
+                          console.log("Send message error:", error);
                       }
                       });
             //          } else {
@@ -320,7 +320,7 @@ videoController = function (config) {
                                                             "msgname": "publish"
                                                             }), function(error){
                       if(error){
-                      log.info("Send message error:", error);
+                          console.log("Send message error:", error);
                       }
                       });
                                  });
@@ -379,7 +379,7 @@ videoController = function (config) {
                                                                           "data": desc
                                                                           }), function(error){
                       if(error){
-                      log.info("Send message error:", error);
+                          console.log("Send message error:", error);
                       }
                       });
                                                
@@ -575,11 +575,11 @@ videoController = function (config) {
                                          "streamid": localst.streamid
                                          }), function(error){
                       if(error){
-                      log.info("Send message error:", error);
+                          console.log("Send message error:", error);
                       }
                       }, function(error){
                       if(error){
-                      log.info("Send message error:", error);
+                          console.log("Send message error:", error);
                       }
                       });
        	}
@@ -634,7 +634,7 @@ videoController = function (config) {
             	                        "ismute": muteInfo.ismute
                                      }), function(error){
                       if(error){
-                      log.info("Send message error:", error);
+                          console.log("Send message error:", error);
                       }
                       }); 	
     };        	   		

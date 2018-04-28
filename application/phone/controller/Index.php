@@ -178,6 +178,29 @@ class Index extends BasicBaby
 
     }
 
+    /**
+     * 手机用户房间设备列表
+     * @return View
+     */
+    public function device()
+    {
+        $uRoomId = $this->request->get('room_id');
+        //$uRoomId = isset($uRoomId) ? $uRoomId : '';
+        Log::info("device: uRoomId= " . $uRoomId);
+
+        //保存用户房间ID
+        session('room_id', $uRoomId);
+
+        //拉取设备列表
+
+        $this->title = '设备列表' . $uRoomId;
+
+        $db = Db::name('TDevRoomInfo')->where(['is_deleted' => '0'])
+            ->whereBetween('dev_status', ["1", "2"]);
+
+        return parent::_list($db);
+
+    }
 
     /**
      * 列表数据处理
@@ -188,17 +211,28 @@ class Index extends BasicBaby
 
         foreach ($list as &$vo) {
             //转换为中文字符
-            if($vo['status'] == ErrorCode::BABY_ROOM_STATUS_BUILD){
+            $status = isset($vo['status']) ? $vo['status'] : '';
+            $dev_status = isset($vo['dev_status']) ? $vo['dev_status'] : '';
+            $tag = isset($vo['tag']) ? $vo['tag'] : '';
+            $dev_tag = isset($vo['dev_tag']) ? $vo['dev_tag'] : '';
+            if( $dev_status ){
+                $status = $dev_status;
+            }
+            if( $dev_tag ){
+                $tag = $dev_tag;
+            }
+
+            if( $status == ErrorCode::BABY_ROOM_STATUS_BUILD ){
                 $vo['status_c'] = '修建中';
-            }elseif($vo['status'] == ErrorCode::BABY_ROOM_STATUS_ON){
+            }elseif( $status == ErrorCode::BABY_ROOM_STATUS_ON ){
                 $vo['status_c'] = '空闲';
-            }elseif($vo['status'] == ErrorCode::BABY_ROOM_STATUS_BUSY){
+            }elseif( $status == ErrorCode::BABY_ROOM_STATUS_BUSY ){
                 $vo['status_c'] = '正在游戏';
-            }elseif($vo['status'] == ErrorCode::BABY_ROOM_STATUS_OFF){
+            }elseif( $status == ErrorCode::BABY_ROOM_STATUS_OFF ){
                 $vo['status_c'] = '维护';
             }
 
-            if($vo['tag'] == ErrorCode::BABY_ROOM_MODEL_COM){
+            if( $tag == ErrorCode::BABY_ROOM_MODEL_COM ){
                 $vo['tag_c'] = '普通模式';
             }else{
                 $vo['tag_c'] = '英雄模式';

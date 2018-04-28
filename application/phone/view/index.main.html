@@ -96,7 +96,7 @@
         {if $vo.status eq '0' || $vo.status eq '3'}
         <a href="#">
         {else}
-        <a data-href='{:url("phone/room/index")}?room_id={$vo.room_id}' href="javascript:void(0)">
+        <a data-href='{:url("phone/index/device")}?room_id={$vo.room_id}' href="javascript:void(0)">
         {/if}
 
 
@@ -124,9 +124,9 @@
                     {/if}
             </div>
             {if $vo.status eq 0}
-            <div class="jul" style="color: green;">{$vo.status_c}</div>
-            {else}
             <div class="jul" style="color: red;">{$vo.status_c}</div>
+            {else}
+            <div class="jul" style="color: green;">{$vo.status_c}</div>
             {/if}
 
         </a>

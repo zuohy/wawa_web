@@ -93,8 +93,8 @@
     </div> -->
     <!-- END OF Slideshow Background -->
     <div id="test" class="cover-bg pos-abs full-size">
-        <video id="remoteVideo" autoplay="autoplay"></video>
-        <video id="localVideo" autoplay="autoplay" muted="muted" style="height: 100px; width: 100px"></video>
+        <video id="remoteVideo" autoplay="autoplay" style="height: 80%;"></video>
+        <video class="hidden" id="localVideo" autoplay="autoplay" muted="muted" style="height: 100px; width: 100px"></video>
 
     </div>
     <!--BEGIN OF Static video bg  - uncomment below to use Video as Background-->
@@ -180,13 +180,13 @@
 
                     <div class="contact" style="height: 60px">
                        <div id="m_coins" class="contact" style="text-align:center; ">
-                           <a url={$control_url|default=''} data-coins='{"type":"publish","room_id":{$room_id},"user_id":{$user_id}, "price":{$price}, "to":"abc"}' class="button button-glow button-rounded button-highlight">投币<br>({$price}个)</a>
+                           <a url={$control_url|default=''} data-coins='{"type":"publish","room_id":"{$room_id}","dev_room_id":"{$dev_room_id}","user_id":"{$user_id}", "price":"{$price}", "to":"abc"}' class="button button-glow button-rounded button-highlight">投币<br>({$price}个)</a>
                        </div>
                         <div id="m_coins_none" class="contact hidden" style="text-align:center;">
                             <a class="button disabled button-glow button-rounded button-highlight">请等待<br>({$price}个)</a>
                         </div>
                        <div id="m_catch" class="contact hidden" style="text-align:center;">
-                           <a url={$control_url|default=''} data-coins='{"type":"control","to":"g"}' class="button button-glow button-border button-rounded button-primary">
+                           <a url={$control_url|default=''} data-coins='{"type":"control","dev_room_id":"{$dev_room_id}","to":"g"}' class="button button-glow button-border button-rounded button-primary">
                                Go
                            </a>
                        </div>
@@ -195,23 +195,23 @@
                 <div id="m_control" class="contact hidden" style="text-align:center;">
 
                     <div class="row" >
-                        <button class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","to":"u"}' data-up='{"type":"control","to":"ur"}'>
+                        <button class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","dev_room_id":"{$dev_room_id}","to":"u"}' data-up='{"type":"control","dev_room_id":"{$dev_room_id}","to":"ur"}'>
                             <img  id="top_1" src="__STATIC__/plugs/proom/img/m_up.png" alt="m_up">
                             <img  id="top_2" style="display: none;" src="__STATIC__/plugs/proom/img/m_up.png" alt="m_up">
                         </button>
                     </div>
                     <div class="row" >
-                        <button style="margin-left:0px;" class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","to":"l"}' data-up='{"type":"control","to":"lr"}'>
+                        <button style="margin-left:0px;" class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","dev_room_id":"{$dev_room_id}","to":"l"}' data-up='{"type":"control","dev_room_id":"{$dev_room_id}","to":"lr"}'>
                             <img  id="left_1" src="__STATIC__/plugs/proom/img/m_left.png" alt="m_left">
                             <img  id="left_2" style="display: none;" src="__STATIC__/plugs/proom/img/m_left.png" alt="m_left">
                         </button>
-                        <button style="margin-left:30px;" class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","to":"r"}' data-up='{"type":"control","to":"rr"}'>
+                        <button style="margin-left:30px;" class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","dev_room_id":"{$dev_room_id}","to":"r"}' data-up='{"type":"control","dev_room_id":"{$dev_room_id}","to":"rr"}'>
                             <img  id="right_1" src="__STATIC__/plugs/proom/img/m_right.png" alt="m_right">
                             <img  id="right_2" style="display: none; " src="__STATIC__/plugs/proom/img/m_right.png" alt="m_right">
                         </button>
                     </div>
                     <div class="row" >
-                        <button class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","to":"d"}' data-up='{"type":"control","to":"dr"}'>
+                        <button class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","dev_room_id":"{$dev_room_id}","to":"d"}' data-up='{"type":"control","dev_room_id":"{$dev_room_id}","to":"dr"}'>
                     <img  id="bottom_1" src="__STATIC__/plugs/proom/img/m_down.png" alt="m_down">
                     <img  id="bottom_2" style="display: none;" src="__STATIC__/plugs/proom/img/m_down.png" alt="m_down">
                     </button>
@@ -321,6 +321,7 @@
                                 </div>
                             </form>
                         <button class="button hidden"   onclick="testFun()">111</button>
+                        <button id="dev_info" class="button hidden" >{$dev_info}</button>
                     </div>
                 </div>
                 <!-- End of page SubSection -->
@@ -411,12 +412,9 @@
 
     //房间视频服务全局变量
     var Controller = null;
-    var roomName;
-    var serverUrl;
-    var serverPort;
     var qvgaConstraints  = {
-        audio: true,
-        video: false,
+        audio: false,
+        video: true,
         video: {
             mandatory: {
                 maxWidth: 352,
@@ -433,6 +431,7 @@
     var b_giftShow = null;  //房间商品展示图，作为房间背景图片
     var b_curMember = null;  //房间当前用户信息
     var b_maxShowMember = 3;  //top 成员最大个数
+    var b_deviceInfo = null;  //房间设备对象
 
     //房间长连接全局变量
     var ws_chat=null, name, client_list={};
@@ -442,7 +441,7 @@
     require(['proom.toast', 'proom.barrager', 'proom.downcount'], function (iziToast) {
     $(function(){
 
-        var reqData = {type:'room_servers'}
+       /* var reqData = {type:'room_servers'}
         $.ajax("{:url('phone/apiwawa/index')}", {
             dataType: 'json', method: 'post', data: {json: reqData},
             success: function (ret) {
@@ -455,7 +454,11 @@
                     chatStart(retData.wa_chat_url, retData.wa_chat_port)
                 }
             }
-        });
+        });*/
+
+        var devInfo = $('#dev_info').text();
+        b_deviceInfo = $.parseJSON(devInfo);
+        chatStart(b_deviceInfo.dev_chat_url, b_deviceInfo.dev_chat_port);
 
     });
 
@@ -528,6 +531,7 @@
                 $('#exit_room').attr('data-href' , '{:url("phone/index/main")}')
                 $('#exit_room').attr('href' , 'javascript:void(0)')
                 //data-href='{:url("phone/index/main")}' href="javascript:void(0)"
+                exitVideoRoom()
                 break;
             default :
                 break;
@@ -555,6 +559,7 @@
                         //返回房间服务器信息
                         var retData = retObj.data
                         initRoomInfo(retData)
+                        joinVideoRoom(b_deviceInfo.dev_room_id, b_deviceInfo.dev_video_url, b_deviceInfo.dev_video_port, b_curMember.user_id);
                     }
 
                 }, 'json');
@@ -700,10 +705,6 @@
 
         }
 
-    //初始化房间服务器信息
-    var initRoomServers = function( retData ){
-
-    }
 
     //初始化房间信息变量
     var initRoomInfo = function( retData ){
@@ -720,11 +721,13 @@
         console.log(b_giftShow)
         console.log('b_curMember:')
         console.log(b_curMember)
+        console.log('b_deviceInfo:')
+        console.log(b_deviceInfo)
 
         onRunBarrager(1, '', '欢迎加入房间');
 
         //根据房间状态 控制按钮显示
-        if(b_roomInfo.status != 1){
+        if(b_deviceInfo.dev_status != 1){
             //不在空闲状态
             showWaitPage();
         }
@@ -759,7 +762,7 @@
         var showMembers = '';
         var index = 0;
 
-        if( null == memberList &&  '' == memberList ){
+        if( null == memberList ||  '' == memberList ){
             return;
         }
 
@@ -830,13 +833,6 @@
         return showMsg;
     }
 
-
-    var controlStart = function(serverUrl, serverPort){
-
-    }
-    var videoStart = function(serverUrl, serverPort){
-
-    }
 
     /////////
     iziToast.settings({
@@ -951,7 +947,7 @@
 
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////video interface////////////////////////////////////////////////////////
     var onErrorFun = function(errorCode, errorStr){
 
         console.log("error reason:", errorStr);
@@ -965,7 +961,7 @@
 
     };
 
-    var joinVideoRoom = function(){
+    var joinVideoRoom = function(videoName, videoUrl, videoPort, userId){
         //start
         var videoList = [];
         var localPara = {};
@@ -989,11 +985,11 @@
             switch (onStatus){
                 case "InitReady":
                     console.log("InitReady");
-                    var roomName = 'wawa';
-                    var serverUrl = 'hqscs.com';
-                    var serverPort = '3004';
+                    var roomName = videoName;
+                    var serverUrl = videoUrl;
+                    var serverPort = videoPort;
                     var userType = '2';
-                    var userid = '001';
+                    var userid = userId;
                     var client_type = '1';
                     var extramsg = {"userType":userType, "userId":userid, "client_type":client_type};
                     console.log("extramsg: ", extramsg);

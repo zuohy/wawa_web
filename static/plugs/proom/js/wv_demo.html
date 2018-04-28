@@ -1,0 +1,245 @@
+<html>
+    <HEAD>
+    <SCRIPT Language="JavaScript" src="wv_controller.js"></SCRIPT>
+    </HEAD>	
+    <body>
+        Local: <br>
+        <video id="localVideo" autoplay="autoplay" muted="muted"></video><br>
+        Remote: <br>
+        <video id="remoteVideo" autoplay></video>
+        <input type='button' value='recording' onclick='recordvedio();' />
+        <input type='button' value='stoprecord' onclick='stoprecordvedio();' />
+        <input type='button' value='switchvideo' onclick='switchvideo();' />
+        <input type='button' value='joinroom' onclick='joinroom();' />
+        <input type='button' value='exitroom' onclick='exitroom();' />
+        <input type='button' value='roomid' onclick='testfun();' />
+        <input name="room_name" type="text" value="123" id="name" style="width:200px; height:20px;" />
+        <input name="serverurl" type="text" value="hqscs.com" id="serverurl" style="width:200px; height:20px;" />
+        <input name="serverport" type="text" value="3004" id="serverport" style="width:100px; height:20px;" />
+        <input name="usertype" type="text" value="2" id="usertype" style="width:100px"; height:20px;" />
+        <input name="userid" type="text" value="001" id="userid" style="width:100px"; height:20px;" />
+        <input name="client_type" type="text" value="1" id="client_type" style="width:100px"; height:20px;" />
+        <script>
+
+
+
+////////////////////////////main////////////////////////////////////////     
+    var Controller = null;
+    var roomName;
+    var serverUrl;
+    var serverPort;
+    var qvgaConstraints  = {
+          audio: true,
+          video: true,
+          video: {
+              mandatory: {
+                  maxWidth: 352,
+                  maxHeight: 288,
+                  maxFrameRate: 35
+              }
+          }
+    };    
+    var onErrorFun = function(errorCode, errorStr){
+
+      console.log("error reason:", errorStr);
+      if (errorCode != 0){
+      	if (Controller != null){
+          Controller.ExitRoom();
+          Controller = null;      	
+      	}
+      	
+      }   	
+    	
+    };
+    	
+     var joinroom = function(){
+         //start 
+         var videoList = [];
+         var localPara = {};
+         var remotePara = {};
+                  
+         localPara.isLocal = true;
+         localPara.view = "localVideo";
+         
+         videoList.push(localPara);
+         
+         remotePara.isLocal = false;
+         remotePara.view = "remoteVideo";
+         videoList.push(remotePara);
+            
+         if (Controller != null){
+           return;
+         }
+         Controller = videoController(qvgaConstraints);	
+     		 Controller.VideoInit(videoList, function(onStatus, param){
+     			
+     			switch (onStatus){
+     				case "InitReady":
+     				  console.log("InitReady");
+     				  var roomName = document.getElementById("name").value;
+     				  var serverUrl = document.getElementById("serverurl").value;
+     				  var serverPort = document.getElementById("serverport").value;
+     				  var userType = document.getElementById("usertype").value;
+     				  var userid = document.getElementById("userid").value;
+     				  var client_type = document.getElementById("client_type").value;
+     				  var extramsg = {"userType":userType, "userId":userid, "client_type":client_type};
+     				  console.log("extramsg: ", extramsg);
+     				  
+     				  Controller.JoinRoom(roomName, JSON.stringify(extramsg), serverUrl, serverPort, serverUrl, "3478", onErrorFun);
+     				  
+     				break;
+     				
+     				case"JoinRoom":
+     				console.log("JoinRoom");
+     				
+     				break;
+     				
+     				case"PeerConnected":
+     				console.log("PeerConnected");
+     				
+     				break;
+     				  			
+     				case"PeerMuteVideo":
+     				var isMute = param;
+     				console.log("PeerMuteVedio", isMute);
+     				break;
+     				
+     				case"MuteVideo":
+     				var isMute = param;
+     				console.log("MuteVedio", isMute);     				
+     				break;
+     				
+     				case"ExitRoom":
+     				console.log("ExitRoom");     				
+     				break;     				     				
+     				}
+     			
+     			});
+     		
+      }; 
+      
+     var recordvedio = function(){
+         //start record
+     		
+     		
+      }; 
+
+     var stoprecordvedio = function(){
+  	    
+     	};
+     
+     var isSwitchVideo = false;
+     var switchvideo = function(){
+     	   if (Controller == null){
+           return;
+         }
+         
+         Controller.MuteVideo();
+         isSwitchVideo = !isSwitchVideo;
+     };
+     	    	
+     var exitroom = function(){
+     	   if (Controller == null){
+           return;
+         }     	
+         Controller.ExitRoom();
+         Controller = null;
+     	};
+
+
+  var recordFiles = {};
+  var recordNums = [];
+  var today = '20160126';
+  var record = {};
+  record.room = '123';
+  record.roomNum = 1;
+  
+  var backupRecordNums = function(){
+  	 //if new date for record files
+  	 var newDate = true;   
+    
+     //new recordFiles as date
+     var recordDate = today;
+     record.roomNum =  record.roomNum + 1;
+     recordNums.push(record);
+     
+//	   for(recordDate in recordFiles)
+//	   {
+	 	   if (recordFiles.hasOwnProperty(recordDate))
+	 	   {
+	 	   	  console.log("info: record nums on today");
+          newDate = false; 	   	
+	  	 }
+//	   }
+
+     if(newDate == true)
+     {
+     	  recordFiles[recordDate] = recordNums;
+     	  console.log("info: new date for record, recordFiles=", recordFiles);
+     	  recordNums = [];
+     }
+
+  }    	               
+    var testfun = function(){
+    	today = '20160126';
+    	backupRecordNums();
+    	
+    	today = '20160127';
+    	backupRecordNums();
+    	today = '20160127';
+    	backupRecordNums();
+    	today = '20160127';
+    	backupRecordNums();
+    	today = '20160128';
+    	backupRecordNums();  	
+    	        //test code
+/*    	  var testobj = {};
+        var testarry = [];
+        var testiii = 3;      
+        var testmy1 = {};
+        var testmy2 = {};
+        testmy1.id = testiii;
+        testmy1.name = "111";
+        testmy2.id = testiii;
+        testmy2.name = "222";
+        
+        //test obj
+        testobj[testiii++] = testmy1;
+        testobj[testiii++] = testmy2;
+        testobj[testiii++] = testmy1;
+        
+        console.log("testobj", testobj);
+        var i;
+        for(i in testobj){
+        	if (testobj.hasOwnProperty(i)){
+        		console.log("testobj iii", i);
+        		console.log("testobj value", testobj[i]);
+        		var tttobj = testobj[i];
+        		if (i == 4){
+        			  tttobj.name = "ttt";
+        			  tttobj.id = 123;
+        			  if (testobj[i] == testmy1){
+        			  delete testobj[i];
+        		    }
+        			}
+        		
+        		}
+        	
+        	}
+        	
+        console.log("testobj", testobj);
+        
+        testarry.push(testmy1);
+        testarry.push(testmy2);
+        for (i=0; i<testarry.length; i++) {
+        	var testar = testarry[i];
+        	testarry.splice(i, 1);
+        	}
+        //test code end
+*/    	
+    	};
+
+                    
+        </script>
+    </body>
+</html>
