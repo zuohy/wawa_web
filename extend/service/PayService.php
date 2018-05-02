@@ -145,4 +145,57 @@ class PayService
         return $prepayinfo['prepayid'];
     }
 
+
+    ////////////////////////////////start 现金红包///////////////////////////////////////////////
+    /**
+     * 创建微信现金红包
+     * @param WechatPay $pay 支付SDK
+     * @param string $openid 微信用户openid
+     * @param string $order_no 系统订单号
+     * @param int $fee 支付金额
+     * @param string $title 订单标题
+     * @return bool|array
+     */
+    public static function createRedPackage(WechatPay $pay, $openid, $order_no)
+    {
+        $ret = $pay->sendRedPack($openid,   //用户openid
+            100,                                  //红包总金额 单位分
+            $order_no,                     //订单ID
+            '阿斗夹娃娃',                 //商户名称
+            '测试红包',                    //红包祝福语
+            '测试活动',                    //活动名称
+            '测试备注',                    //备注
+            1,                              //红包总数
+            null,                              //场景ID  非必填
+            '',                             //活动信息 非必填
+            null                           //授权商户ID
+            );
+        Log::error("现金红包 内部订单号{$order_no}生成预支付失败，{$pay->errMsg}");
+        return $ret;
+    }
+
+
+
+    /**
+     * 创建微信企业付款
+     * @param WechatPay $pay 支付SDK
+     * @param string $openid 微信用户openid
+     * @param string $order_no 系统订单号
+     * @param int $fee 支付金额
+     * @param string $title 订单标题
+     * @return bool|array
+     */
+    public static function createTransfer(WechatPay $pay, $openid, $order_no)
+    {
+        $ret = $pay->transfers($openid,   //用户openid
+            100,                                  //红包总金额
+            $order_no,                     //订单ID
+            '阿斗夹娃娃'                //备注
+
+        );
+
+        Log::error("企业转账 内部订单号{$order_no}生成预支付失败，{$pay->errMsg}");
+        return $ret;
+    }
+    ////////////////////////////////end 现金红包///////////////////////////////////////////////
 }

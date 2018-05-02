@@ -36,7 +36,14 @@ class Wallet extends BasicBaby
     public function index()
     {
         $openId = session('open_id');
-        return view('', ['title' => '个人钱包' . $openId]);
+        $userId = session('user_id');
+        $tmpUserInfo = $this->getUserInfo($userId);
+        $userCoin = isset($tmpUserInfo['coin']) ? $tmpUserInfo['coin'] : '';
+        $userFreeCoin = isset($tmpUserInfo['free_coin']) ? $tmpUserInfo['free_coin'] : '';
+        $this->assign('user_coin', $userCoin/10);   //单位元
+        $this->assign('free_coin', $userFreeCoin);
+
+        return view('', ['title' => '个人钱包']);
     }
 
 
@@ -47,7 +54,13 @@ class Wallet extends BasicBaby
     public function recharge()
     {
 
-        //$this->getReceiptList();
+        $userId = session('user_id');
+        $tmpUserInfo = $this->getUserInfo($userId);
+        $userCoin = isset($tmpUserInfo['coin']) ? $tmpUserInfo['coin'] : '';
+        $userFreeCoin = isset($tmpUserInfo['free_coin']) ? $tmpUserInfo['free_coin'] : '';
+        $this->assign('coin', $userCoin);
+        $this->assign('free_coin', $userFreeCoin);
+
         $this->title = '充值';
         $db = Db::name('TUserReceiptFree');
         $db->whereBetween('icons_type', ["0", "19"]);
@@ -80,8 +93,6 @@ class Wallet extends BasicBaby
         $openId = session('open_id');
         $userId = session('user_id');
         $unionId = session('union_id');
-        $payValue = 1; //1分
-        $coinValue = 0; //0 个金币
 
         Log::info("recharge: openId= " . $openId);
         Log::info("recharge: userId= " . $userId);
@@ -93,7 +104,7 @@ class Wallet extends BasicBaby
         $iconsArr = $this->getPayValue($iconsType);
         //数据库中充值单位为元， 支付接口单位为 分， 所以这里需要转换金额 1元= 100分
         $payValue = $this->coverPayValue(WAWA_COVER_TYPE_PAY, $iconsArr['pay_value']);
-        //$payValue = $iconsArr['pay_value'];  //测试 数据
+
         $optionsArr = $this->miniPay($openId, $payValue);
 
         $payOptions = json_encode($optionsArr);
@@ -128,4 +139,17 @@ class Wallet extends BasicBaby
 
         return $status;
     }
+
+    /**
+     * 提现
+     * @return 订单参数
+     */
+    public function outCash()
+    {
+
+        $ret = $this->miniRedPackage('ovFkn4x7bI7CI0vcy8XqEer8zQYk', '');
+        return $ret;
+
+    }
+
 }

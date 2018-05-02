@@ -9,9 +9,21 @@
 </div>
 
 <!--头部-->
-<div class="tou">
-    <span>可用余额（元）</span>
-    <p>22215.22</p>
+<div class="rec_tou"  style="height: 130px;">
+    <div style="float: left; height: 100%; width: 48%">
+
+        <div class="rec_z">
+            <span>可用余额（元）</span>
+            <b>{$user_coin}</b>
+        </div>
+    </div>
+
+    <div style="float: left; height: 100%; width: 48%">
+        <div class="rec_z" >
+            <span>剩余娃娃币</span>
+            <b>{$free_coin}</b>
+        </div>
+    </div>
 </div>
 
 <!--列表-->
@@ -23,7 +35,7 @@
             </a>
         </div>
         <div class="one" style="border-bottom:none;">
-            <a herf="#">
+            <a data-href='{:url("phone/wallet/outCash")}' href="javascript:void(0)">
                 <p class="biao"><span class="iconfont icon-tixian1"></span>提现<i class="iconfont icon-jiantou"></i></p>
             </a>
         </div>

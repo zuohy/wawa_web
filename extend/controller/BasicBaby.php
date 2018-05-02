@@ -453,7 +453,10 @@ class BasicBaby extends Controller
         if (PayService::isPay($order_no)) {
             //清除已经支付完成的订单号缓存
             Log::info("miniPay wechat pay already ok: order_no= " . $order_no);
-            $this->completeMiniPay($order_no, WAWA_PAY_SUCCESS);
+            $retBool = $this->saveReceipt('', '', '',  '', $order_no, '', WAWA_PAY_SUCCESS);  //$orderNo 为第5个参数，注意
+            // 重置缓存订单
+            session('pay-mini-order-no', null);
+            //$this->completeMiniPay($order_no, WAWA_PAY_SUCCESS);
             return ['code' => 2, 'msg' => "此订单已完成支付", 'order_no' => $order_no];
         }
 
@@ -604,10 +607,10 @@ class BasicBaby extends Controller
             $userInfo = $db_user->where('user_id', $userId)->find();
             if($userInfo && ($userInfo['user_id'] == $userId ) ){
 
-                $saveCoin = $userInfo['coin'] + $lastCoinValue;
-                $saveFree = $userInfo['free_coin'] + $lastFreeValue;
+                //$saveCoin = $userInfo['coin'] + $lastCoinValue;   //充值全部 为娃娃币 金币只有在产生收益时候增加
+                $saveFree = $userInfo['free_coin'] + $lastFreeValue + $lastCoinValue;
                 //$pk = empty($userId) ? ($db_receipt->getPk() ? $db_receipt->getPk() : 'id') : 'user_id';
-                $data_userCoin = array('id'=> $userInfo['id'], 'coin'=> $saveCoin, 'free_coin'=> $saveFree);
+                $data_userCoin = array('id'=> $userInfo['id'], 'coin'=> $userInfo['coin'], 'free_coin'=> $saveFree);
                 $retBool = DataService::save($db_user, $data_userCoin);
             }
 
@@ -836,4 +839,33 @@ class BasicBaby extends Controller
 
     ////////////////////////////////////end 支付 金币 相关函数 ////////////////////////////////////
 
+    ////////////////////////////////////start 现金红包 相关函数 ////////////////////////////////////
+    /**
+     * 小程序发送现金红包 目前使用企业打款方式
+     * @param string $unionId
+     * @param string $openId
+     * @param string $name
+     * @param string $pic
+     * @return bool
+     */
+    protected function miniRedPackage($openId, $total_fee)
+    {
+        //查询当前是否已经存在订单
+        $orderId = $this->createTmpSeq(12);
+        Log::info("miniRedPackage start: order_no= " . $orderId);
+
+        $pay = load_wx_mini('pay');
+        //$result = PayService::createRedPackage($pay, $openId, $orderId);
+        $result = PayService::createTransfer($pay, $openId, $orderId);
+
+        if($result){
+            Log::info("miniRedPackage: end ok order_id= " . $orderId );
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("miniRedPackage: end failed order_id= " . $orderId );
+            $result = ErrorCode::E_USER_NOT_FOUND;
+        }
+
+    }
+   ////////////////////////////////////end 现金红包 相关函数 ////////////////////////////////////
 }

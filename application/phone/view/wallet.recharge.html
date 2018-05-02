@@ -13,14 +13,14 @@
 
     <div class="rec_z">
         <span>剩余金币</span>
-        <b>80 </b>
+        <b>{$coin}</b>
     </div>
     </div>
 
     <div style="float: left; height: 100%; width: 48%">
     <div class="rec_z" >
         <span>剩余娃娃币</span>
-        <b>10 </b>
+        <b>{$free_coin}</b>
     </div>
     </div>
 </div>
@@ -40,7 +40,7 @@
             <p>充￥{$vo.pay_value}元 </p>
             <p>送 {$vo.free_value}个娃娃币</p>
             </a>
-            <a class="rec_all">共{$vo.pay_value}*10个金币 {$vo.free_value}个娃娃币</a>
+            <a class="rec_all">共 {$vo.pay_value*10 + $vo.free_value} 个娃娃币</a>
         </div>
             {/foreach}
     </div>
