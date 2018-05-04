@@ -280,13 +280,17 @@ class BasicBaby extends Controller
     {
         $outValue = $inValue;
         switch($coverType){
-            case WAWA_COVER_TYPE_COIN:
+            case ErrorCode::BABY_COVER_TYPE_COIN:
                 //元 转换为 金币（角）
                 $outValue = $inValue * 10;
                 break;
-            case WAWA_COVER_TYPE_PAY:
+            case ErrorCode::BABY_COVER_TYPE_PAY:
                 //元 转换为 分
                 $outValue = $inValue * 100;
+                break;
+            case ErrorCode::BABY_COVER_TYPE_CNY:
+                //金币 转换为 元
+                $outValue = $inValue / 10;
                 break;
             default:
                 $outValue = $inValue;
@@ -433,6 +437,20 @@ class BasicBaby extends Controller
     }
 
     /**
+     * 生成 字母开头的 缓存唯一序号 (失败返回 NULL )
+     * @param int $length 序号长度
+     * @return string
+     */
+    protected function createHeaderSeq($topType, $length = 10)
+    {
+        $topSequence = null;
+        $seq = $this->createTmpSeq($length);
+        $topSequence = $topType . '-' . $seq;
+
+        return $topSequence;
+    }
+
+    /**
      * 小程序支付请求 生成统一订单
      * @param string $unionId
      * @param string $openId
@@ -453,7 +471,7 @@ class BasicBaby extends Controller
         if (PayService::isPay($order_no)) {
             //清除已经支付完成的订单号缓存
             Log::info("miniPay wechat pay already ok: order_no= " . $order_no);
-            $retBool = $this->saveReceipt('', '', '',  '', $order_no, '', WAWA_PAY_SUCCESS);  //$orderNo 为第5个参数，注意
+            $retBool = $this->saveReceipt('', '', '',  '', $order_no, '', ErrorCode::BABY_PAY_SUCCESS);  //$orderNo 为第5个参数，注意
             // 重置缓存订单
             session('pay-mini-order-no', null);
             //$this->completeMiniPay($order_no, WAWA_PAY_SUCCESS);
@@ -520,7 +538,7 @@ class BasicBaby extends Controller
             if (PayService::isPay($order_no)) {
                 //微信订单支付成功， 查询用户充值订单表 t_user_commonpay_receipt
                 $db_receipt = Db::name('TUserCommonpayReceipt');
-                $receiptInfo = $db_receipt->where('order_no', $orderNo)->where('receipt_type', WAWA_PAY_SUCCESS)->find();
+                $receiptInfo = $db_receipt->where('order_no', $orderNo)->where('receipt_type', ErrorCode::BABY_PAY_SUCCESS)->find();
                 if($receiptInfo && ($receiptInfo['order_no'] == $orderNo ) ){
                     Log::info("completeMiniPay: user receipt complete order_no=" . $order_no);
                     $retBool = true;
@@ -595,7 +613,7 @@ class BasicBaby extends Controller
             } //if($receiptFreeInfo && ($receiptFreeInfo['pay_value'] == $receiptInfo['pay_value'] ) )
 
             //转换充值金额为 充值金币  1元 = 10 金币
-            $lastCoinValue = $this->coverPayValue(WAWA_COVER_TYPE_COIN, $lastPayValue);
+            $lastCoinValue = $this->coverPayValue(ErrorCode::BABY_COVER_TYPE_COIN, $lastPayValue);
 
             Log::info("rechargeUserCoin: cover receipt value success lastPayValue=" . $lastPayValue . " lastCoinValue=" . $lastCoinValue . " lastFreeValue=" . $lastFreeValue);
 
@@ -634,16 +652,30 @@ class BasicBaby extends Controller
         //获取充值优惠
         $receiptFreeInfo = $this->getPayValue($freeType);
         $lastFreeValue = isset($receiptFreeInfo['free_value']) ? $receiptFreeInfo['free_value'] : 0;
+        $lastCoinValue = isset($receiptFreeInfo['coin_value']) ? $receiptFreeInfo['coin_value'] : 0;
 
-        Log::info("freeUserCoin:  lastFreeValue= " . $lastFreeValue);
+        Log::info("freeUserCoin:  lastFreeValue= " . $lastFreeValue . ' lastCoinValue=' . $lastCoinValue);
 
         $db_user = Db::name('TUserConfig');
 
         $userInfo = $db_user->where('user_id', $userId)->find();
         if($userInfo && ($userInfo['user_id'] == $userId ) ){
 
-            $saveFree = $userInfo['free_coin'] + $lastFreeValue;
-            $data_userCoin = array('id'=> $userInfo['id'], 'free_coin'=> $saveFree);
+            $data_userCoin = array('id'=> $userInfo['id']);
+            if($lastFreeValue > 0){
+                $saveFree = $userInfo['free_coin'] + $lastFreeValue;
+                $arrFree = array('free_coin'=> $saveFree);
+                $data_userCoin = array_merge($data_userCoin, $arrFree);
+            }
+            if($lastCoinValue > 0){
+                $saveCoin = $userInfo['coin'] + $lastCoinValue;
+                $arrCoin = array('coin'=> $saveCoin);
+                $data_userCoin = array_merge($data_userCoin, $arrCoin);
+            }
+
+            $log_userCoin = json_encode($data_userCoin);
+            Log::info("freeUserCoin: update user coins= " . $log_userCoin);
+
             $retBool = DataService::save($db_user, $data_userCoin);
         }
 

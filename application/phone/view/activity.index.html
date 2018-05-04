@@ -1,0 +1,73 @@
+{extend name="extra@phone/main"}
+
+{block name="body"}
+
+
+<!--top-->
+<div class="top_c">
+    <a data-href='{:url("phone/index/main")}' href="javascript:void(0)" class="iconfont icon-jiantou-copy-copy" ></a>
+    <p class="titi">活动列表</p>
+</div>
+
+<!--头部-->
+<div class="tou">
+    <span>活动</span>
+</div>
+
+<div class="product">
+    {foreach $list as $key=>$vo}
+    <div class="sp_pr">
+        <a data-href='{:url("phone/activity/page")}?product_code={$vo.act_code}' href="javascript:void(0)">
+
+            {if $vo.act_pic_show eq ''}
+            <img src="__STATIC__/plugs/proom/img/bg-default.jpg">
+            {else}
+            <img src="__STATIC__/{$vo.act_pic_show}">
+            {/if}
+
+            <div class="text_p">
+                <p>{$vo.act_name}</p>
+                <span class="yue">价格<em>{$vo.act_price}</em>金币</span>
+
+            </div>
+            <div class="jul" style="color: red;">{$vo.act_end}</div>
+
+
+        </a>
+        </a>
+    </div>
+    {/foreach}
+
+    </div>
+
+
+
+
+
+</div>
+
+    <script src="__STATIC__/plugs/phone/js/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="__STATIC__/plugs/phone/js/iscroll.js"></script>
+
+    <script>
+        $(function(){
+            var t_shu=$(".scroll a").width();
+            var g_shu=$(".scroll a").length;
+            var u_shu=g_shu*t_shu+g_shu*28+'px';
+            $(".scroll").css({width:u_shu});
+            var Scroll = new iScroll('wrapper',{hScrollbar:false, vScrollbar:false,hScroll:true,vScroll:false});
+        })
+
+    </script>
+    <script src="__STATIC__/plugs/phone/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="__STATIC__/plugs/phone/js/index.js" type="text/javascript"></script>
+
+<script>
+
+    var  mini_send = function(){
+
+    }
+
+</script>
+
+    {/block}

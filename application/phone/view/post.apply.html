@@ -19,7 +19,7 @@
 
 <!--top-->
 <div class="top_c">
-    <a href="address.html" class="iconfont icon-jiantou-copy-copy" ></a>
+    <a data-href='{:url("phone/post/getresult")}' href="javascript:void(0)"  class="iconfont icon-jiantou-copy-copy" ></a>
     <p class="titi">填写收货地址</p>
 </div>
 
@@ -75,8 +75,10 @@
             data: $('#address-form').serialize(),
             success: function (result) {
                 console.log(result);//打印服务端返回的数据(调试用)
-                if (result.resultCode == 200) {
-                    alert("SUCCESS");
+                if (result.code == 1) {
+                    alert("成功！");
+                }else{
+                    alert("异常！");
                 }
             },
             error : function() {

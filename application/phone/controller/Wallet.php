@@ -15,6 +15,7 @@
 namespace app\phone\controller;
 
 use controller\BasicBaby;
+use service\ErrorCode;
 use think\Db;
 use think\View;
 use think\Log;
@@ -63,7 +64,9 @@ class Wallet extends BasicBaby
 
         $this->title = '充值';
         $db = Db::name('TUserReceiptFree');
-        $db->whereBetween('icons_type', ["0", "19"]);
+        $minType = ErrorCode::BABY_COIN_TYPE_REG_1;
+        $maxType = ErrorCode::BABY_COIN_TYPE_SHARE - 1;
+        $db->whereBetween('icons_type', [$minType, $maxType]);
         return parent::_list($db);
     }
 
@@ -103,7 +106,7 @@ class Wallet extends BasicBaby
 
         $iconsArr = $this->getPayValue($iconsType);
         //数据库中充值单位为元， 支付接口单位为 分， 所以这里需要转换金额 1元= 100分
-        $payValue = $this->coverPayValue(WAWA_COVER_TYPE_PAY, $iconsArr['pay_value']);
+        $payValue = $this->coverPayValue(ErrorCode::BABY_COVER_TYPE_PAY, $iconsArr['pay_value']);
 
         $optionsArr = $this->miniPay($openId, $payValue);
 

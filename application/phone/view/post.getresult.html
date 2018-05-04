@@ -62,9 +62,9 @@
             </a>
         </div>
         <div class="button">
-            <a data-href='/index.php/phone/post/apply?id={$vo.order_id}' href="javascript:void(0)" class="liji">申请邮寄</a>
+            <a data-href='{:url("phone/post/apply")}?id={$vo.order_id}' href="javascript:void(0)" class="liji">申请邮寄</a>
             {if $vo.status neq 4}
-            <a data-href='/index.php/phone/post/exchangeCoin?id={$vo.order_id}' href="javascript:void(0)" class="qu">兑换</a>
+            <a data-href='{:url("phone/post/exchangeCoin")}?id={$vo.order_id}' href="javascript:void(0)" class="qu">兑换</a>
             {/if}
         </div>
     </div>

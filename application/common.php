@@ -20,14 +20,14 @@ use service\SoapService;
 use think\Db;
 use Wechat\Loader;
 
-define('WAWA_PAY_SUCCESS', 1);
-define('WAWA_PAY_FAILED', 0);
-define('WAWA_COVER_TYPE_COIN', 1); //转换为金币(角)
-define('WAWA_COVER_TYPE_PAY', 2);   //转换为分 微信支付单位
+//define('WAWA_PAY_SUCCESS', 1);
+//define('WAWA_PAY_FAILED', 0);
+//define('WAWA_COVER_TYPE_COIN', 1); //转换为金币(角)
+//define('WAWA_COVER_TYPE_PAY', 2);   //转换为分 微信支付单位
 
-define('WAWA_COIN_TYPE_REG1', 1);   //充值类型1
-define('WAWA_COIN_TYPE_REG2', 2);   //充值类型2
-define('WAWA_COIN_TYPE_SHARE', 20);   //分享类型
+//define('WAWA_COIN_TYPE_REG1', 1);   //充值类型1
+//define('WAWA_COIN_TYPE_REG2', 2);   //充值类型2
+//define('WAWA_COIN_TYPE_SHARE', 20);   //分享类型
 
 //define('BABY_ROOM_MEMBER_STATUS_OUT', 1);   //未进入房间
 //define('BABY_ROOM_MEMBER_STATUS_IN', 2);   //进入房间

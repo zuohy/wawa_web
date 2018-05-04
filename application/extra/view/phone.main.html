@@ -25,7 +25,10 @@
         {block name="header"}{/block}
         {block name="body"}{/block}
         {block name="foot"}
+        {if $title eq '活动'}
+        {else}
         {include file="extra@phone/foot"}
+        {/if}
         {/block}
         {block name="script"}{/block}
     </body>

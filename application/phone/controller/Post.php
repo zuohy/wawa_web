@@ -39,8 +39,10 @@ class Post extends BasicBaby
     public function getresult()
     {
         $status = isset($_GET['status']) ? $_GET['status'] : 0; //0 全部 1 寄存中 2 待邮寄 3 已发货 4 已换币
-        //$userId = session('user_id');
-        $userId = 3665019677;
+        $userId = session('user_id');
+        $this->title = '抓取记录';
+
+        //$userId = 3665019677;
         $field = ["user_id" => $userId];
         if($status != 0)
         {
@@ -60,10 +62,10 @@ class Post extends BasicBaby
     public function apply()
     {
         $order_id = isset($_GET['id']) ? $_GET['id'] : 0;
-        //$userId = session('user_id');
-        $userId = 3665019677;
+        $userId = session('user_id');
+        //$userId = 3665019677;
 
-        return view('', ['order_id' => $order_id]);
+        return view('', ['order_id' => $order_id, 'title' => '收货地址' ]);
     }
 
 
@@ -72,13 +74,14 @@ class Post extends BasicBaby
      */
     public function applyPost()
     {
-        //$userId = session('user_id');
-        $userId = 3665019677;
+        $userId = session('user_id');
+        //$userId = 3665019677;
         $data = $_POST;
+        $this->title = '申请邮寄';
 
         $user_name = $_POST['user_name'];
         $address = $_POST['address'];
-        $phone = $_POST['address'];
+        $phone = $_POST['phone'];
         $order_id = $_POST['order_id'];
 
         //查询是否是新地址

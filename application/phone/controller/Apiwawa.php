@@ -63,12 +63,12 @@ class Apiwawa extends BasicBaby
                 //分享者登录
                 $retStatus = $this->_buildShareRel( $jPack['user_id'], $jPack['code_father']);
                 if(ErrorCode::CODE_OK == $retStatus){
-                    $this->freeUserCoin($jPack['user_id'], WAWA_COIN_TYPE_SHARE);
+                    $this->freeUserCoin($jPack['user_id'], ErrorCode::BABY_COIN_TYPE_SHARE);
 
                     $db_user = Db::name('TUserConfig');
                     $userInfo = $db_user->where('code', $jPack['code_father'])->find();
                     if($userInfo && ($userInfo['code'] == $jPack['code_father'] ) ){
-                        $this->freeUserCoin($userInfo['user_id'], WAWA_COIN_TYPE_SHARE);
+                        $this->freeUserCoin($userInfo['user_id'], ErrorCode::BABY_COIN_TYPE_SHARE);
                     }
 
                 }
@@ -387,7 +387,7 @@ class Apiwawa extends BasicBaby
      *
      * @return array
      */
-/*    private function _saveShareHis($userAccept, $userFather, $isStatus)
+/*    private function _saveShareHis($procodeCode, $userAccept, $userFather, $isStatus)
     {
         //保存分享记录表
         $db_share_his = Db::name('TUserShareHis');
@@ -434,22 +434,22 @@ class Apiwawa extends BasicBaby
             if($userAccept && $userAccept['user_id'] == $userId){
                 if($userAccept['code_father'] != ''){
                     //当前用户已经被分享了，暂时不更新分享者邀请码
-                    $isShare = 1;
+                    $isShare = ErrorCode::BABY_SHARE_FAILED;
                 }else{
                     //更新当前用户的父级邀请码
                     $data_user = array('id'=> $userAccept['id'], 'code_father'=> $codeFather);
                     $result = DataService::save($db_user, $data_user);
-                    $isShare = 0;
+                    $isShare = ErrorCode::BABY_SHARE_SUCCESS;
                 }
 
             }else{
                 //记录日志
-                $isShare = 3;  //没有被邀请者信息
+                $isShare = ErrorCode::BABY_SHARE_NO_ACCEPT;  //没有被邀请者信息
 
             }
         }else{
             //记录日志
-            $isShare = 9; //没有找到邀请者信息
+            $isShare = ErrorCode::BABY_SHARE_NO_INVITATION; //没有找到邀请者信息
         }
 
         //保存分享记录表

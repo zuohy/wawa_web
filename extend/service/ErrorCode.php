@@ -39,7 +39,29 @@ class ErrorCode
 
 
     //常量
-const BABY_ROOM_MEMBER_STATUS_OUT = 1;   //未进入房间
+    const BABY_PAY_SUCCESS = 1;      //支付成功
+    const BABY_PAY_FAILED = 0;      //支付失败
+
+    const BABY_SHARE_SUCCESS = 0;       //分享成功  有效分享
+    const BABY_SHARE_FAILED = 1;        //分享失败 用户已经被分享了
+    const BABY_SHARE_NO_ACCEPT = 3;        //分享失败 没有被分享者信息
+    const BABY_SHARE_NO_INVITATION = 9;        //分享失败 没有邀请者信息
+
+
+    const BABY_HEADER_SEQ_APP = 'A-00001';    //app 应用默认值 字母开头
+    const BABY_HEADER_SEQ_A = 'A';    //字母开口的随机数
+    const BABY_HEADER_SEQ_S = 'S';    //字母开口的随机数
+    const BABY_HEADER_SEQ_H = 'H';    //字母开口的随机数
+
+    const BABY_COVER_TYPE_COIN = 1;    //转换为金币(角)
+    const BABY_COVER_TYPE_PAY = 2;    //转换为分 微信支付单位
+    const BABY_COVER_TYPE_CNY = 3;    //金币 转换为元
+
+    const BABY_COIN_TYPE_REG_1 = 1;    //充值类型1
+    const BABY_COIN_TYPE_REG_2 = 2;    //充值类型2
+    const BABY_COIN_TYPE_SHARE = 20;  //分享类型
+
+    const BABY_ROOM_MEMBER_STATUS_OUT = 1;   //未进入房间
 const BABY_ROOM_MEMBER_STATUS_IN = 2;   //进入房间
 const BABY_ROOM_MEMBER_STATUS_RUN = 3;   //正在游戏
 
