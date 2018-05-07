@@ -494,7 +494,7 @@
     }
 
     var chatStart = function(serverUrl, serverPort){
-        var chatServer = "ws://" + serverUrl + ":" + serverPort;
+        var chatServer = "wss://" + serverUrl + '/wss';//":" + serverPort;
         ws_chat = new WebSocket(chatServer);
         // 服务端主动推送消息时会触发这里的onmessage
 
