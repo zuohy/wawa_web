@@ -3,8 +3,13 @@
 {block name="body"}
 
 
+<style>
+    .icon-img{
+        width: 34px;
+    }
+</style>
 <!--头部-->
-<div class="zhang">
+<div class="zhang" style="background: #ffd800">
     <div class="container">
         <div class="xiao">
             <a href="#"><span class="iconfont icon-xiaoxi"><i></i></span></a>
@@ -12,8 +17,10 @@
         </div>
         <div class="tou_x">
             <a href="information.html">
-                <div class="iconfont icon-touxiang"></div>
-                <div class="yong">
+                <div class="sp_pr" style="float: left;border: none">
+                    <img style="border-radius: 40px;width: 80px;height: 80px" src="__STATIC__/plugs/proom/img/bg-default.jpg">
+                </div>
+                <div class="yong" style="margin-top: 1.743em">
                     <p>华富锦大厦</p>
                     <span>手机号：15425586998</span>
                 </div>
@@ -28,38 +35,38 @@
     <div class="one">
         <div class="container">
             <a href="order.html">
-                <p class="biao">全部订单<i class="iconfont icon-jiantou"></i></p>
+                <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/qbdd.png" class="icon-img"/></span>全部订单<i class="iconfont icon-jiantou"></i></p>
             </a>
         </div>
     </div>
     <ul>
         <li>
             <a href="#">
-                <span class="iconfont icon-qianbao-"><i>12</i></span>
+                <span class="iconfont"><img src="__STATIC__/plugs/proom/img/daifuk.png" class="icon-img"/><i>12</i></span>
                 <p>待付款</p>
             </a>
         </li>
         <li>
             <a href="#">
-                <span class="iconfont icon-daifahuo1"><i>8</i></span>
+                <span class="iconfont"><img src="__STATIC__/plugs/proom/img/daifh.png" class="icon-img"/><i>8</i></span>
                 <p>待发货</p>
             </a>
         </li>
         <li>
             <a href="#">
-                <span class="iconfont icon-daishouhuo"></span>
+                <span class="iconfont"><img src="__STATIC__/plugs/proom/img/daish.png" class="icon-img"/></span>
                 <p>待收货</p>
             </a>
         </li>
         <li>
             <a href="#">
-                <span class="iconfont icon-daipingjia1"></span>
+                <span class="iconfont"><img src="__STATIC__/plugs/proom/img/daipj.png" class="icon-img"/></span>
                 <p>待评价</p>
             </a>
         </li>
         <li>
             <a href="#">
-                <span class="iconfont icon-tuikuan"></span>
+                <span class="iconfont"><img src="__STATIC__/plugs/proom/img/tuik.png" class="icon-img"/></span>
                 <p>退款/售后</p>
             </a>
         </li>
@@ -68,48 +75,42 @@
 
 
 <!--列表-->
-<div class="lie_y">
+<div class="lie_b">
     <div class="container">
-        <div class="row">
-            <div class="col-xs-4">
-                <a data-href='{:url("phone/personal/gresult")}' href="javascript:void(0)">
-                    <span class="iconfont icon-shoucang"></span>
-                    <p class="lll">抓的娃娃</p>
-                </a>
-            </div>
-            <div class="col-xs-4">
-                <a data-href='{:url("phone/post/getresult?status=0")}' href="javascript:void(0)">
-                    <span class="iconfont icon-zuji1" style="color:#f9a900;"></span>
-                    <p class="lll">我的娃娃</p>
-                </a>
-            </div>
-            <div class="col-xs-4">
-                <a href="recommend.html">
-                    <span class="iconfont icon-tuijian" style="color:#bd45e5;"></span>
-                    <p class="lll">推荐好友</p>
-                </a>
-            </div>
-            <div class="col-xs-4">
-                <a href="address.html">
-                    <span class="iconfont icon-shouhuodizhi" style="color:#72ad14;"></span>
-                    <p class="lll">收货地址</p>
-                </a>
-            </div>
-            <div class="col-xs-4">
-                <a href="capital.html">
-                    <span class="iconfont icon-iconliushuizijin" style="color:#ec3535;"></span>
-                    <p class="lll">资金流水</p>
-                </a>
-            </div>
-            <div class="col-xs-4">
-                <a href="center.html">
-                    <span class="iconfont icon-shangjia"></span>
-                    <p class="lll">商家中心</p>
-                </a>
-            </div>
+        <div class="one">
+            <a data-href='{:url("phone/personal/gresult")}' href="javascript:void(0)">
+                <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/qbdd.png" class="icon-img"/></span>抓的娃娃<i class="iconfont icon-jiantou"></i></p>
+            </a>
+        </div>
+        <div class="one">
+            <a data-href='{:url("phone/post/getresult?status=0")}' href="javascript:void(0)">
+                <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/qbdd.png" class="icon-img"/></span>我的娃娃<i class="iconfont icon-jiantou"></i></p>
+            </a>
+        </div>
+        <div class="one">
+            <a  href="recommend.html">
+                <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/tjhy.png" class="icon-img"/></span>推荐好友<i class="iconfont icon-jiantou"></i></p>
+            </a>
+        </div>
+        <div class="one">
+            <a  href="address.html">
+                <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/shdz.png" class="icon-img"/></span>收货地址<i class="iconfont icon-jiantou"></i></p>
+            </a>
+        </div>
+        <div class="one">
+            <a href="capital.html">
+                <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/sz.png" class="icon-img"/></span>资金流水<i class="iconfont icon-jiantou"></i></p>
+            </a>
+        </div>
+        <div class="one" style="border-bottom:none;margin-bottom: 70px">
+            <a href="center.html">
+                <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/sjzx.png" class="icon-img"/></span>商家中心<i class="iconfont icon-jiantou"></i></p>
+            </a>
         </div>
     </div>
 </div>
+
+
 
 <script src="__STATIC__/plugs/phone/js/jquery.min.js" type="text/javascript"></script>
 
