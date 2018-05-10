@@ -181,20 +181,25 @@ class PayService
      * @param WechatPay $pay 支付SDK
      * @param string $openid 微信用户openid
      * @param string $order_no 系统订单号
-     * @param int $fee 支付金额
-     * @param string $title 订单标题
+     * @param int $feeValue 转账金额  单位分
+     * @param string $des 描述
      * @return bool|array
      */
-    public static function createTransfer(WechatPay $pay, $openid, $order_no)
+    public static function createTransfer(WechatPay $pay, $openid, $order_no, $feeValue, $des)
     {
         $ret = $pay->transfers($openid,   //用户openid
-            100,                                  //红包总金额
+            $feeValue,                     //红包总金额
             $order_no,                     //订单ID
-            '阿斗夹娃娃'                //备注
+            $des                           //备注
 
         );
 
-        Log::error("企业转账 内部订单号{$order_no}生成预支付失败，{$pay->errMsg}");
+        if($ret == false){
+            Log::error("企业转账 内部订单号{$order_no}生成预支付失败，{$pay->errMsg}");
+        }else{
+            Log::info("企业转账 内部订单号{$order_no}生成预支付成功");
+        }
+
         return $ret;
     }
     ////////////////////////////////end 现金红包///////////////////////////////////////////////

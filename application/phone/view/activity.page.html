@@ -32,12 +32,12 @@
         <div class="tudi_icon">
             <img src="__STATIC__/plugs/phone/act_images/default_pupil_icon.png"/>
             <span>徒弟数量</span>
-            <div class="tudi_num tudi_num1">{$share_num}</div>
+            <div class="tudi_num tudi_num1">{$share_num|default="0"}</div>
         </div>
         <div class="tudi_icon">
             <img src="__STATIC__/plugs/phone/act_images/default_effect_pupil_icon.png"/>
             <span>有效徒弟</span>
-            <div class="tudi_num tudi_num2">{$share_valid}</div>
+            <div class="tudi_num tudi_num2">{$share_valid|default="0"}</div>
         </div>
         <div class="tudi_icon">
             <img src="__STATIC__/plugs/phone/act_images/default_reward_pupil_icon.png"/>
@@ -50,31 +50,31 @@
     <!-- 排行 -->
     <div class="rank">
         <div class="rank_list rank_two rank_list2">
-            <div class="rank_num">500</div>
+            <div class="rank_num">{$list[1]['share_valid']|default="-"}</div>
             <img src="__STATIC__/plugs/phone/act_images/default_second_icon.png"/>
             <div class="rank_pic">
-                <img src="__STATIC__/plugs/phone/act_images/default_quesiton_icon.png"/>
+                <img src="{$list[1]['pic']|default='__STATIC__/plugs/phone/act_images/default_quesiton_icon.png'}"/>
             </div>
-            <div class="rank_name">昵称66666</div>
-            <div class="rank_gift">iPhone7</div>
+            <div class="rank_name">{$list[1]['name']|default="缺席"}</div>
+            <div class="rank_gift">娃娃1</div>
         </div>
         <div class="rank_list rank_one rank_list1">
-            <div class="rank_num">700</div>
+            <div class="rank_num">{$list[0]['share_valid']|default="-"}</div>
             <img src="__STATIC__/plugs/phone/act_images/default_first_icon.png"/>
             <div class="rank_pic">
-                <img src="__STATIC__/plugs/phone/act_images/default_quesiton_icon.png"/>
+                <img src="{$list[0]['pic']|default='__STATIC__/plugs/phone/act_images/default_quesiton_icon.png'}"/>
             </div>
-            <div class="rank_name">昵称66666</div>
-            <div class="rank_gift">iPhoneX</div>
+            <div class="rank_name">{$list[0]['name']|default="缺席"}</div>
+            <div class="rank_gift">娃娃0</div>
         </div>
         <div class="rank_list rank_three rank_list3">
-            <div class="rank_num">400</div>
+            <div class="rank_num">{$list[2]['share_valid']|default="-"}</div>
             <img src="__STATIC__/plugs/phone/act_images/default_third_icon.png"/>
             <div class="rank_pic">
-                <img src="__STATIC__/plugs/phone/act_images/default_quesiton_icon.png"/>
+                <img src="{$list[2]['pic']|default='__STATIC__/plugs/phone/act_images/default_quesiton_icon.png'}"/>
             </div>
-            <div class="rank_name">昵称2B2B2B</div>
-            <div class="rank_gift">iPhone6</div>
+            <div class="rank_name">{$list[2]['name']|default="缺席"}</div>
+            <div class="rank_gift">娃娃2</div>
         </div>
     </div>
 
@@ -83,7 +83,7 @@
         <img src="__STATIC__/plugs/phone/act_images/default_rule_into_btn.png" width="100%"/>
     </div>
     <!-- 阶段奖励 -->
-    <div class="award">
+    <div class="award hidden">
         <img class="award_title" src="__STATIC__/plugs/phone/act_images/default_list_title.png"/>
         <div class="aw_title_font">本阶段奖励<span>999</span>元</div>
         <div class="award_main">
@@ -218,12 +218,9 @@
     <div class="rules">
         <img src="__STATIC__/plugs/phone/act_images/rules.png"/>
         <ul class="rules_ul">
-            <li>活动时间：2018年4月27日18：00—2018年5月10日18：00</li>
-            <li>1. 奖励发放时间：实时发放</li>
-            <li>活动期间内，邀请的有效徒弟达指定人数，可获得阶梯现金奖励，最高可以额外获得9999元。同时对活动中邀请有效徒弟排名前三名者；分别送iPhone X 、iPhone 7、iPhone 6一台；现金奖励以最高梯度计算，收徒越多，奖励越高。</li>
-            <li>2. 凡参加活动者即可获得一次免费抽奖的机会，同时每邀请一位有效徒弟增加一次抽奖机会，100%中奖机率，邀请的人数越多，中大奖的机会越高。</li>
-            <li>3. 有效徒弟：活动时期间内任意一天，邀请的徒弟给师傅贡献阅读奖励（120金币）5次；即视为有效徒弟。</li>
-            <li>4. 奖励发放:阶梯奖励在上一阶梯的基础上发放，达到第一个阶梯奖励9元，达到第二个阶梯再奖励5元，总共一起为14元;达到第三个阶梯再奖励16元，总共为30元，以此类推。</li>
+            {foreach $des_arr as $key=>$vo}
+            <li>{$vo}</li>
+            {/foreach}
             <li class="rules_specil">特别说明:为保证活动的公平性，对于存在违规收徒行为的用户，平台将取消其参加活动的资格，并扣除所有奖励，请遵守平台规则，正常邀请收徒。本活动最终解释权归阿斗夹娃娃所有。</li>
         </ul>
     </div>
@@ -231,7 +228,7 @@
     <!-- 底部btn -->
     <div class="footer">
         <div class="footer_btn footer_left">幸运大抽奖</div>
-        <div class="footer_btn footer_right"><a href="function://callapp?f=test&title=参与悦头条赚9999元，送iPhone X&description=14天赚9999元，再送iPhone X，零投入高回报，1元可提现，下载即送现金，赶紧点击赚钱吧！&image=http://hbhunter.oss-cn-qingdao.aliyuncs.com/assets/shoutu0119.png&link=http://url.cn/5ixHRoG&callback=shareDone">立领9999元</a></div>
+        <div class="footer_btn footer_right"><a href="">立领购买</a></div>
     </div>
 </div>
 

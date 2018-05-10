@@ -150,8 +150,8 @@ class Wallet extends BasicBaby
     public function outCash()
     {
 
-        $ret = $this->miniRedPackage('ovFkn4x7bI7CI0vcy8XqEer8zQYk', '');
-        return $ret;
+        //$ret = $this->miniRedPackage('ovFkn4x7bI7CI0vcy8XqEer8zQYk', '');
+        //return $ret;
 
     }
 

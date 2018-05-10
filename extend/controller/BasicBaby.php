@@ -9,7 +9,7 @@ use think\Db;
 use think\db\Query;
 use service\PayService;
 use think\Log;
-
+use service\ActivityService;
 
 /**
  * 娃娃业务基础控制器
@@ -186,6 +186,27 @@ class BasicBaby extends Controller
      * @param string $userId
      * @return bool
      */
+    protected function getOpenId($userId)
+    {
+        //查询openid
+        //查询当前是否已经存在用户信息
+        $db_wx = Db::name('TUserWeixin');
+        $wxUser = '';
+        $openId = '';
+        $unionId = '';
+
+        $wxUser = $db_wx->where('user_id', $userId)->find();
+        $openId = isset($userInfo['open_id']) ? $userInfo['open_id'] : '';
+        $unionId = isset($userInfo['union_id']) ? $userInfo['union_id'] : '';
+
+        return $openId;
+    }
+
+    /**
+     * 设置open id 在session 中
+     * @param string $userId
+     * @return bool
+     */
     protected function setOpenId($userId)
     {
         //查询openid
@@ -208,11 +229,8 @@ class BasicBaby extends Controller
     }
     ////////////////////////////////////start 用户管理 相关函数////////////////////////////////////
     /**
-     * 新用户微信id 名称，头像
-     * @param string $unionId
-     * @param string $openId
-     * @param string $name
-     * @param string $pic
+     * 获取用户信息 id 名称，头像
+     * @param string $userId
      * @return array
      */
     protected function getUserInfo($userId){
@@ -226,6 +244,26 @@ class BasicBaby extends Controller
         return '';
 
     }
+    /**
+     * 获取用户信息 by code
+     * @param string $unionId
+     * @param string $openId
+     * @param string $name
+     * @param string $pic
+     * @return array
+     */
+    protected function getUserInfoByCode($code){
+        //获取用户信息
+        $db_user = Db::name('TUserConfig');
+        $userInfo = $db_user->where('code', $code)->find();
+        if($userInfo && ($userInfo['code'] == $code ) ){
+            return $userInfo;
+        }
+
+        return '';
+
+    }
+
 
     /**
      * 更新用户信息 更新用户金额
@@ -292,6 +330,10 @@ class BasicBaby extends Controller
                 //金币 转换为 元
                 $outValue = $inValue / 10;
                 break;
+            case ErrorCode::BABY_COVER_TYPE_FEE:
+                //金币 转换为 分
+                $outValue = $inValue * 10;
+                break;
             default:
                 $outValue = $inValue;
                 break;
@@ -336,26 +378,45 @@ class BasicBaby extends Controller
     {
         $db_list = Db::name('TuserReceiptFree');
         $receiptList = '';
-        $result = '';
+
         //查询订单信息
         $receiptList = $db_list->whereBetween('icons_type', ["0", "20"]);
 
         return $receiptList;
     }
 
+    /**
+     * 获取充值 购买订单信息
+     * @param int $userId
+     * @param string $orderNo
+     * @return Array
+     */
+    protected function getReceiptInfo($orderNo)
+    {
+        $db_receipt = Db::name('TUserCommonpayReceipt');
+        $receiptInfo = '';
+
+        Log::info("getReceiptInfo: order_no=" . $orderNo);
+        $receiptInfo = $db_receipt->where('order_no', $orderNo)->find();
+        if($receiptInfo && ($receiptInfo['order_no'] == $orderNo) ) {
+            return $receiptInfo;
+        }
+        return '';
+    }
 
     /**
      * 生成支付收据
      * @param int $userId
-     * @param string $orderNo
      * @param string $prepayid
-     * @param int $channelId
      * @param int $payValue  金币数量 1元等于10个金币
-     * @param int $receiptType 交易类型 0为生成订单，1为交易成功
      * @param int $iconsType  充值优惠类型
+     * @param string $orderNo
+     * @param int $proCode  产品编码
+     * @param int $channelId
+     * @param int $receiptType 交易类型 0为生成订单，1为交易成功
      * @return bool
      */
-    protected function saveReceipt($userId, $prepayId, $payValue, $iconsType, $orderNo, $channelId=1, $receiptType=0)
+    protected function saveReceipt($userId, $prepayId, $payValue, $iconsType, $orderNo, $proCode=ErrorCode::BABY_HEADER_SEQ_APP, $channelId=1, $receiptType=0)
     {
         $db_receipt = Db::name('TUserCommonpayReceipt');
         $receiptInfo = '';
@@ -403,7 +464,8 @@ class BasicBaby extends Controller
                 'channel_id'=> $channelId,
                 'pay_value'=> $payValue,
                 'receipt_type'=> $receiptType,
-                'icons_type'=> $iconsType);
+                'icons_type'=> $iconsType,
+                'product_code'=> $proCode);
             $result = DataService::save($db_receipt, $data_receipt);
         }
 
@@ -512,12 +574,12 @@ class BasicBaby extends Controller
         Log::info("completeMiniPay: start orderNo=" . $orderNo . " status=" . $status . " pay-mini-order-no=" . $order_no);
 
         if( $orderNo ){
-            if($status == 1){
+            if($status == ErrorCode::BABY_PAY_SUCCESS){
                 //支付成功
                 Log::info("completeMiniPay: saveReceipt orderNo=" . $orderNo . " status=" . $status);
                 //更新充值表状态 t_user_commonpay_receipt
 
-                $retBool = $this->saveReceipt('', '', '',  '', $orderNo, '', $status);  //$orderNo 为第5个参数，注意
+                $retBool = $this->saveReceipt('', '', '',  '', $orderNo, '', '', $status);  //$orderNo 为第5个参数，注意
                 if( empty($retBool) ){
                     Log::error("completeMiniPay: update pay failed orderNo=" . $orderNo . " status=" . $status);
                     return $retBool;
@@ -559,6 +621,210 @@ class BasicBaby extends Controller
 
     }
 
+    /**
+     * 小程序 支付完成 清除缓存订单 更新订单表
+     * @param string $orderNo
+     * @param int $status
+     * @return bool
+     */
+    protected function completeOrderPay($orderNo, $status){
+        $order_no = session('pay-mini-order-no');   //由于微信小程序 支付请求接口，重新建立session 所以预支付订单页面的 session数据获取不到
+        $result = ErrorCode::BABY_PAY_FAILED;
+
+        Log::info("completeOrderPay: start orderNo=" . $orderNo . " status=" . $status . " pay-mini-order-no=" . $order_no);
+
+        if( $orderNo ){
+            if($status == ErrorCode::BABY_PAY_SUCCESS){
+                //支付成功
+                Log::info("completeOrderPay: saveReceipt orderNo=" . $orderNo . " status=" . $status);
+                //更新充值表状态 t_user_commonpay_receipt
+
+                $retBool = $this->saveReceipt('', '', '',  '', $orderNo, '', '', $status);  //$orderNo 为第5个参数，注意
+                if( empty($retBool) ){
+                    Log::error("completeOrderPay: update pay failed orderNo=" . $orderNo . " status=" . $status);
+                    return $result;
+                }
+                $result = ErrorCode::BABY_PAY_SUCCESS;
+                Log::info("completeOrderPay: update pay complete orderNo=" . $orderNo);
+
+                // 重置缓存订单
+                session('pay-mini-order-no', null);
+            }
+
+        }elseif ($order_no){
+            //处理请求的$orderNo 异常为空的情况，查找缓存中$order_no的状态
+            //查询微信订单表 wechat_pay_prepayid
+            if (PayService::isPay($order_no)) {
+                //微信订单支付成功， 查询用户充值订单表 t_user_commonpay_receipt
+                $db_receipt = Db::name('TUserCommonpayReceipt');
+                $receiptInfo = $db_receipt->where('order_no', $orderNo)->where('receipt_type', ErrorCode::BABY_PAY_SUCCESS)->find();
+                if($receiptInfo && ($receiptInfo['order_no'] == $orderNo ) ){
+                    Log::info("completeOrderPay: user receipt complete order_no=" . $order_no);
+                    $result = ErrorCode::BABY_PAY_ALREADY_SUCCESS;
+                }else{
+                    Log::error("completeOrderPay: user receipt not complete order_no=" . $order_no);
+                }
+
+            }else{
+                //微信订单未支付成功
+                Log::error("completeOrderPay: wechat pay receipt complete order_no=" . $order_no);
+                return $result;
+            }
+
+        }
+        Log::info("completeOrderPay: end orderNo=" . $orderNo . " status=" . $status);
+
+        return $result;
+
+    }
+
+    /**
+     * 支付成功后， 处理逻辑
+     * @param string $unionId
+     * @param string $unionId
+     * @return bool
+     */
+    protected function handleUserCoin($orderNo){
+
+        $result = ErrorCode::CODE_OK;
+
+        //获取内部订单
+        Log::info("handleUserCoin: start orderNo=" . $orderNo);
+
+        //查询订单信息
+        $db_receipt = Db::name('TUserCommonpayReceipt');
+        $receiptInfo = $db_receipt->where('order_no', $orderNo)->find();
+        $iconsType = isset($receiptInfo['icons_type']) ? $receiptInfo['icons_type'] : '';
+
+        Log::info("handleUserCoin: query receipt success iconsType=" . $iconsType);
+
+        if( $iconsType >= ErrorCode::BABY_COIN_TYPE_REG_1
+        && $iconsType < ErrorCode::BABY_COIN_TYPE_SHARE){
+            //充值用户金币数量 t_user_config
+            $retBool = $this->rechargeUserCoin($orderNo);
+            Log::info("handleUserCoin: update user config coin complete retBool=" . $retBool);
+            if($retBool != true){
+                $result = ErrorCode::E_NOT_SUPPORT;  //通用错误
+            }
+
+        }elseif($iconsType >= ErrorCode::BABY_COIN_TYPE_SHARE){
+            //分享购买返现
+            $result = $this->backUserCoin(ErrorCode::BABY_INCOME_BACK_CNY, $orderNo);
+
+        }
+
+        return $result;
+
+    }
+
+    /**
+     * 购买返现
+     * @param string $isCNY   1 直接反现金， 0 反金币
+     * @param string $orderNo   //购买订单ID
+     * @return bool
+     */
+    protected function backUserCoin($isCNY, $orderNo){
+
+        Log::info("backUserCoin: start orderNo=" . $orderNo . ' isCNY=' . $isCNY);
+        //获取订单信息
+        $receiptInfo = $this->getReceiptInfo($orderNo);
+        $userId = isset($receiptInfo['user_id']) ? $receiptInfo['user_id'] : '';
+        $proCode = isset($receiptInfo['product_code']) ? $receiptInfo['product_code'] : '';
+        $iconsType = isset($receiptInfo['icons_type']) ? $receiptInfo['icons_type'] : '';
+
+        Log::info("backUserCoin: receipt info user_id=" . $userId . ' product_code=' . $proCode . ' icons_type=' . $iconsType);
+
+        //获取用户信息
+        $tmpUserInfo = $this->getUserInfo($userId);
+        $tmpCode = isset($tmpUserInfo['code']) ? $tmpUserInfo['code'] : '';
+
+
+
+        //获取分享者 收益者信息
+        $isShare = ErrorCode::BABY_SHARE_NOT_PAY;
+        $tmpShareHis = ActivityService::getShareHisInfo($proCode, $tmpCode, $isShare, 0);  //不查询isShare
+        $tmpFatherCode = isset($tmpShareHis['code_father']) ? $tmpShareHis['code_father'] : '';
+        $tmpShareStatus = isset($tmpShareHis['s_status']) ? $tmpShareHis['s_status'] : '';
+        if('' == $tmpFatherCode){
+            //没有收益者信息
+            Log::error("backUserCoin: father code not found product_code=" . $proCode  . ' user_id=' . $userId . ' code(被邀请码)=' . $tmpCode);
+            $result = ErrorCode::E_NOT_SUPPORT;  //这里做错误处理，只是不产生收益，有可能是已经处理过收益逻辑的用户
+            return $result;
+
+        }elseif(ErrorCode::BABY_SHARE_SUCCESS == $tmpShareStatus){
+            //没有收益者信息
+            Log::info("backUserCoin: share status already done product_code=" . $proCode  . ' user_id=' . $userId . ' code(被邀请码)=' . $tmpCode . ' tmpFatherCode=' . $tmpFatherCode);
+            $result = ErrorCode::CODE_OK;  //这里不做错误处理，只是不产生收益，有可能是已经处理过收益逻辑的用户
+            return $result;
+        }
+
+        $inUserInfo = $this->getUserInfoByCode($tmpFatherCode);
+        $inUserId = isset($inUserInfo['user_id']) ? $inUserInfo['user_id'] : '';
+
+
+        //获取优惠记录
+        $receiptFreeInfo = $this->getPayValue($iconsType);
+        $tmpCoinValue = isset($receiptFreeInfo['coin_value']) ? $receiptFreeInfo['coin_value'] : '';
+        $tmpFreeValue = isset($receiptFreeInfo['free_value']) ? $receiptFreeInfo['free_value'] : '';
+        $InValue = 0;   //返现金
+        $InCoin = 0;    //返金币
+        if($isCNY == ErrorCode::BABY_INCOME_BACK_CNY){
+            $InValue = $this->coverPayValue(ErrorCode::BABY_COVER_TYPE_CNY, $tmpCoinValue);  //转换为单位元
+            $payValue = $this->coverPayValue(ErrorCode::BABY_COVER_TYPE_PAY, $InValue);  //转换为单位分
+        }else{
+            $InCoin = $tmpCoinValue;
+        }
+
+        //异常检测
+        //$payValue 如果为 异常， 微信转账会报错误， 不用检查。
+        if( empty($inUserId)
+            || empty($tmpCoinValue) ){
+            Log::error("backUserCoin: income data user_id=" . $inUserId . ' coin_value(金币)=' . $tmpCoinValue . ' free_value(娃娃币)=' . $tmpFreeValue);
+            $result = ErrorCode::E_NOT_SUPPORT;  //通用错误
+            return $result;
+        }
+
+        //更新分享记录表 为有效分享
+        ActivityService::updateShareHis($proCode, $tmpUserInfo, $inUserInfo, ErrorCode::BABY_SHARE_SUCCESS);
+
+        Log::info("backUserCoin: income data user_id=" . $inUserId . ' coin_value(金币)=' . $tmpCoinValue . ' free_value(娃娃币)=' . $tmpFreeValue);
+        Log::info("backUserCoin: income data user_id=" . $inUserId . ' InValue(元)=' . $InValue . ' payValue(分)=' . $payValue);
+
+        //保存收益记录表
+        $orderNum = $this->createHeaderSeq(ErrorCode::BABY_HEADER_SEQ_IN, 12);
+        $result = ActivityService::addUserIncome($inUserId, $proCode, $orderNum, $orderNo, $InValue, $InCoin, $tmpFreeValue, ErrorCode::BABY_EMPLOY_REASON_3, '活动收益');
+        if($result != ErrorCode::CODE_OK){
+            Log::error("backUserCoin: addUserIncome failed user_id=" . $inUserId . ' InValue(元)=' . $InValue . ' payValue(分)=' . $payValue);
+            return $result;
+        }
+
+        //检查$payValue  值上限 10元
+        $maxFee = $this->coverPayValue(ErrorCode::BABY_COVER_TYPE_PAY, 10);
+        if( $payValue > $maxFee ){
+            Log::error("backUserCoin: income data too max user_id=" . $inUserId . ' InValue(元)=' . $InValue . ' payValue(分)=' . $payValue);
+            $result = ErrorCode::E_USER_INCOME_MAX;
+            return $result;
+        }
+
+        //存入对应的收益
+        if($isCNY == ErrorCode::BABY_INCOME_BACK_CNY){
+            $result = $this->miniRedPackage($inUserId, $orderNum, $payValue, '活动收益');
+        }else{
+            $this->freeUserCoin($proCode, $inUserId, $iconsType);
+        }
+
+        if(ErrorCode::CODE_OK == $result){
+            Log::info("backUserCoin: end ok order_no= " . $orderNo . ' order_num=' . $orderNum  . ' isCNY=' . $isCNY);
+            //更新收益记录表
+            $result = ActivityService::updateIncomeStatus($orderNum, ErrorCode::BABY_INCOME_DONE);
+
+        }else{
+            Log::error("backUserCoin: end failed order_no= " . $orderNo . ' order_num=' . $orderNum  . ' isCNY=' . $isCNY);
+        }
+
+        return $result;
+
+    }
 
     /**
      * 充值用户金币数量
@@ -644,10 +910,12 @@ class BasicBaby extends Controller
 
     /**
      * 优惠 奖励用户金币 娃娃币
-     * @param string $freeType
+     * @param string $proCode   产品编码
+     * @param string $userId   用户ID
+     * @param string $freeType  优惠类型
      * @return bool
      */
-    protected function freeUserCoin($userId, $freeType){
+    protected function freeUserCoin($proCode, $userId, $freeType){
 
         //获取充值优惠
         $receiptFreeInfo = $this->getPayValue($freeType);
@@ -657,8 +925,8 @@ class BasicBaby extends Controller
         Log::info("freeUserCoin:  lastFreeValue= " . $lastFreeValue . ' lastCoinValue=' . $lastCoinValue);
 
         $db_user = Db::name('TUserConfig');
-
         $userInfo = $db_user->where('user_id', $userId)->find();
+
         if($userInfo && ($userInfo['user_id'] == $userId ) ){
 
             $data_userCoin = array('id'=> $userInfo['id']);
@@ -680,9 +948,13 @@ class BasicBaby extends Controller
         }
 
         if($retBool){
-            Log::info("freeUserCoin: end ok userId= " . $userId);
+            Log::info("freeUserCoin: end ok userId= " . $userId . ' product_code=' . $proCode . ' freeType=' . $freeType);
+            //保存收益记录表
+            $orderNum = self::createHeaderSeq(ErrorCode::BABY_HEADER_SEQ_IN, 12);
+            $result = ActivityService::addUserIncome($userId, $proCode, $orderNum, '', 0, $lastCoinValue, $lastFreeValue, ErrorCode::BABY_EMPLOY_REASON_1, '分享收益', $iStatus=ErrorCode::BABY_INCOME_DONE);
+
         }else{
-            Log::error("freeUserCoin: end failed userId= " . $userId);
+            Log::error("freeUserCoin: end failed userId= " . $userId . ' product_code=' . $proCode . ' freeType=' . $freeType);
         }
 
     }
@@ -819,7 +1091,8 @@ class BasicBaby extends Controller
         }
 
         //保存消费记录
-        $orderId = self::createTmpSeq(12);
+        //$orderId = self::createTmpSeq(12);
+        $orderId = self::createHeaderSeq(ErrorCode::BABY_HEADER_SEQ_COST, 12);
         self::updateUserBill($userId, $orderId, $billCoin, $billFreeCoin, $reason, $remark);
 
         if(ErrorCode::CODE_OK == $result){
@@ -869,35 +1142,132 @@ class BasicBaby extends Controller
         return $result;
     }
 
+    /**
+     * 添加收益记录
+     * @param string $userId   用户ID
+     * @param int $coinType  金币类型  默认消耗娃娃币
+     * @param int $num   金币数量
+     * @return bool
+     */
+/*    protected function addUserIncome($userId, $proCode, $orderNum, $orderNo, $inValue, $coin, $freeCoin, $reason, $remark, $iStatus=ErrorCode::BABY_INCOME_NEW){
+        Log::info("addUserIncome: start user_id= " . $userId);
+
+        $tmpValue = 0;   //收益金额  单位元
+        $tmpCoin = 0;    //收益金币  单位金币
+        if( $inValue != 0 ){
+            // 保证 现金和 金币互斥
+            $tmpValue = $inValue;
+        }else{
+            $tmpCoin = $coin;
+        }
+        $db_income = Db::name('TUserIncome');
+        $data_income = array(
+            'user_id' => $userId,
+            'order_num' => $orderNum,
+            'order_no' => $orderNo,
+            'product_code' => $proCode,
+            'i_value' => $tmpValue,  //单位元
+            'coin' => $tmpCoin,
+            'free_coin' => $freeCoin,
+            'reason' => $reason,
+            'remark' => $remark,
+            'i_status' => $iStatus,  //默认为 0 生成收益
+        );
+
+        $jsonData = json_encode($data_income);
+        Log::info("addUserIncome: update user income= " . $jsonData );
+        $result = DataService::save($db_income, $data_income);
+
+        if($result){
+            Log::info("addUserIncome: end ok user_id= " . $userId );
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("addUserIncome: end failed user_id= " . $userId );
+            $result = ErrorCode::E_NOT_SUPPORT;
+        }
+        return $result;
+    }
+*/
+    /**
+     * 更新收益状态
+     * @param string $userId   用户ID
+     * @param int $coinType  金币类型  默认消耗娃娃币
+     * @param int $num   金币数量
+     * @return bool
+     */
+    protected function updateIncomeStatus($userId, $orderNum, $orderNo, $iStatus){
+
+    }
     ////////////////////////////////////end 支付 金币 相关函数 ////////////////////////////////////
 
     ////////////////////////////////////start 现金红包 相关函数 ////////////////////////////////////
     /**
      * 小程序发送现金红包 目前使用企业打款方式
-     * @param string $unionId
+     * @param string $userId
      * @param string $openId
-     * @param string $name
-     * @param string $pic
+     * @param string $total_fee  单位分
+     * @param string $reMark
      * @return bool
      */
-    protected function miniRedPackage($openId, $total_fee)
+    protected function miniRedPackage($userId, $orderNum, $total_fee, $reMark)
     {
-        //查询当前是否已经存在订单
-        $orderId = $this->createTmpSeq(12);
-        Log::info("miniRedPackage start: order_no= " . $orderId);
+        //获取openid
+        $openId = self::getOpenId($userId);
+
+        Log::info("miniRedPackage start: order_num= " . $orderNum . ' openid=' . $openId);
 
         $pay = load_wx_mini('pay');
         //$result = PayService::createRedPackage($pay, $openId, $orderId);
-        $result = PayService::createTransfer($pay, $openId, $orderId);
+        $result = PayService::createTransfer($pay, $openId, $orderNum, $total_fee, $reMark);
 
         if($result){
-            Log::info("miniRedPackage: end ok order_id= " . $orderId );
+            Log::info("miniRedPackage: end ok order_no= " . $orderNum . ' openid=' . $openId);
             $result = ErrorCode::CODE_OK;
         }else{
-            Log::error("miniRedPackage: end failed order_id= " . $orderId );
+            Log::error("miniRedPackage: end failed order_no= " . $orderNum . ' openid=' . $openId);
             $result = ErrorCode::E_USER_NOT_FOUND;
         }
 
+        return $result;
+
     }
    ////////////////////////////////////end 现金红包 相关函数 ////////////////////////////////////
+
+   ////////////////////////////////////start 抓取结果 相关函数 ////////////////////////////////////
+    /**
+     * 获取抓取记录信息
+     * @param string $userId
+     * @param string $result   抓取结果 1为成功 0 为失败
+     * @param string $status   结果处理状态
+     * @return array
+     */
+    protected function getResultList($userId, $result, $status){
+        //获取用户信息
+        $db_result = Db::name('TRoomGameResult');
+
+        $field = ["user_id" => $userId];
+        if($status != ErrorCode::BABY_POST_ALL)
+        {
+            $field['status'] = $status;
+        }
+        if($result == ErrorCode::BABY_CATCH_SUCCESS)
+        {
+            //获取抓取成功记录
+            $field['result'] = $status;
+        }
+
+        $db_result = $db_result->where($field);
+
+        $resultList = $db_result->select();
+        /*foreach($resultList as $key => $record){
+            //获取每条结果记录的礼物信息
+
+        }*/
+
+        return $resultList;
+
+    }
+
+   ////////////////////////////////////end 抓取结果 相关函数 ////////////////////////////////////
+
 }

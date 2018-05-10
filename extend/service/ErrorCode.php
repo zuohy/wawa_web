@@ -39,42 +39,60 @@ class ErrorCode
 
 
     //常量
+
+    //收益 常量
+    const BABY_INCOME_NEW = 0;    //生成收益记录
+    const BABY_INCOME_DONE = 1;    //处理收益完成
+    const BABY_INCOME_FAILED = 2;    //处理收益异常
+    const BABY_INCOME_BACK_CNY = 1;    //收益直接返现金
+    const BABY_INCOME_BACK_COIN = 0;    //收益返金币
+
+    //支付常量
     const BABY_PAY_SUCCESS = 1;      //支付成功
     const BABY_PAY_FAILED = 0;      //支付失败
+    const BABY_PAY_ALREADY_SUCCESS = 2;      //已经支付成功
 
     const BABY_SHARE_SUCCESS = 0;       //分享成功  有效分享
-    const BABY_SHARE_FAILED = 1;        //分享失败 用户已经被分享了
+    const BABY_SHARE_FAILED = 1;        //分享失败 用户已经被分享了 app 应用
+    const BABY_SHARE_NOT_PAY = 2;        //分享但未付款 活动 产品
     const BABY_SHARE_NO_ACCEPT = 3;        //分享失败 没有被分享者信息
     const BABY_SHARE_NO_INVITATION = 9;        //分享失败 没有邀请者信息
 
 
+    //随机数 头标签
     const BABY_HEADER_SEQ_APP = 'A-00001';    //app 应用默认值 字母开头
-    const BABY_HEADER_SEQ_A = 'A';    //字母开口的随机数
-    const BABY_HEADER_SEQ_S = 'S';    //字母开口的随机数
-    const BABY_HEADER_SEQ_H = 'H';    //字母开口的随机数
+    const BABY_HEADER_SEQ_A = 'A';    //字母开口的随机数 app应用
+    const BABY_HEADER_SEQ_S = 'S';    //字母开口的随机数 商品
+    const BABY_HEADER_SEQ_H = 'H';    //字母开口的随机数 活动
+    const BABY_HEADER_SEQ_IN = 'I';    //收益随机数
+    const BABY_HEADER_SEQ_COST = 'C';    //消费随机数
 
     const BABY_COVER_TYPE_COIN = 1;    //转换为金币(角)
     const BABY_COVER_TYPE_PAY = 2;    //转换为分 微信支付单位
     const BABY_COVER_TYPE_CNY = 3;    //金币 转换为元
+    const BABY_COVER_TYPE_FEE = 4;    //金币 转换为分
 
     const BABY_COIN_TYPE_REG_1 = 1;    //充值类型1
     const BABY_COIN_TYPE_REG_2 = 2;    //充值类型2
     const BABY_COIN_TYPE_SHARE = 20;  //分享类型
+    //const BABY_COIN_TYPE_CNY = 100;  //分享类型 直接存入金币 暂时未用
 
+    //房间 常量
     const BABY_ROOM_MEMBER_STATUS_OUT = 1;   //未进入房间
-const BABY_ROOM_MEMBER_STATUS_IN = 2;   //进入房间
-const BABY_ROOM_MEMBER_STATUS_RUN = 3;   //正在游戏
+    const BABY_ROOM_MEMBER_STATUS_IN = 2;   //进入房间
+    const BABY_ROOM_MEMBER_STATUS_RUN = 3;   //正在游戏
 
-const BABY_ROOM_STATUS_BUILD = 0;   //修建中
-const BABY_ROOM_STATUS_ON = 1;   //空闲
-const BABY_ROOM_STATUS_BUSY = 2;   //忙碌 游戏
-const BABY_ROOM_STATUS_OFF = 3;   //下线 维护
+    const BABY_ROOM_STATUS_BUILD = 0;   //修建中
+    const BABY_ROOM_STATUS_ON = 1;   //空闲
+    const BABY_ROOM_STATUS_BUSY = 2;   //忙碌 游戏
+    const BABY_ROOM_STATUS_OFF = 3;   //下线 维护
 
-const BABY_ROOM_MODEL_COM = 0;   //普通模式
-const BABY_ROOM_MODEL_HERO = 1;   //英雄模式
+    const BABY_ROOM_MODEL_COM = 0;   //普通模式
+    const BABY_ROOM_MODEL_HERO = 1;   //英雄模式
 
-const BABY_EMPLOY_TYPE_FREE = 0;   //娃娃币
-const BABY_EMPLOY_TYPE_COIN = 1;   //金币
+    //消费 常量
+    const BABY_EMPLOY_TYPE_FREE = 0;   //娃娃币
+    const BABY_EMPLOY_TYPE_COIN = 1;   //金币
 
     const BABY_EMPLOY_REASON_1 = 1;   //投币游戏
     const BABY_EMPLOY_REASON_2 = 2;   //支援游戏
@@ -82,6 +100,14 @@ const BABY_EMPLOY_TYPE_COIN = 1;   //金币
 
     const BABY_CATCH_SUCCESS = 1;   //抓取成功
     const BABY_CATCH_FAIL = 0;   //抓取失败
+
+    const BABY_POST_ALL = 0;   //所有状态
+    const BABY_POST_IN = 1;   //寄存中
+    const BABY_POST_WAIT = 2;   //待邮寄
+    const BABY_POST_TO = 3;   //已发货
+    const BABY_POST_DONE = 4;   //已兑换
+
+
     //
     //消息文案类型
     const MSG_TYPE_ERROR = 1;               //英文错误消息，用于服务器打印日志
@@ -102,6 +128,7 @@ const BABY_EMPLOY_TYPE_COIN = 1;   //金币
     const E_USER_INSERT_COIN_ERROR = -2005;  //投币金额不正确
     const E_USER_EMPLOY_COIN_ERROR = -2006;  //用户消费金额错误
     const E_USER_COUNT_COIN_ERROR = -2007;  //用户消费金额计算错误
+    const E_USER_INCOME_MAX = -2008;  //用户返现超过最大值 10元
 
     const E_ROOM_STATUS_ERROR = -2101;       //房间状态不正确
     const E_ROOM_USER_STATUS_ERROR = -2102;  //房间成员状态不正确

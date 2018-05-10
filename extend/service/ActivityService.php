@@ -48,17 +48,6 @@ class ActivityService
         'share_valid' => '',
         'update_at' => '',
     );
-    public static $memberInfo = array(    //当前成员信息
-        'room_id' => '',
-        'user_id' => '',
-        'name' => '',
-        'pic' => '',
-        'user_status' => '',
-        'v_user_type' => '',
-        'v_client_type' => '',
-        'c_client_id' => '',
-    );
-    public static $memberList = array();
 
 
     /**
@@ -85,17 +74,29 @@ class ActivityService
     }
 
     /**
+     * 拆分活动描述信息
+     * @param string $actCode 产品编码
+     * @return bool|string
+     */
+    public static function createDesArr($describe)
+    {
+        $desArr = explode('\n', $describe);
+
+        return $desArr;
+    }
+
+    /**
      * 获取分享 数量信息
      * @param string $productCode 产品编码
      * @param string $userId 用户ID
      * @return bool|string
      */
-    public static function getShareNum($productCode, $userId)
+    public static function getShareNum($productCode, $code)
     {
         $db_num = Db::name('TUserShareNum');
 
         $numArr = $db_num->where('product_code', $productCode)
-                         ->where('user_id', $userId)
+                         ->where('code', $code)
                          ->find();
         if($numArr && ($numArr['product_code'] == $productCode ) ){
 
@@ -109,9 +110,85 @@ class ActivityService
         return self::$shareNumInfo;
     }
 
+    /**
+     * 获取分享 数量信息
+     * @param string $productCode 产品编码
+     * @param string $userId 用户ID
+     * @param string $isShare 是否为有效分享
+     * @param string $name 用户名
+     * @param string $pic 用户头像
+     * @param string $gender 性别
+     * @return bool|string
+     */
+    public static function addShareNum($productCode, $code, $name, $pic, $gender, $isShare)
+    {
+        Log::info("addShareNum: start product_code= " . $productCode);
+        //获取更新 有效分享
+        $num = 0;      //分享次数
+        $validNum = 0; //有效分享次数
+
+        if($isShare == ErrorCode::BABY_SHARE_SUCCESS){
+            //有效分享， 都加1次
+            $num = 1;
+            $validNum = 1;
+        }else{
+            $num = 1;
+        }
+
+        $curNumInfo = self::getShareNum($productCode, $code);
+        $curId = isset($curNumInfo['id']) ? $curNumInfo['id'] : '';
+        $curCode = isset($curNumInfo['code']) ? $curNumInfo['code'] : '';
+        $curShareNum = isset($curNumInfo['share_num']) ? $curNumInfo['share_num'] : 0;
+        $curShareValid = isset($curNumInfo['share_valid']) ? $curNumInfo['share_valid'] : 0;
+
+
+
+        if($curCode == $code){
+            //分享次数统计，记录已经存在 更新信息
+            $data_num = array(
+                'id'=> $curId,
+                //'product_code'=> $productCode,
+                //'code'=> $code,
+                'name'=> $name,
+                'pic'=> $pic,
+                'gender'=> $gender,
+                'share_num'=> $curShareNum + $num,
+                'share_valid'=> $curShareValid + $validNum,
+
+                'update_at'=> date('Y-m-d H:m:s')    //记录更新时间
+            );
+
+        }else{
+            $data_num = array(
+                'product_code'=> $productCode,
+                'code'=> $code,
+                'name'=> $name,
+                'pic'=> $pic,
+                'gender'=> $gender,
+                'share_num'=> $num,
+                'share_valid'=> $validNum,
+
+                'update_at'=> date('Y-m-d H:m:s')    //记录更新时间
+            );
+        }
+
+        $db_num = Db::name('TUserShareNum');
+        $retBool = DataService::save($db_num, $data_num);   //返回bool 量
+
+        if($retBool){
+            Log::info("addShareNum: end ok isShare= " . $isShare . ' product_code=' . $productCode . ' code=' .  $code);
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("addShareNum: end failed isShare= " . $isShare . ' product_code=' . $productCode . ' code=' .  $code);
+            $result = ErrorCode::E_NOT_SUPPORT;
+        }
+
+        return $result;
+
+    }
 
     /**
-     * 保存分享记录表
+     * 保存分享记录表 更新分享记录状态
      * @param array $productCode 产品编码 默认为A-00001 应用分享
      * @param array $userAccept 当前被分享者
      * @param array $userFather 分享者
@@ -119,8 +196,9 @@ class ActivityService
      *
      * @return array
      */
-   private function _saveShareHis($productCode=ErrorCode::BABY_HEADER_SEQ_APP, $userAccept, $userFather, $isShare)
+   public static function updateShareHis($productCode=ErrorCode::BABY_HEADER_SEQ_APP, $userAccept, $userFather, $isShare)
    {
+       Log::info("updateShareHis: start product_code= " . $productCode);
         //保存分享记录表
         $db_share_his = Db::name('TUserShareHis');
 
@@ -137,7 +215,8 @@ class ActivityService
        //异常判断
        if($i_code == '' || $i_code_father == ''){
            Log::info("_saveShareHis: code is empty i_code= " . $i_code . ' i_code_father' . $i_code_father);
-           return;
+           $result = ErrorCode::E_NOT_SUPPORT;
+           return $result;
        }
        //查找分享记录 是否已经存在
        $curShareHis = $db_share_his->where('product_code', $productCode)
@@ -149,12 +228,13 @@ class ActivityService
            $inNum = $curShareHis['s_num'] + 1;
            $data_share = array(
                'id' =>  $curShareHis['id'],
-               's_num'=> $inNum
+               's_num'=> $inNum,
+               'update_at'=> date('Y-m-d H:m:s')    //记录更新时间 很重要，用于确定最新的分享者
            );
 
            $curStatus = $curShareHis['s_status'];
            if($curStatus != ErrorCode::BABY_SHARE_SUCCESS){
-               //已经为有效分享，只增加分享计数
+               //已经为有效分享，更新为有效分享
                $shareStatus = array(
                    's_status'=> $isShare
                );
@@ -174,15 +254,21 @@ class ActivityService
                'pic_father'=> $i_pic_father,
                'gender_father'=> $i_gender_father,
                's_status'=> $isShare,
-               's_num'=> 1);     //新建分享记录 计数为 1 次
+               's_num'=> 1,       //新建分享记录 计数为 1 次
+               'update_at'=> date('Y-m-d H:m:s')    //记录更新时间
+           );
+
        }
 
 
-        $result = DataService::save($db_share_his, $data_share);
+        $result = DataService::save($db_share_his, $data_share);   //返回bool 量
 
        if($result){
            Log::info("_saveShareHis: end ok isShare= " . $isShare );
            $result = ErrorCode::CODE_OK;
+
+           //增加分享统计 信息
+           self::addShareNum($productCode, $i_code_father, $i_name_father, $i_pic_father, $i_gender_father, $isShare);
        }else{
            Log::error("_saveShareHis: end failed isShare= " . $isShare );
            $result = ErrorCode::E_NOT_SUPPORT;
@@ -192,9 +278,122 @@ class ActivityService
    }
 
 
+    /**
+     * 获取分享者记录表信息 根据update_at 字段获取最新的分享者记录
+     * @param array $productCode 产品编码 默认为A-00001 应用分享
+     * @param array $userCode 当前被分享者code
+     * @param int $isShare 是否有效分享
+     * @param int $check 是否需要加入isShare 查询 0 默认不限制 1 加入isShare
+     * @return array
+     */
+    public static function getShareHisInfo($productCode=ErrorCode::BABY_HEADER_SEQ_APP, $userCode, $isShare, $check=0){
+
+
+        $db_share_his = Db::name('TUserShareHis');
+        $db_where = $db_share_his->where('product_code', $productCode)
+            ->where('code', $userCode)
+            ->order('update_at desc');   //获取最新的 分享者记录
+
+
+        if($check){
+            $db_where->where('s_status', $isShare);
+        }
+        $listShareHis = $db_where->select();   //分享信息  这里有可能有多个分享者记录
+        $curShareHis = isset($listShareHis[0]) ? $listShareHis[0] : '';
+
+        if($curShareHis && $curShareHis['code'] == $userCode){
+            return $curShareHis;
+        }else{
+            $curShareHis = '';
+        }
+        return $curShareHis;
+    }
+
+
+    /**
+     * 添加收益记录
+     * @param string $userId   用户ID
+     * @param int $coinType  金币类型  默认消耗娃娃币
+     * @param int $num   金币数量
+     * @return bool
+     */
+    public static function addUserIncome($userId, $proCode, $orderNum, $orderNo, $inValue, $coin, $freeCoin, $reason, $remark, $iStatus=ErrorCode::BABY_INCOME_NEW){
+        Log::info("addUserIncome: start user_id= " . $userId);
+
+        $tmpValue = 0;   //收益金额  单位元
+        $tmpCoin = 0;    //收益金币  单位金币
+        if( $inValue != 0 ){
+            // 保证 现金和 金币互斥
+            $tmpValue = $inValue;
+        }else{
+            $tmpCoin = $coin;
+        }
+        $db_income = Db::name('TUserIncome');
+        $data_income = array(
+            'user_id' => $userId,
+            'order_num' => $orderNum,
+            'order_no' => $orderNo,
+            'product_code' => $proCode,
+            'i_value' => $tmpValue,  //单位元
+            'coin' => $tmpCoin,
+            'free_coin' => $freeCoin,
+            'reason' => $reason,
+            'remark' => $remark,
+            'i_status' => $iStatus,  //默认为 0 生成收益
+        );
+
+        $jsonData = json_encode($data_income);
+        Log::info("addUserIncome: update user income= " . $jsonData );
+        $retBool = DataService::save($db_income, $data_income);
+
+        if($retBool){
+            Log::info("addUserIncome: end ok user_id= " . $userId );
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("addUserIncome: end failed user_id= " . $userId );
+            $result = ErrorCode::E_NOT_SUPPORT;
+        }
+        return $result;
+    }
+
+    /**
+     * 更新收益记录 状态
+     * @param string $orderNum   收益编码
+     * @param int $iStatus  收益状态
+     * @return bool
+     */
+    public static function updateIncomeStatus($orderNum, $iStatus=ErrorCode::BABY_INCOME_NEW)
+    {
+        Log::info("updateIncomeStatus: start order_num= " . $orderNum);
+        $retBool = false;
+
+        $db_income = Db::name('TUserIncome');
+        $incomeInfo = $db_income->where('order_num', $orderNum)->find();
+        if($incomeInfo && $incomeInfo['order_num'] == $orderNum){
+            //更新状态
+            $data_income = array(
+                'id' =>  $incomeInfo['id'],
+                'i_status'=> $iStatus,
+                'update_at'=> date('Y-m-d H:m:s')    //记录更新时间
+            );
+            $retBool = DataService::save($db_income, $data_income);
+        }
 
 
 
-}
+        if($retBool){
+            Log::info("updateIncomeStatus: end ok i_status= " . $iStatus );
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("updateIncomeStatus: end failed i_status= " . $iStatus );
+            $result = ErrorCode::E_NOT_SUPPORT;
+        }
+
+        return $result;
+
+    }
+
+
+ }
 
 

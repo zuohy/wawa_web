@@ -62,16 +62,25 @@ class Activity extends BasicBaby
         $proCode = $this->request->get('product_code');
         $userId = session('user_id');
 
+        $tmpUserInfo = $this->getUserInfo($userId);
+        $tmpCode = isset($tmpUserInfo['code']) ? $tmpUserInfo['code'] : '';
         //分享 收徒数量
-        $actNum = ActivityService::getShareNum($proCode, $userId);
+        $actNum = ActivityService::getShareNum($proCode, $tmpCode);
         $shareNum = isset($actNum['share_num']) ? $actNum['share_num'] : '';
         $shareValid = isset($actNum['share_valid']) ? $actNum['share_valid'] : '';
         $this->assign('share_num', $shareNum);
         $this->assign('share_valid', $shareValid);
 
+        //活动信息
+        $actInfo = ActivityService::getActInfo($proCode);
+        $desArr = ActivityService::createDesArr($actInfo['describe']);
+        $this->assign('des_arr', $desArr);
         //分享 排名 top3
+        $db_num = Db::name('TUserShareNum');
+        $dbArr = $db_num->where('product_code', $proCode)->order('share_valid desc');
 
-        return view('', ['title' => '活动']);
+        $this->title = '活动';
+        return parent::_list($dbArr);
     }
 
     /**

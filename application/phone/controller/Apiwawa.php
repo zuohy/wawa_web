@@ -21,7 +21,7 @@ use service\DataService;
 use service\ErrorCode;
 use service\RoomService;
 use service\DeviceService;
-//use GatewayClient\Gateway;
+use service\ActivityService;
 /**
  * 手机接口
  * Class Index
@@ -61,20 +61,24 @@ class Apiwawa extends BasicBaby
         switch($cmdType) {
             case 'share_login':
                 //分享者登录
-                $retStatus = $this->_buildShareRel( $jPack['user_id'], $jPack['code_father']);
-                if(ErrorCode::CODE_OK == $retStatus){
-                    $this->freeUserCoin($jPack['user_id'], ErrorCode::BABY_COIN_TYPE_SHARE);
+                $proCode = isset($jPack['product_code']) ? $jPack['product_code'] : ErrorCode::BABY_HEADER_SEQ_APP;
+                $codeFather = isset($jPack['code_father']) ? $jPack['code_father'] : '';
+                $userId = isset($jPack['user_id']) ? $jPack['user_id'] : '';
 
-                    $db_user = Db::name('TUserConfig');
-                    $userInfo = $db_user->where('code', $jPack['code_father'])->find();
-                    if($userInfo && ($userInfo['code'] == $jPack['code_father'] ) ){
-                        $this->freeUserCoin($userInfo['user_id'], ErrorCode::BABY_COIN_TYPE_SHARE);
+                $retStatus = $this->_buildShareRecord( $proCode, $userId, $codeFather);
+                if(ErrorCode::CODE_OK == $retStatus){
+                    //用户分享app 应用 立刻返 娃娃币
+                    $this->freeUserCoin($proCode, $jPack['user_id'], ErrorCode::BABY_COIN_TYPE_SHARE);
+
+
+                    $faUserInfo = $this->getUserInfoByCode($codeFather);
+                    if($faUserInfo && ($faUserInfo['code'] == $codeFather ) ){
+                        $this->freeUserCoin($proCode, $faUserInfo['user_id'], ErrorCode::BABY_COIN_TYPE_SHARE);
                     }
 
                 }
                 $this->retMsg['code'] = $retStatus;
-                //$this->retMsg['type'] = $cmdType;
-                $this->retMsg['data'] = $jPack['code_father'];
+                $this->retMsg['data'] = $codeFather;
                 break;
             case 'room_servers':
                 //获取房间 服务器信息  视频服务器 聊天服务器 设备服务器
@@ -353,6 +357,69 @@ class Apiwawa extends BasicBaby
                 RoomService::gateWaySendMsg($roomId, '', $chatData);
 
                 break;
+///////////////start 支付接口////////////////////////
+            case 'payment':
+                //支付 生成订单
+                //获取openid
+                $openId = session('open_id');
+                $userId = session('user_id');
+                $unionId = session('union_id');
+
+                Log::info("recharge: openId= " . $openId);
+                Log::info("recharge: userId= " . $userId);
+                Log::info("recharge: unionId= " . $unionId);
+
+                //获取产品编码
+                $productCode = isset($jPack['product_code']) ? $jPack['product_code'] : ErrorCode::BABY_HEADER_SEQ_APP;
+                //获取pay value
+                $iconsType = isset($jPack['icons_type']) ? $jPack['icons_type'] :0;   //0 为无效的优惠
+                $userPay = isset($jPack['pay_value']) ? $jPack['pay_value'] : -1;   //用户自定义 支付金额
+
+                $lastPay = -1;     //支付金额
+                $iconsArr = $this->getPayValue($iconsType);
+                if( 0 == $iconsType){
+                    $lastPay = $userPay;
+                }else{
+                    $lastPay = isset($iconsArr['pay_value']) ? $iconsArr['pay_value'] : -1;
+                }
+
+                //数据库中充值单位为元， 支付接口单位为 分， 所以这里需要转换金额 1元= 100分
+                $payValue = $this->coverPayValue(ErrorCode::BABY_COVER_TYPE_PAY, $lastPay);
+
+                $optionsArr = $this->miniPay($openId, $payValue);
+                //$payOptions = json_encode($optionsArr);
+
+                //生成用户订单信息
+                Log::info("recharge: options code= " . $optionsArr['code']);
+                if( $optionsArr['code'] == 0 ){
+                    $this->saveReceipt($userId, $optionsArr['prepayId'], $lastPay, $iconsType, $optionsArr['order_no'], $productCode);
+                }
+                //订单 返回支付订单信息
+                $this->retMsg['data'] = $optionsArr;
+                break;
+            case 'pay_result':
+                //支付结果， 处理支付后逻辑
+                $orderNo = isset($jPack['order_no']) ? $jPack['order_no'] : '';
+                $status = isset($jPack['status']) ? $jPack['status'] : '';
+                Log::info("paymentResult: start orderNo=" . $orderNo . " status=" . $status);
+
+                $result = $this->completeOrderPay($orderNo, $status);
+                if( $result == ErrorCode::BABY_PAY_SUCCESS){
+                    $this->retMsg['code'] = ErrorCode::CODE_OK;
+                    $this->retMsg['msg'] = ErrorCode::$ERR_MSG[ErrorCode::CODE_OK];
+
+                    //支付成功， 后续逻辑处理
+                    $this->handleUserCoin($orderNo);
+
+                }else{
+                    $this->retMsg['code'] = ErrorCode::CODE_NOT_SUPPORT;
+                    $this->retMsg['msg'] = ErrorCode::$ERR_MSG[ErrorCode::CODE_NOT_SUPPORT];
+                }
+
+                Log::info("paymentResult: end orderNo=" . $orderNo . " result=" . $result);
+
+                break;
+///////////////end 支付接口////////////////////////
             default:
                 $this->retMsg['code'] = ErrorCode::CODE_NOT_SUPPORT;
                 $this->retMsg['msg'] = ErrorCode::$ERR_MSG[ErrorCode::CODE_NOT_SUPPORT];
@@ -379,42 +446,58 @@ class Apiwawa extends BasicBaby
         return $this->retMsg;
     }
 
+
     /**
-     * 保存分享记录表
-     * @param array $userAccept 当前被分享者
-     * @param array $userFather 分享者
-     * @param int $isStatus 是否已经分享
-     *
+     * 建立分享关系 邀请码对应用户
      * @return array
      */
-/*    private function _saveShareHis($procodeCode, $userAccept, $userFather, $isStatus)
+    private function _buildShareRecord($proCode ,$userId, $codeFather)
     {
+        $isShare = ErrorCode::BABY_SHARE_FAILED;  //0 分享关联成功 1 用户 已经被分享  2 购买商品 未支付
+
+        //查找当前登录用户
+        $userAccept = $this->getUserInfo($userId);         //被分享者信息
+        $userInvitation = $this->getUserInfoByCode($codeFather);   //邀请者信息
+
         //保存分享记录表
-        $db_share_his = Db::name('TUserShareHis');
+        if($proCode != ErrorCode::BABY_HEADER_SEQ_APP){
+            $isShare = ErrorCode::BABY_SHARE_NOT_PAY;  //商品分享，未支付
 
-        $i_code = isset($userAccept['code']) ? $userAccept['code'] : '';
-        $i_name = isset($userAccept['name']) ? $userAccept['name'] : '';
-        $i_pic = isset($userAccept['pic']) ? $userAccept['pic'] : '';
-        $i_gender = isset($userAccept['gender']) ? $userAccept['gender'] : '';
-        $i_code_father = isset($codeFather) ? $codeFather : '';
-        $i_name_father = isset($userInvitation['name']) ? $userInvitation['name'] : '';
-        $i_pic_father = isset($userInvitation['pic']) ? $userInvitation['pic'] : '';
-        $i_gender_father = isset($userInvitation['gender']) ? $userInvitation['gender'] : '';
+        }else{
+            //用户是否被分享
+            if($userInvitation && $userInvitation['code'] == $codeFather){
+                if($userAccept && $userAccept['user_id'] == $userId){
+                    if($userAccept['code_father'] != ''){
+                        //当前用户已经被分享了，暂时不更新分享者邀请码
+                        $isShare = ErrorCode::BABY_SHARE_FAILED;
+                    }else{
+                        //更新当前用户的父级邀请码
+                        $db_user = Db::name('TUserConfig');
+                        $data_user = array('id'=> $userAccept['id'], 'code_father'=> $codeFather);
+                        $result = DataService::save($db_user, $data_user);
+                        $isShare = ErrorCode::BABY_SHARE_SUCCESS;
+                    }
 
-        $data_share = array(
-            'code'=> $i_code,
-            'name'=> $i_name,
-            'pic'=> $i_pic,
-            'gender'=> $i_gender,
+                }else{
+                    //记录日志
+                    $isShare = ErrorCode::BABY_SHARE_NO_ACCEPT;  //没有被邀请者信息
 
-            'code_father'=> $i_code_father,
-            'name_father'=> $i_name_father,
-            'pic_father'=> $i_pic_father,
-            'gender_father'=> $i_gender_father,
-            's_status'=> $isShare);
-        $result = DataService::save($db_share_his, $data_share);
+                }
+            }else{
+                //记录日志
+                $isShare = ErrorCode::BABY_SHARE_NO_INVITATION; //没有找到邀请者信息
+            }
+        }
+
+
+        $result = ActivityService::updateShareHis($proCode, $userAccept, $userInvitation, $isShare);
+
+        Log::info("_buildShareRecord: isShare= " . $isShare);
+        return $isShare;
+
     }
-*/
+
+
     /**
      * 建立分享关系 邀请码对应用户
      * @return array

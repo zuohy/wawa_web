@@ -15,69 +15,23 @@
 	<p class="titi">我抓的娃娃</p>
 </div>
 
-<!--头部-->
-<div class="pos">
-	<div class="container">
-    	<div class="row titll">
-        	<a href="#"><div class="col-xs-2" style="color:#246fc0;">全部</div></a>
-            <a href="#"><div class="col-xs-2">待发货</div></a>
-            <a href="#"><div class="col-xs-2">已发货</div></a>
-            <a href="#"><div class="col-xs-2">待收货</div></a>
-            <a href="#"><div class="col-xs-2">待评价</div></a>
-
-        </div>
-    </div>
-</div>
-
 <!--列表-->
 
 <div class="ding_d">
+    {foreach $list as $key=>$vo}
 	<div class="on_d">
-    	<p class="bh">订单编号：4878555166555<span>待付款</span></p>
+    	<p class="bh">订单编号：{$vo.order_id}<span>{$vo.result_c}</span></p>
         <div class="sp_pr">
             <a href="details.html">
-                <img src="__STATIC__/plugs/phone/images/gdsgf4.jpg">
+                <img src="__STATIC__/{$vo.gift_pic_show}">
                 <div class="text_p">
-                    <p>百佳超级市场</p>
-                    <div class="xing">
-                        <span class="glyphicon glyphicon-star"></span>
-                        <span class="glyphicon glyphicon-star"></span>
-                        <span class="glyphicon glyphicon-star"></span>
-                        <span class="glyphicon glyphicon-star"></span>
-                        <span class="glyphicon glyphicon-star"></span>
-                    </div>
-                    <span class="yue" style="margin-top:1.286em;">下单时间：2017-01-20 11:08</span>
+                    <p>{$vo.gift_name}</p>
+                    <span class="yue" style="margin-top:1.286em;">抓取时间：{$vo.create_at}</span>
                 </div>
             </a>     
         </div>
-        <div class="button">
-        	<a href="#" class="liji">立即付款</a>
-            <a href="#" class="qu">取消订单</a>
-        </div>
     </div>
-    <div class="on_d">
-    	<p class="bh">订单编号：4878555166555<span>待发货</span></p>
-        <div class="sp_pr">
-            <a href="details.html">
-                <img src="__STATIC__/plugs/phone/images/gdsgf4.jpg">
-                <div class="text_p">
-                    <p>百佳超级市场</p>
-                    <div class="xing">
-                        <span class="glyphicon glyphicon-star"></span>
-                        <span class="glyphicon glyphicon-star"></span>
-                        <span class="glyphicon glyphicon-star"></span>
-                        <span class="glyphicon glyphicon-star"></span>
-                        <span class="glyphicon glyphicon-star"></span>
-                    </div>
-                    <span class="yue" style="margin-top:1.286em;">下单时间：2017-01-20 11:08</span>
-                </div>
-            </a>     
-        </div>
-        <div class="button">
-        	<a href="#" class="liji">确认收货</a>
-            <a href="#" class="qu">取消订单</a>
-        </div>
-    </div>
+    {/foreach}
 	
 </div>
 

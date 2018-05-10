@@ -23,7 +23,7 @@
             <a class="" data-href='{:url("phone/post/getresult")}?status=1' href="javascript:void(0)"><div class="col-xs-2">寄存中</div></a>
             <a data-href='{:url("phone/post/getresult")}?status=2' href="javascript:void(0)"><div class="col-xs-2">待邮寄</div></a>
             <a data-href='{:url("phone/post/getresult")}?status=3' href="javascript:void(0)"><div class="col-xs-2">已发货</div></a>
-            <a data-href='{:url("phone/post/getresult")}?status=4' href="javascript:void(0)"><div class="col-xs-2">待付款</div></a>
+            <a data-href='{:url("phone/post/getresult")}?status=4' href="javascript:void(0)"><div class="col-xs-2">已换币</div></a>
 
         </div>
     </div>
@@ -47,17 +47,10 @@
         </p>
         <div class="sp_pr">
             <a href="details.html">
-                <img src="{$vo.pic}">
+                <img src="__STATIC__/{$vo.gift_pic_show}">
                 <div class="text_p">
-                    <p>{$vo.name}</p>
-                    <div class="xing">
-                        <span class="glyphicon glyphicon-star"></span>
-                        <span class="glyphicon glyphicon-star"></span>
-                        <span class="glyphicon glyphicon-star"></span>
-                        <span class="glyphicon glyphicon-star"></span>
-                        <span class="glyphicon glyphicon-star"></span>
-                    </div>
-                    <span class="yue" style="margin-top:1.286em;">下单时间：{$vo.create_at}</span>
+                    <p>{$vo.gift_name}</p>
+                    <span class="yue" style="margin-top:1.286em;">抓取时间：{$vo.create_at}</span>
                 </div>
             </a>
         </div>
