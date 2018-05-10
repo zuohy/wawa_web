@@ -2,6 +2,23 @@
 
 {block name="body"}
 
+<style>
+    .sp_pr
+    {
+        display: block;
+        float: left;
+        width: 49%;
+        border: 1px solid white
+    }
+    .sp_pr img{
+        width: 100%;
+    }
+    .jul{
+        padding: 0 6px;
+        border-radius: 8px;
+        margin-top: 0.9em;
+    }
+</style>
 
 <!--top-->
 <div class="top_c">
@@ -41,27 +58,13 @@
             <img src="__STATIC__/{$vo.dev_pic}">
             {/if}
 
-            <div class="text_p">
+            <div class="text_p" style="margin-top: 10px">
                 <p>{$vo.dev_room_id}</p>
-                <div class="xing">
-                    <span class="glyphicon glyphicon-star"></span>
-                    <span class="glyphicon glyphicon-star"></span>
-                    <span class="glyphicon glyphicon-star"></span>
-                    <span class="glyphicon glyphicon-star"></span>
-                    <span class="glyphicon glyphicon-star"></span>
-                </div>
-                <span class="yue">在线人数<em>1215</em>人</span>
-                <span class="yue">模式
-                    {if $vo.dev_tag eq 0}
-                    <em style="color: blue">{$vo.tag_c}</em></span>
-                    {else}
-                    <em style="color: #FF5722">{$vo.tag_c}</em></span>
-                    {/if}
             </div>
             {if $vo.dev_status eq 0}
-            <div class="jul" style="color: red;">{$vo.status_c}</div>
+            <div class="jul" style="background: red;color: white">{$vo.status_c}</div>
             {else}
-            <div class="jul" style="color: green;">{$vo.status_c}</div>
+            <div class="jul" style="background: green;color: white">{$vo.status_c}</div>
             {/if}
 
         </a>

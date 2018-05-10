@@ -2,6 +2,27 @@
 
 {block name="body"}
 
+<style>
+    .sp_pr
+    {
+        display: block;
+        float: left;
+        width: 49%;
+        border: 1px solid white
+    }
+    .sp_pr img{
+        width: 100%;
+    }
+    .jul{
+        padding: 0 6px;
+        border-radius: 8px;
+        margin-top: 1.6em;
+    }
+    .yue_img{
+        height: 10% !important;
+        width: 10% !important;
+    }
+</style>
 
 <!--banner-->
 <div id="carousel-example-generic" class="carousel slide banner" data-ride="carousel">
@@ -90,7 +111,9 @@
     </div>
 </div>
 
+
 <div class="product">
+
     {foreach $list as $key=>$vo}
     <div class="sp_pr">
         {if $vo.status eq '0' || $vo.status eq '3'}
@@ -108,25 +131,13 @@
 
             <div class="text_p">
                 <p>{$vo.topic}</p>
-                <div class="xing">
-                    <span class="glyphicon glyphicon-star"></span>
-                    <span class="glyphicon glyphicon-star"></span>
-                    <span class="glyphicon glyphicon-star"></span>
-                    <span class="glyphicon glyphicon-star"></span>
-                    <span class="glyphicon glyphicon-star"></span>
-                </div>
-                <span class="yue">在线人数<em>1215</em>人</span>
-                <span class="yue">价格<em class="em_s">{$vo.price}</em>模式
-                    {if $vo.tag eq 0}
-                    <em style="color: blue">{$vo.tag_c}</em></span>
-                    {else}
-                    <em style="color: #FF5722">{$vo.tag_c}</em></span>
-                    {/if}
+                <span class="yue">价格<em class="em_s">{$vo.price}/次</em>
+                </span>
             </div>
             {if $vo.status eq 0}
-            <div class="jul" style="color: red;">{$vo.status_c}</div>
+            <div class="jul" style="background: red;color: white">{$vo.status_c}</div>
             {else}
-            <div class="jul" style="color: green;">{$vo.status_c}</div>
+            <div class="jul" style="background: green;color: white">{$vo.status_c}</div>
             {/if}
 
         </a>
