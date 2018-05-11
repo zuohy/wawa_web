@@ -35,8 +35,20 @@ class Personal extends BasicBaby
      */
     public function index()
     {
+        $userId = session('user_id');
+        $inCount = $this->getResultList($userId, ErrorCode::BABY_CATCH_SUCCESS, ErrorCode::BABY_POST_IN, 1);
+        $waitCount = $this->getResultList($userId, ErrorCode::BABY_CATCH_SUCCESS, ErrorCode::BABY_POST_WAIT, 1);
 
-        return view('', ['title' => '个人中心']);
+        $userInfo = $this->getUserInfo($userId);
+        $userName = isset($userInfo['name']) ? $userInfo['name'] : '';
+        $userFreeCoin = isset($userInfo['free_coin']) ? $userInfo['free_coin'] : '';
+        $userPic = isset($userInfo['pic']) ? $userInfo['pic'] : '';
+        $userId = isset($userInfo['user_id']) ? $userInfo['user_id'] : '';
+        $minUserId = substr($userId,4); //截取后6位user ID
+
+        return view('', ['title' => '个人中心', 'in_count' => $inCount, 'wait_count' => $waitCount,
+            'min_user_id' => $minUserId, 'name' => $userName, 'free_coin' => $userFreeCoin,'pic' => $userPic]);
+
     }
 
     /**

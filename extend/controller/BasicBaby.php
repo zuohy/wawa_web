@@ -1239,9 +1239,10 @@ class BasicBaby extends Controller
      * @param string $userId
      * @param string $result   抓取结果 1为成功 0 为失败
      * @param string $status   结果处理状态
+     * @param string $isCount   是否只获取记录条数 0为无效 1 为有效
      * @return array
      */
-    protected function getResultList($userId, $result, $status){
+    protected function getResultList($userId, $result, $status, $isCount=0){
         //获取用户信息
         $db_result = Db::name('TRoomGameResult');
 
@@ -1253,12 +1254,15 @@ class BasicBaby extends Controller
         if($result == ErrorCode::BABY_CATCH_SUCCESS)
         {
             //获取抓取成功记录
-            $field['result'] = $status;
+            $field['result'] = $result;
         }
 
-        $db_result = $db_result->where($field);
+        if(0 == $isCount){
+            $resultList = $db_result->where($field)->select();
+        }else{
+            $resultList = $db_result->where($field)->count();
+        }
 
-        $resultList = $db_result->select();
         /*foreach($resultList as $key => $record){
             //获取每条结果记录的礼物信息
 

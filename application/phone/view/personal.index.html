@@ -14,14 +14,21 @@
         <div class="xiao">
         </div>
         <div class="tou_x">
-            <a href="information.html">
+            <a href="#">
                 <div class="sp_pr" style="float: left;border: none">
-                    <img style="border-radius: 40px;width: 80px;height: 80px" src="__STATIC__/plugs/proom/img/bg-default.jpg">
+                    <img style="border-radius: 40px;width: 80px;height: 80px" src="{$pic|default='__STATIC__/plugs/proom/img/bg-default.jpg'}">
                 </div>
                 <div class="yong" style="margin-top: 1.743em">
-                    <p>华富锦大厦</p>
-                    <span>手机号：15425586998</span>
+                    <p>{$name|default=""}</p>
+                    <span>娃娃币：{$free_coin|default=""}</span>
                 </div>
+            </a>
+            <a data-href='{:url("phone/wallet/recharge")}' href="javascript:void(0)">
+                <div class="yong" style="margin-top: 1.743em">
+                    <p>({$min_user_id|default=""})</p>
+                    <span>+去充值</span>
+                </div>
+
             </a>
         </div>
     </div>
@@ -30,44 +37,44 @@
 <!--列表-->
 
 <div class="ding">
-    <div class="one">
+    <!--<div class="one">
         <div class="container">
             <a href="order.html">
                 <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/qbdd.png" class="icon-img"/></span>全部订单<i class="iconfont icon-jiantou"></i></p>
             </a>
         </div>
-    </div>
+    </div> -->
     <ul>
         <li>
-            <a href="#">
-                <span class="iconfont"><img src="__STATIC__/plugs/proom/img/daifuk.png" class="icon-img"/><i>12</i></span>
-                <p>待付款</p>
+            <a data-href='{:url("phone/post/getresult")}?status=1' href="javascript:void(0)">
+                <span class="iconfont"><img src="__STATIC__/plugs/proom/img/daifuk.png" class="icon-img"/><i>{$in_count|default="0"}</i></span>
+                <p>寄存中</p>
             </a>
         </li>
         <li>
-            <a href="#">
-                <span class="iconfont"><img src="__STATIC__/plugs/proom/img/daifh.png" class="icon-img"/><i>8</i></span>
-                <p>待发货</p>
+            <a data-href='{:url("phone/post/getresult")}?status=2' href="javascript:void(0)">
+                <span class="iconfont"><img src="__STATIC__/plugs/proom/img/daifh.png" class="icon-img"/><i>{$wait_count|default="0"}</i></span>
+                <p>待邮寄</p>
             </a>
         </li>
         <li>
-            <a href="#">
+            <a data-href='{:url("phone/post/getresult")}?status=3' href="javascript:void(0)">
                 <span class="iconfont"><img src="__STATIC__/plugs/proom/img/daish.png" class="icon-img"/></span>
-                <p>待收货</p>
+                <p>已发货</p>
             </a>
         </li>
         <li>
-            <a href="#">
+            <a data-href='{:url("phone/post/getresult")}?status=4' href="javascript:void(0)">
                 <span class="iconfont"><img src="__STATIC__/plugs/proom/img/daipj.png" class="icon-img"/></span>
-                <p>待评价</p>
+                <p>已换币</p>
             </a>
         </li>
-        <li>
+        <!-- <li>
             <a href="#">
                 <span class="iconfont"><img src="__STATIC__/plugs/proom/img/tuik.png" class="icon-img"/></span>
                 <p>退款/售后</p>
             </a>
-        </li>
+        </li> -->
     </ul>
 </div>
 
@@ -82,20 +89,20 @@
         </div>
         <div class="one">
             <a data-href='{:url("phone/post/getresult?status=0")}' href="javascript:void(0)">
-                <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/qbdd.png" class="icon-img"/></span>我的娃娃<i class="iconfont icon-jiantou"></i></p>
+                <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/sjzx.png" class="icon-img"/></span>我的娃娃<i class="iconfont icon-jiantou"></i></p>
             </a>
         </div>
         <div class="one">
-            <a  href="recommend.html">
+            <a  href="#">
                 <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/tjhy.png" class="icon-img"/></span>推荐好友<i class="iconfont icon-jiantou"></i></p>
             </a>
         </div>
         <div class="one">
-            <a  href="address.html">
+            <a  href="#">
                 <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/shdz.png" class="icon-img"/></span>收货地址<i class="iconfont icon-jiantou"></i></p>
             </a>
         </div>
-        <div class="one">
+        <!-- <div class="one">
             <a href="capital.html">
                 <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/sz.png" class="icon-img"/></span>资金流水<i class="iconfont icon-jiantou"></i></p>
             </a>
@@ -104,7 +111,7 @@
             <a href="center.html">
                 <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/sjzx.png" class="icon-img"/></span>商家中心<i class="iconfont icon-jiantou"></i></p>
             </a>
-        </div>
+        </div> -->
     </div>
 </div>
 
