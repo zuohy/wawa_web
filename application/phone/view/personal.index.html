@@ -7,9 +7,19 @@
     .icon-img{
         width: 34px;
     }
+    .re_bt{
+        border: 1px solid orange;
+        text-align: center;
+        border-radius: 10px;
+        background: orange;
+    }
+    .zhang{
+        background: url("__STATIC__/plugs/proom/img/gr_bg.png");
+        background-size:100%
+    }
 </style>
 <!--头部-->
-<div class="zhang" style="background: #ffd800">
+<div class="zhang">
     <div class="container">
         <div class="xiao">
         </div>
@@ -26,7 +36,7 @@
             <a data-href='{:url("phone/wallet/recharge")}' href="javascript:void(0)">
                 <div class="yong" style="margin-top: 1.743em">
                     <p>({$min_user_id|default=""})</p>
-                    <span>+去充值</span>
+                    <span class="re_bt">+去充值</span>
                 </div>
 
             </a>

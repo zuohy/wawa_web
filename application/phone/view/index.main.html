@@ -7,20 +7,29 @@
     {
         display: block;
         float: left;
-        width: 49%;
-        border: 1px solid white
+        width: 46%;
+        border: 1px solid white;
+        margin: 4px;
+        border-radius: 8px;
+        padding: 0px;
+        background: white;
     }
     .sp_pr img{
         width: 100%;
+        height: 105px;
     }
     .jul{
         padding: 0 6px;
         border-radius: 8px;
         margin-top: 1.6em;
     }
-    .yue_img{
-        height: 10% !important;
-        width: 10% !important;
+    .text_p{
+        margin-bottom: 5px;
+        margin-left: 5px;
+    }
+    .sp img{
+        height: 100%;
+        width: 100%;
     }
 </style>
 
@@ -70,33 +79,32 @@
             <span class="glyphicon glyphicon-star" ></span>
         </div>
         <div class="row">
-            <div class="col-xs-5">
+            <div class="col-xs-4">
                 <a href="#" class="sp">
                     <img src="__STATIC__/plugs/phone/images/sf4.jpg">
                     <p>首充送免费券1张</p>
                     <span>￥<em>10.00</em></span>
                 </a>
             </div>
-            <div class="col-xs-7">
-                <div class="sp_1">
-                    <a data-href='{:url("phone/activity/index")}?product_code=H-00001' href="javascript:void(0)">
-                        <img src="__STATIC__/plugs/phone/images/787554.jpg">
-                        <div>
-                            <p>iPhone6数据线苹果6s二合一拖7plus伸缩5s</p>
-                            <span>￥<em>29.00</em></span>
-                        </div>
-                    </a>
-                </div>
-                <div class="sp_1" style="margin-top:1em; border-bottom:none;">
-                    <a href="#">
-                        <img src="__STATIC__/plugs/phone/images/454554.jpg">
-                        <div>
-                            <p>英国jellycat小男孩幼儿童女孩Cordy Roy大象毛绒玩具</p>
-                            <span>￥<em>145.00</em></span>
-                        </div>
-                    </a>
-                </div>
+            <div class="col-xs-4">
+                <a  class="sp" data-href='{:url("phone/activity/index")}?product_code=H-00001' href="javascript:void(0)">
+                    <img src="__STATIC__/plugs/phone/images/787554.jpg">
+                    <div>
+                        <p>iPhone6数据线苹果6s二合一拖7plus伸缩5s</p>
+                        <span>￥<em>29.00</em></span>
+                    </div>
+                </a>
             </div>
+            <div class="col-xs-4">
+                <a  class="sp" href="#">
+                    <img src="__STATIC__/plugs/phone/images/454554.jpg">
+                    <div>
+                        <p>英国jellycat小男孩幼儿童女孩Cordy Roy大象毛绒玩具</p>
+                        <span>￥<em>145.00</em></span>
+                    </div>
+                </a>
+            </div>
+
         </div>
     </div>
 </div>
