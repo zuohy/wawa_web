@@ -92,8 +92,12 @@
         <i class='img' data-src='__STATIC__/plugs/proom/img/bg-slide4.jpg'></i>
     </div> -->
     <!-- END OF Slideshow Background -->
-    <div id="test" class="cover-bg pos-abs full-size">
-        <video id="remoteVideo" autoplay="autoplay" style="height: 80%;"></video>
+
+    <!-- Solid color as background -->
+    <div class="cover-bg pos-abs full-size bg-color" data-bgcolor="rgb(254, 175, 27)"></div>
+
+    <div style="height: 70%;" id="test" class="cover-bg pos-abs full-size">
+        <video id="remoteVideo" autoplay="autoplay" ></video>
         <video class="hidden" id="localVideo" autoplay="autoplay" muted="muted" style="height: 100px; width: 100px"></video>
 
     </div>
@@ -107,11 +111,9 @@
     </div>-->
     <!--END OF Static video bg-->
 
-    <!-- Solid color as background -->
-    <!--            <div class="cover-bg pos-abs full-size bg-color" data-bgcolor="rgb(59, 59, 59)"></div>-->
 
     <!-- Solid color as filter -->
-    <div class="cover-bg-mask pos-abs full-size bg-color" data-bgcolor="rgba(0, 0, 0, 0.41)"></div>
+    <div class="cover-bg-mask pos-abs full-size bg-color" data-bgcolor="rgba(0, 0, 0, 0.00)"></div>
 
 </div>
 <!--END OF site Cover -->
@@ -152,14 +154,14 @@
 <!-- End of timer pane -->
 
 <!-- BEGIN OF site main content content here -->
-<main class="page-main" id="mainpage">
+<main class="page-main" id="mainpage" >
 
 
     <!-- Begin of Control page   -->
     <div class="section page-contact page page-cent bg-color" data-bgcolor="rgba(95, 25, 208, 0.88)s" id="s-control">
         <!-- Begin of contact information -->
             <section class="content">
-                <header class="p-title">
+                <header class="p-title" >
 
                     <h3>
                         <a title="金币"><i id="u_coin" class="ion ion-social-reddit-outline">{$coin}</i></a>
@@ -180,7 +182,7 @@
 
                     <div class="contact" style="height: 60px">
                        <div id="m_coins" class="contact" style="text-align:center; ">
-                           <a url={$control_url|default=''} data-coins='{"type":"publish","room_id":"{$room_id}","dev_room_id":"{$dev_room_id}","user_id":"{$user_id}", "price":"{$price}", "to":"abc"}' class="button button-glow button-rounded button-highlight">投币<br>({$price}个)</a>
+                           <a url={$control_url|default=''} data-coins='{"type":"publish","room_id":"{$room_id}","dev_room_id":"{$dev_room_id}","user_id":"{$user_id}", "price":"{$price}", "to":"abc"}' class="button button-glow button-rounded button-caution">投币<br>({$price}个)</a>
                        </div>
                         <div id="m_coins_none" class="contact hidden" style="text-align:center;">
                             <a class="button disabled button-glow button-rounded button-highlight">请等待<br>({$price}个)</a>
