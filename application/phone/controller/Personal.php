@@ -52,7 +52,7 @@ class Personal extends BasicBaby
     }
 
     /**
-     * 个人收藏
+     * 个人地址
      * @return View
      */
     public function collection()

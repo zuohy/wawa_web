@@ -1272,6 +1272,188 @@ class BasicBaby extends Controller
 
     }
 
+    /**
+     * 更新抓取记录信息状态
+     * @param string $userId
+     * @param string $orderId   抓取结果 订单ID
+     * @param string $status   结果处理状态
+     * @return array
+     */
+    protected function updateResultStatus($userId, $orderId, $status){
+        $data_result = array();
+        Log::info("updateResultStatus: start order_id= " . $orderId . ' status=' . $status . ' user_id=' . $userId);
+
+        $db_result = Db::name('TRoomGameResult');
+
+        $field = ["order_id" => $orderId];
+        $resultInfo = $db_result->where($field)->find();
+        if($resultInfo && ($resultInfo['user_id'] == $userId ) ){
+            //更新
+            $data_result['id'] = $resultInfo['id'];
+            $data_result['status'] = $status;
+            //异常检查
+            if( $status < $resultInfo['status']){
+                //更新状态值 小于 当前结果记录状态值， 记录错误日志
+                Log::error("updateResultStatus: !!! status issue !!! order_id= " . $orderId . 'cur status=' . $resultInfo['status'] . ' new status=' . $status );
+            }
+
+        }else{
+            Log::error("updateResultStatus: not found order_id= " . $orderId . ' status=' . $status . ' user_id=' . $userId );
+            $result = ErrorCode::E_NOT_SUPPORT;
+            return $result;
+        }
+
+        $retBool = DataService::save($db_result, $data_result);
+        if($retBool){
+            Log::info("updateResultStatus: end ok order_id= " . $orderId . ' status=' . $status . ' user_id=' . $userId );
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("updateResultStatus: end failed order_id= " . $orderId . ' status=' . $status . ' user_id=' . $userId );
+            $result = ErrorCode::E_NOT_SUPPORT;
+        }
+        return $result;
+    }
+
+    /**
+     * 获取地址信息
+     * @param string $addrId
+     * @return array
+     */
+    protected function getAddressInfo($addrId){
+        //获取用户信息
+        $db_result = Db::name('TUserPostalAddress');
+
+        $field = ["id" => $addrId];
+        $addrInfo = $db_result->where($field)->find();
+        if($addrInfo && ($addrInfo['id'] == $addrId ) ){
+            return $addrInfo;
+        }
+        return '';
+    }
+
+    /**
+     * 获取用户所有 地址信息
+     * @param string $userId
+     * @param string $isDefault  是否获取默认地址
+     * @param string $isAll  是否获取该用户所有的地址  1 为获取所有的
+     * @return array
+     */
+    protected function getAddressByUser($userId, $isDefault=0){
+        //获取地址信息
+        $db_address = Db::name('TUserPostalAddress');
+
+        //获取默认地址信息
+
+        $field = ["user_id" => $userId, "is_default" => 1];
+        $addrInfo = $db_address->where($field)->find();
+        if( empty($addrInfo) && ($isDefault != 0) ){
+
+            return '';   //未找到默认地址信息
+
+        }elseif( empty($addrInfo) ){
+            //没有默认信息 获取用户最新的地址信息
+            $addrInfo = $db_address->where("user_id", $userId)->order('create_at desc')->find();
+
+        }
+
+        if( empty($addrInfo) ){
+            return '';   //没有找到任何地址信息
+        }
+
+        return $addrInfo;
+    }
+
+
+    /**
+     * 更新地址信息
+     * @param string $addrId
+     * @param string $name
+     * @param string $phone
+     * @param string $address
+     * @param string $isDefault
+     * @return array
+     */
+    protected function updateAddressInfo($addrId, $userId, $name, $phone, $address, $isDefault){
+        //检查更新数据
+        $data_addr = array();
+        Log::info("updateAddressInfo: start address_id= " . $addrId );
+
+        if($userId != ''){
+            $data_addr['user_id'] = $userId;
+        }
+        if($name != ''){
+            $data_addr['name'] = $name;
+        }
+        if($phone != ''){
+            $data_addr['phone'] = $phone;
+        }
+        if($address != ''){
+            $data_addr['address'] = $address;
+        }
+        if($isDefault != ''){
+            $data_addr['is_default'] = $isDefault;
+        }
+
+        $db_address = Db::name('TUserPostalAddress');
+
+        $field = ["id" => $addrId];
+        $addrInfo = $db_address->where($field)->find();
+        if($addrInfo && ($addrInfo['id'] == $addrId ) ){
+            //更新
+            $data_addr['id'] = $addrId;
+
+        }
+
+        $retBool = DataService::save($db_address, $data_addr);
+        if($retBool){
+            Log::info("updateAddressInfo: end ok address_id= " . $addrId );
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("updateAddressInfo: end failed address_id= " . $addrId );
+            $result = ErrorCode::E_NOT_SUPPORT;
+        }
+        return $result;
+    }
+
+    /**
+     * 删除地址信息
+     * @param string $addrId
+     * @param string $userId
+     * @return array
+     */
+    protected function deleteAddressInfo($addrId, $userId){
+
+        Log::info("deleteAddressInfo: start address_id= " . $addrId );
+
+
+        $db_address = Db::name('TUserPostalAddress');
+        //检查更新数据
+        $field = ["id" => $addrId];
+        $addrInfo = $db_address->where($field)->find();
+        if($addrInfo && ($addrInfo['id'] == $addrId ) ){
+            //更新
+            if($userId != $addrInfo['user_id']){
+                Log::error("deleteAddressInfo: user failed address_id= " . $addrId . 'user_id=' . $userId);
+                $result = ErrorCode::E_NOT_SUPPORT;
+                return;
+            }
+
+        }
+
+
+
+        $field = ["id" => $addrId];
+        $retBool = $db_address->where($field)->delete();
+
+        if($retBool){
+            Log::info("deleteAddressInfo: end ok address_id= " . $addrId );
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("deleteAddressInfo: end failed address_id= " . $addrId );
+            $result = ErrorCode::E_NOT_SUPPORT;
+        }
+        return $result;
+    }
    ////////////////////////////////////end 抓取结果 相关函数 ////////////////////////////////////
 
 }

@@ -101,13 +101,16 @@ class ErrorCode
     const BABY_CATCH_SUCCESS = 1;   //抓取成功
     const BABY_CATCH_FAIL = 0;   //抓取失败
 
+    //邮寄常量
     const BABY_POST_ALL = 0;   //所有状态
     const BABY_POST_IN = 1;   //寄存中
     const BABY_POST_WAIT = 2;   //待邮寄
     const BABY_POST_TO = 3;   //已发货
     const BABY_POST_DONE = 4;   //已兑换
+    const BABY_POST_MIN_NUM = 2;   //最少邮寄娃娃数量
 
-
+    const BABY_APPLY_HANDLE = 0;   //用户申请待处理
+    const BABY_APPLY_DONE = 1;   //用户申请处理完成
     //
     //消息文案类型
     const MSG_TYPE_ERROR = 1;               //英文错误消息，用于服务器打印日志

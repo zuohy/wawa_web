@@ -34,16 +34,16 @@ class Post extends BasicBaby
 
 
     /**
-     * 抓取记录
+     * 抓取成功记录
      * @return View
      */
     public function getresult()
     {
         $status = isset($_GET['status']) ? $_GET['status'] : 0; //0 全部 1 寄存中 2 待邮寄 3 已发货 4 已换币
+        $addressId = isset($_GET['address_id']) ? $_GET['address_id'] : 0;
         $userId = session('user_id');
-        $this->title = '抓取记录';
+        $this->title = '我的娃娃';
 
-        //$userId = 3665019677;
         $field = ["user_id" => $userId, "result" => ErrorCode::BABY_CATCH_SUCCESS];
         if($status != 0)
         {
@@ -52,6 +52,25 @@ class Post extends BasicBaby
 
         $db = Db::name('TRoomGameResult');
         $db->where($field)->order('create_at desc');
+
+        //获取地址信息
+        if($addressId != 0){
+            //用户选择了地址信息
+            $addressInfo = $this->getAddressInfo($addressId);
+        }else{
+            $addressInfo = $this->getAddressByUser($userId);
+        }
+
+        $addressId = isset($addressInfo['id']) ? $addressInfo['id'] : '';
+        $name = isset($addressInfo['name']) ? $addressInfo['name'] : '';
+        $phone = isset($addressInfo['phone']) ? $addressInfo['phone'] : '';
+        $address = isset($addressInfo['address']) ? $addressInfo['address'] : '';
+
+        $this->assign('address_id', $addressId);
+        $this->assign('name', $name);
+        $this->assign('phone', $phone);
+        $this->assign('address', $address);
+
         return parent::_list($db);
 
     }
@@ -102,16 +121,83 @@ class Post extends BasicBaby
 
 
     /**
-     * 收货地址页面
+     * 收货地址列表 管理收货地址
      * @return View
      */
-    public function apply()
+    public function address()
     {
-        $order_id = isset($_GET['id']) ? $_GET['id'] : 0;
         $userId = session('user_id');
-        //$userId = 3665019677;
+        $status = isset($_GET['status']) ? $_GET['status'] : 1; //0 全部 1 寄存中 2 待邮寄 3 已发货 4 已换币
+        $isChoose = isset($_GET['is_choose']) ? $_GET['is_choose'] : 0;  //来自寄存申请 选择地址信息
+        $addressId = isset($_GET['address_id']) ? $_GET['address_id'] : 0;  //来自寄存申请 选择地址信息
+        $this->title = '地址管理';
 
-        return view('', ['order_id' => $order_id, 'title' => '收货地址' ]);
+        $this->assign('status', $status);
+        $this->assign('is_choose', $isChoose);
+        $this->assign('address_id', $addressId);
+
+        $field = ["user_id" => $userId];
+        $db = Db::name('TUserPostalAddress');
+        $db->where($field)->order('create_at desc');
+        return parent::_list($db);
+    }
+
+    /**
+     * 编辑收货地址页面
+     * @return View
+     */
+    public function edit()
+    {
+        $address_id = isset($_GET['id']) ? $_GET['id'] : 0;
+        $userId = session('user_id');
+
+        $addressInfo = $this->getAddressInfo($address_id);
+        if($addressInfo == ''){
+            $addressInfo['name'] = '';
+            $addressInfo['phone'] = '';
+            $addressInfo['address'] = '';
+        }
+        return view('', ['address_id' => $address_id, 'address_info' => $addressInfo, 'title' => '收货地址' ]);
+    }
+
+    /**
+     * 保存收货地址数据
+     * @return View
+     */
+    public function save()
+    {
+        $userId = session('user_id');
+        $add_id = isset($_POST['address_id']) ? $_POST['address_id'] : '';
+        $add_name = isset($_POST['name']) ? $_POST['name'] : '';
+        $add_phone = isset($_POST['phone']) ? $_POST['phone'] : '';
+        $add_address = isset($_POST['address']) ? $_POST['address'] : '';
+        $add_is_default = isset($_POST['is_default']) ? $_POST['is_default'] : '';
+
+        $recordResult = $this->updateAddressInfo($add_id, $userId, $add_name, $add_phone, $add_address, $add_is_default);
+        if($recordResult == ErrorCode::CODE_OK)
+        {
+            $this->success("提交收货地址成功！");
+        }else{
+            $this->error("提交失败，请稍后再试");
+        }
+    }
+
+    /**
+     * 保存收货地址数据
+     * @return View
+     */
+    public function delete()
+    {
+        $userId = session('user_id');
+        $add_id = isset($_POST['address_id']) ? $_POST['address_id'] : '';
+
+        $recordResult = $this->deleteAddressInfo($add_id, $userId);
+        if($recordResult == ErrorCode::CODE_OK)
+        {
+            $this->success("提交收货地址成功！");
+        }else{
+            $this->error("提交失败，请稍后再试");
+        }
     }
 
 
@@ -121,49 +207,36 @@ class Post extends BasicBaby
     public function applyPost()
     {
         $userId = session('user_id');
-        //$userId = 3665019677;
-        $data = $_POST;
+
         $this->title = '申请邮寄';
 
-        $user_name = $_POST['user_name'];
-        $address = $_POST['address'];
-        $phone = $_POST['phone'];
-        $order_id = $_POST['order_id'];
+        $order_id = isset($_POST['order_id']) ? $_POST['order_id'] : '';
+        $address_id = isset($_POST['address_id']) ? $_POST['address_id'] : '';
 
-        //查询是否是新地址
-        $db_address = Db::name('TUserPostalAddress');
-        $resultInfo = $db_address->where('user_id',$userId)->where('address',$address)->find();
-
-        //不存在，新增地址
-        if(!$resultInfo)
-        {
-            $addressData = [
-                "user_id" => $userId,
-                "address" => $address,
-                "phone" => $phone,
-                "create_at" => date('Y-m-d H:i:s',time())
-            ];
-            $result = DataService::save($db_address, $addressData, 'id', []);
-            if($result)
-            {
-                $resultInfo = $db_address->where('user_id',$userId)->where('address',$address)->find();
-            }
+        //异常检查
+        if($order_id == '' || $address_id == ''){
+            $this->error("提交失败，请稍后再试");
         }
-
-        $address_id = $resultInfo['id'];
-
+        //大于两个娃娃才能申请邮寄
+        $inCount = $this->getResultList($userId, ErrorCode::BABY_CATCH_SUCCESS, ErrorCode::BABY_POST_IN, 1);
+        if( $inCount < ErrorCode::BABY_POST_MIN_NUM ){
+            $this->error("提交失败，至少两个娃娃才能邮寄！");
+        }
         //存入结果表
         $db_record = Db::name('TUserApplyRecord');
         $recordData = [
             "address_id" => $address_id,
             "order_id" => $order_id,
             "user_id" => $userId,
-            "req_type" => 12,
-            "status" => 0,
-            "remark" => "",
+            "req_type" => ErrorCode::BABY_POST_WAIT,
+            "status" => ErrorCode::BABY_APPLY_HANDLE,
+            "remark" => "邮寄",
             "create_at" => date('Y-m-d H:i:s',time())
         ];
-        $recordResult = DataService::save($db_record, $recordData, 'id', []);
+        $recordResult = DataService::save($db_record, $recordData);
+
+        //更新抓取结果状态
+        $this->updateResultStatus($userId, $order_id, ErrorCode::BABY_POST_WAIT);
 
         if($recordResult)
         {

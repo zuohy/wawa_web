@@ -1,0 +1,138 @@
+{extend name="extra@phone/main"}
+{block name="header"}
+<head>
+
+    <link href="http://at.alicdn.com/t/font_l6a0fwucxvzehfr.css" rel="stylesheet" type="text/css" />
+
+</head>
+{/block}
+
+{block name="body"}
+
+<!--top-->
+<div class="top_c">
+    {if $is_choose neq 0}
+    <a data-href='{:url("phone/post/getresult")}?status={$status}&address_id={$address_id}' href="javascript:void(0)"  class="iconfont icon-jiantou-copy-copy"></a>
+    {else}
+    <a data-href='{:url("phone/personal/index")}' href="javascript:void(0)"  class="iconfont icon-jiantou-copy-copy"></a>
+    {/if}
+    <a data-href='{:url("phone/post/edit")}' href="javascript:void(0)" class="ming">添加</a>
+    <p class="titi">地址管理</p>
+</div>
+
+
+
+<!--列表-->
+<div class="addr">
+    <div class="container">
+        {foreach $list as $key=>$vo}
+        <div class="add">
+            {if $is_choose neq 0}
+            <a data-href='{:url("phone/post/getresult")}?status={$status}&address_id={$vo.id}' href="javascript:void(0)">
+            {else}
+            <a href="#">
+            {/if}
+            <p>收货人：{$vo.name}<i>电话：{$vo.phone}</i></p>
+            <span>地址：{$vo.address}</span>
+            </a>
+            </a>
+            <div class="mo button">
+
+                <label class="checkbox-inline">
+                    <input type="checkbox" id="checkbox1" value="option1"> 默认地址
+                </label>
+
+                <a data-href='{:url("phone/post/edit")}?id={$vo.id}' href="javascript:void(0)" class="liji">编辑</a>
+                <a onclick="deleteAddress('{$vo.id}')" class="qu">删除</a>
+
+            </div>
+
+        </div>
+        {/foreach}
+    </div>
+</div>
+
+<div class="ding_d">
+
+    <div class="ding_d">
+        <div class="button">
+            <a data-href='{:url("phone/post/edit")}' href="javascript:void(0)" class="lip">添加</a>
+        </div>
+    </div>
+
+    <div class="ding_d">
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+{/block}
+
+{block name="script"}
+<script src="__STATIC__/plugs/phone/js/jquery.min.js?ver={:date('ymd')}" type="text/javascript"></script>
+
+<script src="__STATIC__/plugs/phone/js/bootstrap.min.js?ver={:date('ymd')}" type="text/javascript"></script>
+<script src="__STATIC__/plugs/phone/js/index.js?ver={:date('ymd')}" type="text/javascript"></script>
+
+<script  type="text/javascript">
+
+    //选择地址信息 事件处理
+    function chooseAddress(addressId, isChoose)
+    {
+        if(isChoose){
+            //回退页面
+            $.ajax({
+                //几个参数需要注意一下
+                type: "GET",//方法类型
+                dataType: "json",//预期服务器返回的数据类型
+                url: "getresult" ,//url
+                data: {address_id: addressId},
+                success: function (result) {
+                    console.log(result);//打印服务端返回的数据(调试用)
+                },
+                error : function() {
+                    alert("地址选择错误");
+                }
+            });
+
+        }
+
+    }
+
+    function deleteAddress(addressId)
+    {
+        if( confirm("你确认删除吗？") == false ){
+            return;
+        }
+        $.ajax({
+            //几个参数需要注意一下
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: "delete" ,//url
+            data: {address_id: addressId},
+            success: function (result) {
+                console.log(result);//打印服务端返回的数据(调试用)
+                if (result.code == 1) {
+                    alert("成功！");
+                    location.reload();
+                }else{
+                    alert("异常！");
+                }
+            },
+            error : function() {
+                alert("异常！");
+            }
+        });
+
+    }
+
+</script>
+
+{/block}
