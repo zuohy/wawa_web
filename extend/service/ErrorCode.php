@@ -132,6 +132,7 @@ class ErrorCode
     const E_USER_EMPLOY_COIN_ERROR = -2006;  //用户消费金额错误
     const E_USER_COUNT_COIN_ERROR = -2007;  //用户消费金额计算错误
     const E_USER_INCOME_MAX = -2008;  //用户返现超过最大值 10元
+    const E_USER_INCOME_FAIL = -2009;  //用户增加 币 失败
 
     const E_ROOM_STATUS_ERROR = -2101;       //房间状态不正确
     const E_ROOM_USER_STATUS_ERROR = -2102;  //房间成员状态不正确

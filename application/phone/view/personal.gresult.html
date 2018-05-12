@@ -12,7 +12,7 @@
 <!--top-->
 <div class="top_c">
 	<a data-href='{:url("phone/personal/index")}' href="javascript:void(0)"  class="iconfont icon-jiantou-copy-copy"></a>
-	<p class="titi">我抓的娃娃</p>
+	<p class="titi">我的抓取记录</p>
 </div>
 
 <!--列表-->
@@ -20,7 +20,13 @@
 <div class="ding_d">
     {foreach $list as $key=>$vo}
 	<div class="on_d">
-    	<p class="bh">订单编号：{$vo.order_id}<span>{$vo.result_c}</span></p>
+    	<p class="bh">订单编号：{$vo.order_id}
+            {if $vo.result eq 1}
+            <span style="color: green">{$vo.result_c}</span>
+            {else}
+            <span>{$vo.result_c}</span>
+            {/if}
+        </p>
         <div class="sp_pr">
             <a href="details.html">
                 <img src="__STATIC__/{$vo.gift_pic_show}">
@@ -32,10 +38,11 @@
         </div>
     </div>
     {/foreach}
-	
+
 </div>
 
-
+<div class="ding_d">
+</div>
 
 
 

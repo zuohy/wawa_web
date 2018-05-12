@@ -253,24 +253,28 @@ class Post extends BasicBaby
      */
     public function exchangeCoin()
     {
-        $order_id = isset($_GET['id']) ? $_GET['id'] : 0;
+        $order_id = isset($_POST['order_id']) ? $_POST['order_id'] : 0;
 
-        //todo 调用接口，兑换成相应的娃娃币
+        $userId = session('user_id');
 
-        //更新游戏结果表为已换币
-        $db_result = Db::name('TRoomGameResult');
-        $resultData = [
-            "order_id" => $order_id,
-            "status" => 4
-        ];
-        $result =  DataService::update($db_result, $resultData);
-
-        if($result)
+        // 调用接口，兑换成相应的娃娃币
+        $result = $this->exchangeUserCoin($userId, $order_id);
+        if($result != ErrorCode::CODE_OK)
         {
-            $this->success("兑换成功！");
-        }else{
             $this->error("兑换失败");
+            return;
         }
+        //更新游戏结果表为已换币
+        //更新抓取结果状态
+        $retStatus = $this->updateResultStatus($userId, $order_id, ErrorCode::BABY_POST_DONE);
+        if($retStatus != ErrorCode::CODE_OK){
+            $this->error("兑换失败！");
+            return;
+        }else{
+            $this->success("兑换成功！");
+            return;
+        }
+
     }
 
 

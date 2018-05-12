@@ -4,6 +4,7 @@ namespace controller;
 
 use service\DataService;
 use service\ErrorCode;
+use service\RoomService;
 use think\Controller;
 use think\Db;
 use think\db\Query;
@@ -828,7 +829,7 @@ class BasicBaby extends Controller
 
     /**
      * 充值用户金币数量
-     * @param string $unionId
+     * @param string $orderNo  订单编码
      * @param string $unionId
      * @return bool
      */
@@ -893,7 +894,6 @@ class BasicBaby extends Controller
 
                 //$saveCoin = $userInfo['coin'] + $lastCoinValue;   //充值全部 为娃娃币 金币只有在产生收益时候增加
                 $saveFree = $userInfo['free_coin'] + $lastFreeValue + $lastCoinValue;
-                //$pk = empty($userId) ? ($db_receipt->getPk() ? $db_receipt->getPk() : 'id') : 'user_id';
                 $data_userCoin = array('id'=> $userInfo['id'], 'coin'=> $userInfo['coin'], 'free_coin'=> $saveFree);
                 $retBool = DataService::save($db_user, $data_userCoin);
             }
@@ -909,6 +909,105 @@ class BasicBaby extends Controller
     }
 
     /**
+     * 兑换礼物 商品金币数量
+     * @param string $userId  用户ID
+     * @param string $orderId  消费订单编码
+     * @return int
+     */
+    protected function exchangeUserCoin($userId, $orderId){
+        $retStatus = ErrorCode::CODE_OK;
+        $lastCoinValue = 0;   //最终充值的金币数量 单位金币  (1金币= 1娃娃币)
+        $lastFreeValue = 0;   //最终充值的娃娃币数量 单位娃娃币
+
+        Log::info("exchangeUserCoin: start order_id=" . $orderId . ' user_id=' . $userId);
+
+        //获取抓取结果记录
+        $resultInfo = $this->getResultInfo($orderId);
+        $inUserId =  isset($resultInfo['user_id']) ? $resultInfo['user_id'] : '';
+        $resultStatus = isset($resultInfo['result']) ? $resultInfo['result'] : '';
+        $handleStatus = isset($resultInfo['status']) ? $resultInfo['status'] : '';
+        $giftId = isset($resultInfo['gift_id']) ? $resultInfo['gift_id'] : '';
+        //异常判断
+        if( $inUserId != $userId                 //兑换user id 不一致
+        || $resultStatus != ErrorCode::BABY_CATCH_SUCCESS    //结果异常
+        || $handleStatus >= ErrorCode::BABY_POST_TO ){         //处理状态 为已经发货 或 已换币
+
+            $retStatus = ErrorCode::E_NOT_SUPPORT;
+            return $retStatus;
+
+        }
+
+        //获取礼物价格
+        $giftInfo = RoomService::getGiftInfo($giftId);
+        $inPrice = isset($giftInfo['gift_price']) ? $giftInfo['gift_price'] : 0;
+
+        //更新用户金币
+        $retStatus = $this->addUserCoin($giftId, $userId, $inPrice, 0);
+
+
+        if($retStatus == ErrorCode::CODE_OK){
+            //增加收益记录 并处理完成状态
+            Log::info("exchangeUserCoin: add income coin=" . $inPrice );
+            $orderNum = self::createHeaderSeq(ErrorCode::BABY_HEADER_SEQ_IN, 12);
+            ActivityService::addUserIncome($userId, $giftId, $orderNum, $orderId, 0, $inPrice, 0, ErrorCode::BABY_EMPLOY_REASON_1, '兑换礼物', ErrorCode::BABY_INCOME_DONE);
+            Log::info("exchangeUserCoin: end ok order_id= " . $orderId . "userId=" . $userId);
+        }else{
+            Log::error("exchangeUserCoin: end failed order_id= " . $orderId .  "userId=" . $userId);
+        }
+        return $retStatus;
+    }
+
+    /**
+     * 增加用户金币 娃娃币
+     * @param string $proCode   产品编码
+     * @param string $userId   用户ID
+     * @param string $freeType  优惠类型
+     * @return bool
+     */
+    protected function addUserCoin($proCode, $userId, $lastCoinValue, $lastFreeValue){
+
+        Log::info("addUserCoin:  user_id =" . $userId . ' product_code=' . $proCode
+            . ' lastCoinValue=' . $lastCoinValue . ' lastFreeValue=' . $lastFreeValue);
+
+        $retStatus = ErrorCode::CODE_OK;
+        $retBool = false;
+
+        $db_user = Db::name('TUserConfig');
+        $userInfo = $db_user->where('user_id', $userId)->find();
+
+        if($userInfo && ($userInfo['user_id'] == $userId ) ){
+
+            $data_userCoin = array('id'=> $userInfo['id']);
+            if($lastFreeValue > 0){
+                $saveFree = $userInfo['free_coin'] + $lastFreeValue;
+                $arrFree = array('free_coin'=> $saveFree);
+                $data_userCoin = array_merge($data_userCoin, $arrFree);
+            }
+            if($lastCoinValue > 0){
+                $saveCoin = $userInfo['coin'] + $lastCoinValue;
+                $arrCoin = array('coin'=> $saveCoin);
+                $data_userCoin = array_merge($data_userCoin, $arrCoin);
+            }
+
+            $log_userCoin = json_encode($data_userCoin);
+            Log::info("addUserCoin: update user coins= " . $log_userCoin);
+
+            $retBool = DataService::save($db_user, $data_userCoin);
+        }
+
+        if($retBool){
+            $retStatus = ErrorCode::CODE_OK;
+            Log::info("addUserCoin: end ok userId= " . $userId . ' product_code=' . $proCode);
+        }else{
+            $retStatus = ErrorCode::E_USER_INCOME_FAIL;
+            Log::error("addUserCoin: end failed userId= " . $userId . ' product_code=' . $proCode);
+        }
+
+        return $retStatus;
+
+    }
+
+    /**
      * 优惠 奖励用户金币 娃娃币
      * @param string $proCode   产品编码
      * @param string $userId   用户ID
@@ -916,7 +1015,7 @@ class BasicBaby extends Controller
      * @return bool
      */
     protected function freeUserCoin($proCode, $userId, $freeType){
-
+        $retStatus = ErrorCode::CODE_OK;
         //获取充值优惠
         $receiptFreeInfo = $this->getPayValue($freeType);
         $lastFreeValue = isset($receiptFreeInfo['free_value']) ? $receiptFreeInfo['free_value'] : 0;
@@ -924,7 +1023,20 @@ class BasicBaby extends Controller
 
         Log::info("freeUserCoin:  lastFreeValue= " . $lastFreeValue . ' lastCoinValue=' . $lastCoinValue);
 
-        $db_user = Db::name('TUserConfig');
+        //更新用户金币
+        $retStatus = $this->addUserCoin($proCode, $userId, $lastCoinValue, $lastFreeValue);
+        if($retStatus == ErrorCode::CODE_OK){
+            Log::info("freeUserCoin: end ok userId= " . $userId . ' product_code=' . $proCode . ' freeType=' . $freeType);
+            //保存收益记录表
+            $orderNum = self::createHeaderSeq(ErrorCode::BABY_HEADER_SEQ_IN, 12);
+            $result = ActivityService::addUserIncome($userId, $proCode, $orderNum, '', 0, $lastCoinValue, $lastFreeValue, ErrorCode::BABY_EMPLOY_REASON_1, '分享收益', $iStatus=ErrorCode::BABY_INCOME_DONE);
+
+        }else{
+            Log::error("freeUserCoin: end failed userId= " . $userId . ' product_code=' . $proCode . ' freeType=' . $freeType);
+        }
+
+        return $retStatus;
+/*        $db_user = Db::name('TUserConfig');
         $userInfo = $db_user->where('user_id', $userId)->find();
 
         if($userInfo && ($userInfo['user_id'] == $userId ) ){
@@ -955,7 +1067,7 @@ class BasicBaby extends Controller
 
         }else{
             Log::error("freeUserCoin: end failed userId= " . $userId . ' product_code=' . $proCode . ' freeType=' . $freeType);
-        }
+        }*/
 
     }
 
@@ -1142,62 +1254,6 @@ class BasicBaby extends Controller
         return $result;
     }
 
-    /**
-     * 添加收益记录
-     * @param string $userId   用户ID
-     * @param int $coinType  金币类型  默认消耗娃娃币
-     * @param int $num   金币数量
-     * @return bool
-     */
-/*    protected function addUserIncome($userId, $proCode, $orderNum, $orderNo, $inValue, $coin, $freeCoin, $reason, $remark, $iStatus=ErrorCode::BABY_INCOME_NEW){
-        Log::info("addUserIncome: start user_id= " . $userId);
-
-        $tmpValue = 0;   //收益金额  单位元
-        $tmpCoin = 0;    //收益金币  单位金币
-        if( $inValue != 0 ){
-            // 保证 现金和 金币互斥
-            $tmpValue = $inValue;
-        }else{
-            $tmpCoin = $coin;
-        }
-        $db_income = Db::name('TUserIncome');
-        $data_income = array(
-            'user_id' => $userId,
-            'order_num' => $orderNum,
-            'order_no' => $orderNo,
-            'product_code' => $proCode,
-            'i_value' => $tmpValue,  //单位元
-            'coin' => $tmpCoin,
-            'free_coin' => $freeCoin,
-            'reason' => $reason,
-            'remark' => $remark,
-            'i_status' => $iStatus,  //默认为 0 生成收益
-        );
-
-        $jsonData = json_encode($data_income);
-        Log::info("addUserIncome: update user income= " . $jsonData );
-        $result = DataService::save($db_income, $data_income);
-
-        if($result){
-            Log::info("addUserIncome: end ok user_id= " . $userId );
-            $result = ErrorCode::CODE_OK;
-        }else{
-            Log::error("addUserIncome: end failed user_id= " . $userId );
-            $result = ErrorCode::E_NOT_SUPPORT;
-        }
-        return $result;
-    }
-*/
-    /**
-     * 更新收益状态
-     * @param string $userId   用户ID
-     * @param int $coinType  金币类型  默认消耗娃娃币
-     * @param int $num   金币数量
-     * @return bool
-     */
-    protected function updateIncomeStatus($userId, $orderNum, $orderNo, $iStatus){
-
-    }
     ////////////////////////////////////end 支付 金币 相关函数 ////////////////////////////////////
 
     ////////////////////////////////////start 现金红包 相关函数 ////////////////////////////////////
@@ -1236,6 +1292,27 @@ class BasicBaby extends Controller
    ////////////////////////////////////start 抓取结果 相关函数 ////////////////////////////////////
     /**
      * 获取抓取记录信息
+     * @param string $userId
+     * @param string $orderId   抓取消费订单
+     * @return array
+     */
+    protected function getResultInfo($orderId){
+        $db_result = Db::name('TRoomGameResult');
+
+        $field = ["order_id" => $orderId];
+        $resultInfo = $db_result->where($field)->find();
+        if($resultInfo && ($resultInfo['order_id'] == $orderId ) ){
+            return $resultInfo;
+        }else{
+            $resultInfo = '';
+        }
+
+        return $resultInfo;
+
+    }
+
+    /**
+     * 获取抓取记录信息列表
      * @param string $userId
      * @param string $result   抓取结果 1为成功 0 为失败
      * @param string $status   结果处理状态
@@ -1403,7 +1480,7 @@ class BasicBaby extends Controller
             $data_addr['id'] = $addrId;
 
         }
-
+        $data_addr['update_at'] = date('Y-m-d H:i:s',time());
         $retBool = DataService::save($db_address, $data_addr);
         if($retBool){
             Log::info("updateAddressInfo: end ok address_id= " . $addrId );
@@ -1442,8 +1519,9 @@ class BasicBaby extends Controller
 
 
 
-        $field = ["id" => $addrId];
-        $retBool = $db_address->where($field)->delete();
+        $data_addr = ["id" => $addrId, "is_deleted" => 1, "update_at" => date('Y-m-d H:i:s',time()) ];
+        //$retBool = $db_address->where($field)->delete();
+        $retBool = DataService::save($db_address, $data_addr);
 
         if($retBool){
             Log::info("deleteAddressInfo: end ok address_id= " . $addrId );

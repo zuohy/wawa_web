@@ -58,6 +58,7 @@ class RoomService
         'gift_pic_5' => '',
         'gift_name' => '',
         'describe' => '',
+        'gift_price' => '',
     );
 
     /**

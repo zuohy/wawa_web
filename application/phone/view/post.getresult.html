@@ -23,7 +23,7 @@
             <a class="" data-href='{:url("phone/post/getresult")}?status=1' href="javascript:void(0)"><div class="col-xs-2">寄存中</div></a>
             <a data-href='{:url("phone/post/getresult")}?status=2' href="javascript:void(0)"><div class="col-xs-2">待邮寄</div></a>
             <a data-href='{:url("phone/post/getresult")}?status=3' href="javascript:void(0)"><div class="col-xs-2">已发货</div></a>
-            <a data-href='{:url("phone/post/getresult")}?status=4' href="javascript:void(0)"><div class="col-xs-2">待付款</div></a>
+            <a data-href='{:url("phone/post/getresult")}?status=4' href="javascript:void(0)"><div class="col-xs-2">已换币</div></a>
 
         </div>
     </div>
@@ -33,20 +33,25 @@
 <div class="ding_d">
     <div class="container">
         <div class="add">
+            {if $name neq ''}
             <p>收货人：{$name}<i>电话：{$phone}</i></p>
             <span>地址：{$address}</span>
             <div class="mo button">
-
                 <a data-href='{:url("phone/post/address")}?address_id={$address_id}&is_choose=1' href="javascript:void(0)" class="liji">更换地址</a>
-
             </div>
+            {else}
+            <div class="mo button">
+                <a data-href='{:url("phone/post/address")}?address_id={$address_id}&is_choose=1' href="javascript:void(0)" class="lip">添加地址</a>
+            </div>
+            {/if}
+
         </div>
 
     </div>
 </div>
 
 <!--列表-->
-<div class="ding_d">
+
     {foreach $list as $key=>$vo}
     <div class="on_d">
         <p class="bh">订单编号：{$vo.order_id}
@@ -69,19 +74,20 @@
                 </div>
             </a>
         </div>
-        <div class="button">
+        <div class=" mo button">
+            {if $vo.status < 2}
             <a onclick="applyPost('{$vo.order_id}', '{$address_id}')" class="liji">申请邮寄</a>
+            {/if}
             {if $vo.status neq 4}
-            <a data-href='{:url("phone/post/exchangeCoin")}?id={$vo.order_id}' href="javascript:void(0)" class="qu">兑换</a>
+            <a onclick="exchangePost('{$vo.order_id}')" class="qu">兑换</a>
             {/if}
         </div>
     </div>
     {/foreach}
 
+<div class="ding_d">
 
 </div>
-
-
 {/block}
 
 {block name="script"}
@@ -94,7 +100,7 @@
 
     function applyPost(orderId, addressId)
     {
-        if( confirm("你确认申请邮寄吗？") == false ){
+        if( confirm("您确认申请邮寄吗？") == false ){
             return;
         }
         $.ajax({
@@ -103,6 +109,33 @@
             dataType: "json",//预期服务器返回的数据类型
             url: "{:url('phone/post/applypost')}" ,//url
             data: {order_id: orderId, address_id: addressId},
+            success: function (result) {
+                console.log(result);//打印服务端返回的数据(调试用)
+                if (result.code == 1) {
+                    alert(result.msg);
+                    location.reload();
+                }else{
+                    alert(result.msg);
+                }
+            },
+            error : function() {
+                alert("异常！");
+            }
+        });
+
+    }
+
+    function exchangePost(orderId)
+    {
+        if( confirm("您确认兑换吗？") == false ){
+            return;
+        }
+        $.ajax({
+            //几个参数需要注意一下
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: "{:url('phone/post/exchangecoin')}" ,//url
+            data: {order_id: orderId},
             success: function (result) {
                 console.log(result);//打印服务端返回的数据(调试用)
                 if (result.code == 1) {

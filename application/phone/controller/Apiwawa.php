@@ -502,7 +502,7 @@ class Apiwawa extends BasicBaby
      * 建立分享关系 邀请码对应用户
      * @return array
      */
-    private function _buildShareRel($userId, $codeFather)
+ /*   private function _buildShareRel($userId, $codeFather)
     {
         $isShare = 0;  //0 分享关联成功 1 失败 已经被分享  2 更换
         //保存分享记录表
@@ -561,7 +561,7 @@ class Apiwawa extends BasicBaby
         return $isShare;
 
     }
-
+*/
 
     /////////////////////////start baby_coontrol 设备服务器消息处理//////////////////////////////////////////////////
     /**
