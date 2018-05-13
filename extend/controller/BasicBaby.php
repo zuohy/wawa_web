@@ -527,10 +527,22 @@ class BasicBaby extends Controller
         //查询当前是否已经存在订单
         $order_no = session('pay-mini-order-no');
         Log::info("miniPay start: order_no= " . $order_no);
+
         if (empty($order_no)) {
             $order_no = DataService::createSequence(10, 'wechat-pay-mini');
             session('pay-mini-order-no', $order_no);
         }
+
+        //异常判断 检查订单是否 为当前未支付订单
+        $curReceipt = $this->getReceiptInfo($order_no);
+        $PayValue = isset($curReceipt['pay_value']) ? $curReceipt['pay_value'] : 0;  //单位元
+        $cruPayValue = $this->coverPayValue(ErrorCode::BABY_COVER_TYPE_PAY, $PayValue);  //元转换为 分
+        if($cruPayValue != $total_fee){
+            //不是同一个订单 重新生效新的订单
+            $order_no = DataService::createSequence(10, 'wechat-pay-mini');
+            session('pay-mini-order-no', $order_no);
+        }
+
         if (PayService::isPay($order_no)) {
             //清除已经支付完成的订单号缓存
             Log::info("miniPay wechat pay already ok: order_no= " . $order_no);
@@ -538,20 +550,20 @@ class BasicBaby extends Controller
             // 重置缓存订单
             session('pay-mini-order-no', null);
             //$this->completeMiniPay($order_no, WAWA_PAY_SUCCESS);
-            return ['code' => 2, 'msg' => "此订单已完成支付", 'order_no' => $order_no];
+            return ['code' => ErrorCode::E_PAY_ALREADY_SUCCESS, 'msg' => "此订单已完成支付", 'order_no' => $order_no];
         }
 
         $pay = load_wx_mini('pay');
         $options = PayService::createWechatPayJsPicker($pay, $openId, $order_no, $total_fee, 'JSAPI支付测试2');
         if ($options === false) {
-            $options = ['code' => 3, 'msg' => "创建支付失败，{$pay->errMsg}[$pay->errCode]"];
+            $options = ['code' =>  ErrorCode::E_PAY_PICKER_FAILED, 'msg' => "创建支付失败，{$pay->errMsg}[$pay->errCode]"];
         }else{
             //获取prepay id  "package":"prepay_id=wx201803311610441ca39aa76f0719651834",
             $packageArr = explode('=', $options['package']);
             $prepayId = $packageArr[1];
 
             $options['prepayId'] = $prepayId;
-            $options['code'] = 0;
+            $options['code'] = ErrorCode::CODE_OK;
             $options['msg'] = "创建支付成功";
 
         }
@@ -571,6 +583,10 @@ class BasicBaby extends Controller
      */
     protected function completeMiniPay($orderNo, $status){
         $order_no = session('pay-mini-order-no');   //由于微信小程序 支付请求接口，重新建立session 所以预支付订单页面的 session数据获取不到
+
+        // 重置缓存订单
+        session('pay-mini-order-no', null);     //只要完成支付，不管成功失败都清除缓存
+
         $retBool = false;
         Log::info("completeMiniPay: start orderNo=" . $orderNo . " status=" . $status . " pay-mini-order-no=" . $order_no);
 
@@ -661,7 +677,7 @@ class BasicBaby extends Controller
                 $receiptInfo = $db_receipt->where('order_no', $orderNo)->where('receipt_type', ErrorCode::BABY_PAY_SUCCESS)->find();
                 if($receiptInfo && ($receiptInfo['order_no'] == $orderNo ) ){
                     Log::info("completeOrderPay: user receipt complete order_no=" . $order_no);
-                    $result = ErrorCode::BABY_PAY_ALREADY_SUCCESS;
+                    $result = ErrorCode::E_PAY_ALREADY_SUCCESS;
                 }else{
                     Log::error("completeOrderPay: user receipt not complete order_no=" . $order_no);
                 }

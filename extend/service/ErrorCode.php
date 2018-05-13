@@ -48,9 +48,8 @@ class ErrorCode
     const BABY_INCOME_BACK_COIN = 0;    //收益返金币
 
     //支付常量
-    const BABY_PAY_SUCCESS = 1;      //支付成功
-    const BABY_PAY_FAILED = 0;      //支付失败
-    const BABY_PAY_ALREADY_SUCCESS = 2;      //已经支付成功
+    const BABY_PAY_SUCCESS = 1;      //支付成功  微信接口
+    const BABY_PAY_FAILED = 0;      //支付失败   微信接口
 
     const BABY_SHARE_SUCCESS = 0;       //分享成功  有效分享
     const BABY_SHARE_FAILED = 1;        //分享失败 用户已经被分享了 app 应用
@@ -144,6 +143,8 @@ class ErrorCode
 
     //通用错误
     const E_NOT_SUPPORT = -3001;  //通用错误 不支持的操作
+    const E_PAY_ALREADY_SUCCESS = -3002;      //已经支付成功
+    const E_PAY_PICKER_FAILED = -3003;      //创建微信支付订单失败
 
     public static $ERR_MSG = array(
         self::CODE_OK => 'ok',
@@ -168,6 +169,8 @@ class ErrorCode
         self::E_DEV_GAME_TIME_OUT => 'device game time out',
 
         self::E_NOT_SUPPORT => 'not support this step',
+        self::E_PAY_ALREADY_SUCCESS => 'pay already done',
+        self::E_PAY_PICKER_FAILED => 'create picker failed',
     );  //error code msg
 
     //返回客户端的错误文案
@@ -193,6 +196,8 @@ class ErrorCode
         self::E_DEV_GAME_TIME_OUT => '抓取超时失败',
 
         self::E_NOT_SUPPORT => '未知操作',
+        self::E_PAY_ALREADY_SUCCESS => '支付已经完成',
+        self::E_PAY_PICKER_FAILED => '创建微信预支付订单失败',
     );  //error code msg
 
     //通知消息

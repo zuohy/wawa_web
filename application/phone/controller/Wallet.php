@@ -114,7 +114,7 @@ class Wallet extends BasicBaby
 
         //生成用户订单信息
         Log::info("recharge: options code= " . $optionsArr['code']);
-        if( $optionsArr['code'] == 0 ){
+        if( $optionsArr['code'] == ErrorCode::CODE_OK ){
             $this->saveReceipt($userId, $optionsArr['prepayId'], $iconsArr['pay_value'], $iconsArr['icons_type'], $optionsArr['order_no']);
         }
 
