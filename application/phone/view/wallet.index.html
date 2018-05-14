@@ -1,5 +1,24 @@
 {extend name="extra@phone/main"}
 
+{block name="header"}
+
+<style>
+    .icon-img{
+        width: 34px;
+    }
+    .re_bt{
+        border: 1px solid orange;
+        text-align: center;
+        border-radius: 10px;
+        background: orange;
+    }
+    .zhang{
+        background: url("__STATIC__/plugs/proom/img/gr_bg.png");
+        background-size:100%
+    }
+</style>
+{/block}
+
 {block name="body"}
 
 
@@ -45,28 +64,24 @@
 <div class="lie_b">
     <div class="container">
         <div class="one">
-            <a href="quota.html">
-                <p class="biao"><span class="iconfont icon-daikuanedu"></span>信用额度<i class="iconfont icon-jiantou"></i></p>
+            <a data-href='{:url("phone/wallet/bill")}?type=3' href="javascript:void(0)">
+                <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/income.png" class="icon-img"/></span>
+                    收益记录<i class="iconfont icon-jiantou"></i>
+                </p>
+            </a>
+        </div>
+        <div class="one" >
+            <a data-href='{:url("phone/wallet/bill")}?type=1' href="javascript:void(0)">
+                <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/qbdd.png" class="icon-img"/></span>
+                    充值账单<i class="iconfont icon-jiantou"></i>
+                </p>
             </a>
         </div>
         <div class="one" style="border-bottom:none;">
-            <a href="bank.html">
-                <p class="biao"><span class="iconfont icon-buoumaotubiao26"></span>银行卡<i class="iconfont icon-jiantou"></i></p>
-            </a>
-        </div>
-    </div>
-</div>
-
-<div class="lie_b">
-    <div class="container">
-        <div class="one">
-            <a href="profit.html">
-                <p class="biao"><span class="iconfont icon-jilu"></span>分润记录<i class="iconfont icon-jiantou"></i></p>
-            </a>
-        </div>
-        <div class="one" style="border-bottom:none;">
-            <a href="bill.html">
-                <p class="biao"><span class="iconfont icon-zhangdan"></span>账单<i class="iconfont icon-jiantou"></i></p>
+            <a data-href='{:url("phone/wallet/bill")}?type=2' href="javascript:void(0)">
+                <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/qbdd.png" class="icon-img"/></span>
+                    消费账单<i class="iconfont icon-jiantou"></i>
+                </p>
             </a>
         </div>
     </div>

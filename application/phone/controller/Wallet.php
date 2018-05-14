@@ -71,6 +71,47 @@ class Wallet extends BasicBaby
     }
 
     /**
+     * 账单记录  包括消费记录和充值记录
+     * @return 订单参数
+     */
+    public function bill()
+    {
+        $userId = session('user_id');
+        $inType = isset($_GET['type']) ? $_GET['type'] : 1;  //1 返回充值账单， 2 返回消费账单, 3 收益账单
+
+        $this->assign('in_type', $inType);
+        if($inType == 1){
+            //充值账单
+            $this->title = '充值账单';
+            $db = Db::name('TUserCommonpayReceipt');
+            $field = ["user_id" => $userId, "receipt_type" => ErrorCode::BABY_PAY_SUCCESS];
+            $db->where($field);
+            return parent::_list($db);
+        }elseif( $inType == 2 ){
+            //消费账单
+
+            $this->title = '消费账单';
+            $db = Db::name('TUserBill');
+            $db->where('user_id', $userId);
+            return parent::_list($db);
+
+        }elseif( $inType == 3 ){
+            //收益账单
+            $this->title = '收益账单';
+            $db = Db::name('TUserIncome');
+            $db->where('user_id', $userId);
+            return parent::_list($db);
+        }
+
+        //默认消费账单
+        $this->title = '账单';
+        $db = Db::name('TUserBill');
+        $db->where('user_id', $userId);
+        return parent::_list($db);
+
+    }
+
+    /**
      * 列表数据处理
      * @param type $list
      */
@@ -79,6 +120,40 @@ class Wallet extends BasicBaby
 
         foreach ($list as &$vo) {
             //转换为中文字符
+            $reason = isset($vo['reason']) ? $vo['reason'] : '';
+            $iconsType = isset($vo['icons_type']) ? $vo['icons_type'] : '';
+            $proCode = isset($vo['product_code']) ? $vo['product_code'] : '';
+
+            if($reason == ErrorCode::BABY_EMPLOY_REASON_1){
+                $vo['reason_c'] = '投币游戏';
+            }
+
+            //判断充值类型
+            if( $iconsType >= ErrorCode::BABY_COIN_TYPE_REG_1  && $iconsType < ErrorCode::BABY_COIN_TYPE_SHARE){
+                //充值
+                $vo['reason_c'] = '充值';
+                $vo['remark'] = '普通充值';
+            }elseif( $iconsType == ErrorCode::BABY_COIN_TYPE_SHARE ){
+                //分享
+                $vo['reason_c'] = '分享';
+                $vo['remark'] = '分享充值';
+            }elseif( $iconsType > ErrorCode::BABY_COIN_TYPE_SHARE ){
+                //购买
+                $vo['reason_c'] = '购买';
+                //$vo['remark'] = '产品编码' . $proCode;
+            }
+
+            //产品编码 加入 remark 字段
+            if($proCode && $proCode != ErrorCode::BABY_HEADER_SEQ_APP){
+                $vo['remark'] = $vo['remark'] . ' 产品编码 ' . $proCode;
+            }
+            //字段保护
+            if( empty($vo['reason_c']) ){
+                $vo['reason_c'] = '';
+            }
+            if( empty($vo['remark']) ){
+                $vo['remark'] = '';
+            }
 
         }
 

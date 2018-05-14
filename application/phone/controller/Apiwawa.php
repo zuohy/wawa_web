@@ -257,7 +257,7 @@ class Apiwawa extends BasicBaby
                 }
                 //扣除用户金币 娃娃币
                 $orderId = '';
-                $retStatus = $this->employUserCoin($userId, $needCoin, ErrorCode::BABY_EMPLOY_REASON_1, '普通消费', ErrorCode::BABY_EMPLOY_TYPE_FREE, $orderId);
+                $retStatus = $this->employUserCoin($userId, $needCoin, ErrorCode::BABY_EMPLOY_REASON_1, '投币游戏', ErrorCode::BABY_EMPLOY_TYPE_FREE, $orderId);
                 if($retStatus != ErrorCode::CODE_OK){
                     $this->retMsg['code'] = $retStatus;
                     $this->retMsg['msg'] = ErrorCode::$ERR_MSG[$retStatus];

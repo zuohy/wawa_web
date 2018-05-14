@@ -1,0 +1,117 @@
+{extend name="extra@phone/main"}
+{block name="header"}
+<head>
+
+    <link href="http://at.alicdn.com/t/font_l6a0fwucxvzehfr.css" rel="stylesheet" type="text/css" />
+
+</head>
+{/block}
+
+{block name="body"}
+
+<!--top-->
+<div class="top_c">
+	<a data-href='{:url("phone/wallet/index")}' href="javascript:void(0)"  class="iconfont icon-jiantou-copy-copy"></a>
+	<p class="titi">我的账单</p>
+</div>
+
+<!--列表-->
+
+
+<div class="xi_m">
+    {if $in_type eq 1}
+    <!--充值账单-->
+    {foreach $list as $key=>$vo}
+    <div class="xi_one">
+        <div class="container">
+            <div class="xi_left">
+                <p>{$vo.reason_c}</p>
+                <p>{$vo.remark}</p>
+                <span>{$vo.create_at}</span>
+            </div>
+            <div class="xi_right">
+                <p class="edu" style="color: green; font-size:1em"> &nbsp&nbsp元</p>
+            </div>
+            <div class="xi_right">
+                <p class="edu" style="color: green; font-size:1em">+{$vo.pay_value}</p>
+            </div>
+
+        </div>
+    </div>
+    {/foreach}
+    {elseif  $in_type eq 2}
+    <!--消费账单-->
+    {foreach $list as $key=>$vo}
+    <div class="xi_one">
+        <div class="container">
+            <div class="xi_left">
+                <p>{$vo.reason_c}</p>
+                <p>{$vo.remark}</p>
+                <span>{$vo.create_at}</span>
+            </div>
+            <div class="xi_right">
+                <p class="edu" style="color: gold; font-size:1em"> &nbsp&nbsp金币</p>
+                <p class="edu" style="color: royalblue; font-size:1em"> &nbsp娃娃币</p>
+            </div>
+            <div class="xi_right">
+                <p class="edu" style="color: gold; font-size:1em">-{$vo.coin}</p>
+                <p class="edu" style="color: royalblue; font-size:1em">-{$vo.free_coin}</p>
+            </div>
+
+        </div>
+    </div>
+    {/foreach}
+    {elseif  $in_type eq 3}
+    <!--收益账单-->
+    {foreach $list as $key=>$vo}
+    <div class="xi_one">
+        <div class="container">
+            <div class="xi_left">
+                <p>{$vo.reason_c}</p>
+                <p>{$vo.remark}</p>
+                <span>{$vo.create_at}</span>
+            </div>
+
+            {if  $vo.i_value neq 0}
+            <div class="xi_right">
+                <p class="edu" style="color: green; font-size:1em"> &nbsp&nbsp元</p>
+            </div>
+            <div class="xi_right">
+                <p class="edu" style="color: green; font-size:1em">+{$vo.i_value}</p>
+            </div>
+            {else}
+            <div class="xi_right">
+                <p class="edu" style="color: gold; font-size:1em"> &nbsp&nbsp金币</p>
+                <p class="edu" style="color: royalblue; font-size:1em"> &nbsp娃娃币</p>
+            </div>
+            <div class="xi_right">
+                <p class="edu" style="color: gold; font-size:1em">+{$vo.coin}</p>
+                <p class="edu" style="color: royalblue; font-size:1em">+{$vo.free_coin}</p>
+            </div>
+            {/if}
+
+
+        </div>
+    </div>
+    {/foreach}
+    {/if}
+
+</div>
+
+
+
+<div class="ding_d">
+</div>
+
+
+
+
+<script src="__STATIC__/plugs/phone/js/jquery.min.js" type="text/javascript"></script>
+
+<script src="__STATIC__/plugs/phone/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="__STATIC__/plugs/phone/js/index.js" type="text/javascript"></script>
+
+
+
+
+{/block}
