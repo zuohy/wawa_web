@@ -64,6 +64,10 @@ class Activity extends BasicBaby
 
         $tmpUserInfo = $this->getUserInfo($userId);
         $tmpCode = isset($tmpUserInfo['code']) ? $tmpUserInfo['code'] : '';
+        $tmpPhone = isset($tmpUserInfo['phone']) ? $tmpUserInfo['phone'] : '';
+        $this->assign('phone', $tmpPhone);
+        $this->assign('product_code', $proCode);
+
         //分享 收徒数量
         $actNum = ActivityService::getShareNum($proCode, $tmpCode);
         $shareNum = isset($actNum['share_num']) ? $actNum['share_num'] : '';
@@ -73,6 +77,15 @@ class Activity extends BasicBaby
 
         //活动信息
         $actInfo = ActivityService::getActInfo($proCode);
+        //活动价格
+        $iconsType = isset($actInfo['icons_type']) ? $actInfo['icons_type'] : '';
+        $actPrice = isset($actInfo['act_price']) ? $actInfo['act_price'] : '';
+        $payPrice = $this->coverPayValue(ErrorCode::BABY_COVER_TYPE_CNY, $actPrice);
+
+        $this->assign('pay_price', $payPrice);
+        $this->assign('icons_type', $iconsType);
+
+        //规则说明数组
         $desArr = ActivityService::createDesArr($actInfo['describe']);
         $this->assign('des_arr', $desArr);
         //分享 排名 top3
@@ -97,5 +110,42 @@ class Activity extends BasicBaby
 
     }
 
+
+    /**
+     * 填写手机号
+     * @return View
+     */
+    public function phone()
+    {
+        $userId = session('user_id');
+
+        $userInfo = $this->getUserInfo($userId);
+        $name = isset($userInfo['name']) ? $userInfo['name'] : '';
+        $phone = isset($userInfo['phone']) ? $userInfo['phone'] : '';
+
+        return view('', ['name' => $name, 'phone' => $phone, 'title' => '活动电话' ]);
+    }
+
+    /**
+     * 保存手机号
+     * @return View
+     */
+    public function save()
+    {
+        $phone = $this->request->post('phone');
+        $userId = session('user_id');
+        $inUserInfo = array(
+            'phone' => $phone
+        );
+        $userResult = $this->updateUserInfo($userId, $inUserInfo);
+
+
+       if($userResult == ErrorCode::CODE_OK)
+       {
+           $this->success("保存成功！");
+       }else{
+           $this->error("保存失败，请稍后再试");
+       }
+    }
 
 }

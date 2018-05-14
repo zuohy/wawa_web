@@ -43,10 +43,14 @@ class ActivityService
 
     public static $shareNumInfo = array(
         'product_code' => '',
-        'user_id' => '',
-        'share_num' => '',
+        'code' => '',
+        'name' => '',
+        'pic' => '',
+        'code' => '',
+        'gender' => '',
         'share_valid' => '',
         'update_at' => '',
+        'create_at' => '',
     );
 
 
@@ -68,9 +72,11 @@ class ActivityService
                     self::$actInfo[$key] = $value;
                 }
             }
+
+            return $actArr;
         }
 
-        return self::$actInfo;
+        return '';
     }
 
     /**
@@ -105,9 +111,10 @@ class ActivityService
                     self::$shareNumInfo[$key] = $value;
                 }
             }
+            return $numArr;
         }
 
-        return self::$shareNumInfo;
+        return '';
     }
 
     /**
@@ -122,7 +129,7 @@ class ActivityService
      */
     public static function addShareNum($productCode, $code, $name, $pic, $gender, $isShare)
     {
-        Log::info("addShareNum: start product_code= " . $productCode);
+        Log::info("addShareNum: start product_code= " . $productCode . ' code=' . $code . ' name=' . $name . ' isShare=' . $isShare);
         //获取更新 有效分享
         $num = 0;      //分享次数
         $validNum = 0; //有效分享次数
@@ -141,10 +148,12 @@ class ActivityService
         $curShareNum = isset($curNumInfo['share_num']) ? $curNumInfo['share_num'] : 0;
         $curShareValid = isset($curNumInfo['share_valid']) ? $curNumInfo['share_valid'] : 0;
 
-
+        $logData = json_encode($curNumInfo);
+        Log::info("addShareNum: get data " . ' save data=' . $logData );
 
         if($curCode == $code){
             //分享次数统计，记录已经存在 更新信息
+
             $data_num = array(
                 'id'=> $curId,
                 //'product_code'=> $productCode,
@@ -171,6 +180,8 @@ class ActivityService
                 'update_at'=> date('Y-m-d H:m:s')    //记录更新时间
             );
         }
+        $logData = json_encode($data_num);
+        Log::info("addShareNum: update product_code= " . $productCode . ' code=' . $code . ' save data=' . $logData );
 
         $db_num = Db::name('TUserShareNum');
         $retBool = DataService::save($db_num, $data_num);   //返回bool 量
@@ -214,7 +225,7 @@ class ActivityService
 
        //异常判断
        if($i_code == '' || $i_code_father == ''){
-           Log::info("_saveShareHis: code is empty i_code= " . $i_code . ' i_code_father' . $i_code_father);
+           Log::info("updateShareHis: code is empty i_code= " . $i_code . ' i_code_father' . $i_code_father);
            $result = ErrorCode::E_NOT_SUPPORT;
            return $result;
        }
@@ -260,17 +271,19 @@ class ActivityService
 
        }
 
+       $logData = json_encode($data_share);
+       Log::info("updateShareHis: update product_code= " . $productCode .  ' save data=' . $logData );
 
         $result = DataService::save($db_share_his, $data_share);   //返回bool 量
 
        if($result){
-           Log::info("_saveShareHis: end ok isShare= " . $isShare );
+           Log::info("updateShareHis: end ok isShare= " . $isShare );
            $result = ErrorCode::CODE_OK;
 
            //增加分享统计 信息
            self::addShareNum($productCode, $i_code_father, $i_name_father, $i_pic_father, $i_gender_father, $isShare);
        }else{
-           Log::error("_saveShareHis: end failed isShare= " . $isShare );
+           Log::error("updateShareHis: end failed isShare= " . $isShare );
            $result = ErrorCode::E_NOT_SUPPORT;
        }
 

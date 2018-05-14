@@ -365,9 +365,9 @@ class Apiwawa extends BasicBaby
                 $userId = session('user_id');
                 $unionId = session('union_id');
 
-                Log::info("recharge: openId= " . $openId);
-                Log::info("recharge: userId= " . $userId);
-                Log::info("recharge: unionId= " . $unionId);
+                Log::info("payment: openId= " . $openId);
+                Log::info("payment: userId= " . $userId);
+                Log::info("payment: unionId= " . $unionId);
 
                 //获取产品编码
                 $productCode = isset($jPack['product_code']) ? $jPack['product_code'] : ErrorCode::BABY_HEADER_SEQ_APP;
@@ -385,13 +385,13 @@ class Apiwawa extends BasicBaby
 
                 //数据库中充值单位为元， 支付接口单位为 分， 所以这里需要转换金额 1元= 100分
                 $payValue = $this->coverPayValue(ErrorCode::BABY_COVER_TYPE_PAY, $lastPay);
-
+                $payValue = 1; //测试支付
                 $optionsArr = $this->miniPay($openId, $payValue);
                 //$payOptions = json_encode($optionsArr);
 
                 //生成用户订单信息
-                Log::info("recharge: options code= " . $optionsArr['code']);
-                if( $optionsArr['code'] == 0 ){
+                Log::info("payment: options code= " . $optionsArr['code']);
+                if( $optionsArr['code'] == ErrorCode::CODE_OK ){
                     $this->saveReceipt($userId, $optionsArr['prepayId'], $lastPay, $iconsType, $optionsArr['order_no'], $productCode);
                 }
                 //订单 返回支付订单信息

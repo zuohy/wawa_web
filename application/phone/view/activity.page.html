@@ -8,6 +8,7 @@
 <script src="__STATIC__/plugs/phone/js/bootstrap.min.js?ver={:date('ymd')}" type="text/javascript"></script>
 <script src="__STATIC__/plugs/phone/js/index.js?ver={:date('ymd')}" type="text/javascript"></script>
 <script src="__STATIC__/plugs/phone/js/awardRotate.js?ver={:date('ymd')}" type="text/javascript"></script>
+<script src="__STATIC__/plugs/phone/js/pay_page.js?ver={:date('ymd')}" type="text/javascript"></script>
 {/block}
 {block name="body"}
 
@@ -228,7 +229,11 @@
     <!-- 底部btn -->
     <div class="footer">
         <div class="footer_btn footer_left">幸运大抽奖</div>
-        <div class="footer_btn footer_right"><a href="">立领购买</a></div>
+        {if $phone eq ''}
+        <div class="footer_btn footer_right"><a data-href='{:url("phone/activity/phone")}' href="javascript:void(0)">立领购买({$pay_price}元)</a></div>
+        {else}
+        <div class="footer_btn footer_right"><a onclick="act_pay('{$product_code}', '{$icons_type}')">立领购买({$pay_price}元)</a></div>
+        {/if}
     </div>
 </div>
 
@@ -273,6 +278,13 @@
         //获取分享徒弟 数量
 
     });
+
+    var act_pay = function(proCode, payType){
+        var payUrl = "{:url('phone/apiwawa/index')}";
+        console.log('pay url ' + payUrl)
+        mini_send(payUrl, proCode, payType);
+    }
+
 </script>
 
 {/block}

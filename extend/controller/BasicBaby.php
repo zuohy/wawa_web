@@ -192,13 +192,10 @@ class BasicBaby extends Controller
         //查询openid
         //查询当前是否已经存在用户信息
         $db_wx = Db::name('TUserWeixin');
-        $wxUser = '';
-        $openId = '';
-        $unionId = '';
 
         $wxUser = $db_wx->where('user_id', $userId)->find();
-        $openId = isset($userInfo['open_id']) ? $userInfo['open_id'] : '';
-        $unionId = isset($userInfo['union_id']) ? $userInfo['union_id'] : '';
+        $openId = isset($wxUser['open_id']) ? $wxUser['open_id'] : '';
+        $unionId = isset($wxUser['union_id']) ? $wxUser['union_id'] : '';
 
         return $openId;
     }
@@ -422,6 +419,7 @@ class BasicBaby extends Controller
         $db_receipt = Db::name('TUserCommonpayReceipt');
         $receiptInfo = '';
         $result = '';
+        Log::info("saveReceipt: start order_no=" . $orderNo . " receiptType=" . $receiptType);
 
         //异常处理
         if( empty($orderNo) ){
@@ -443,7 +441,6 @@ class BasicBaby extends Controller
 
         //查询订单信息
         $receiptInfo = $db_receipt->where('order_no', $orderNo)->find();
-        Log::info("saveReceipt: start order_no=" . $orderNo . " receiptType=" . $receiptType);
 
         if($receiptInfo && ($receiptInfo['order_no'] == $orderNo ) ){
             //更新订单
@@ -508,7 +505,7 @@ class BasicBaby extends Controller
     {
         $topSequence = null;
         $seq = $this->createTmpSeq($length);
-        $topSequence = $topType . '-' . $seq;
+        $topSequence = $topType  . $seq;
 
         return $topSequence;
     }
@@ -546,11 +543,15 @@ class BasicBaby extends Controller
         if (PayService::isPay($order_no)) {
             //清除已经支付完成的订单号缓存
             Log::info("miniPay wechat pay already ok: order_no= " . $order_no);
-            $retBool = $this->saveReceipt('', '', '',  '', $order_no, '', ErrorCode::BABY_PAY_SUCCESS);  //$orderNo 为第5个参数，注意
+            $retBool = $this->saveReceipt('', '', '',  '', $order_no, '', '', ErrorCode::BABY_PAY_SUCCESS);  //$orderNo 为第5个参数，注意
             // 重置缓存订单
             session('pay-mini-order-no', null);
-            //$this->completeMiniPay($order_no, WAWA_PAY_SUCCESS);
-            return ['code' => ErrorCode::E_PAY_ALREADY_SUCCESS, 'msg' => "此订单已完成支付", 'order_no' => $order_no];
+
+            //return ['code' => ErrorCode::E_PAY_ALREADY_SUCCESS, 'msg' => "此订单已完成支付", 'order_no' => $order_no];
+            //支付完成重新生成新的订单号 不返回错误
+            $order_no = DataService::createSequence(10, 'wechat-pay-mini');
+            session('pay-mini-order-no', $order_no);
+
         }
 
         $pay = load_wx_mini('pay');
@@ -645,7 +646,7 @@ class BasicBaby extends Controller
      * @return bool
      */
     protected function completeOrderPay($orderNo, $status){
-        $order_no = session('pay-mini-order-no');   //由于微信小程序 支付请求接口，重新建立session 所以预支付订单页面的 session数据获取不到
+        $order_no = '';//session('pay-mini-order-no');   //由于微信小程序 支付请求接口，重新建立session 所以预支付订单页面的 session数据获取不到
         $result = ErrorCode::BABY_PAY_FAILED;
 
         Log::info("completeOrderPay: start orderNo=" . $orderNo . " status=" . $status . " pay-mini-order-no=" . $order_no);
@@ -665,7 +666,7 @@ class BasicBaby extends Controller
                 Log::info("completeOrderPay: update pay complete orderNo=" . $orderNo);
 
                 // 重置缓存订单
-                session('pay-mini-order-no', null);
+                //session('pay-mini-order-no', null);
             }
 
         }elseif ($order_no){
@@ -760,17 +761,26 @@ class BasicBaby extends Controller
         //获取分享者 收益者信息
         $isShare = ErrorCode::BABY_SHARE_NOT_PAY;
         $tmpShareHis = ActivityService::getShareHisInfo($proCode, $tmpCode, $isShare, 0);  //不查询isShare
+        if( empty($tmpShareHis) ){
+            //没有分享信息 返回成功
+            Log::info("backUserCoin: not found share history product_code=" . $proCode
+                . ' user_id=' . $userId . ' code(被邀请码)=' . $tmpCode);
+            $result = ErrorCode::CODE_OK;  //这里不做错误处理，只是不产生收益
+            return $result;
+        }
         $tmpFatherCode = isset($tmpShareHis['code_father']) ? $tmpShareHis['code_father'] : '';
         $tmpShareStatus = isset($tmpShareHis['s_status']) ? $tmpShareHis['s_status'] : '';
         if('' == $tmpFatherCode){
             //没有收益者信息
-            Log::error("backUserCoin: father code not found product_code=" . $proCode  . ' user_id=' . $userId . ' code(被邀请码)=' . $tmpCode);
+            Log::error("backUserCoin: father code not found product_code=" . $proCode
+                . ' user_id=' . $userId . ' code(被邀请码)=' . $tmpCode);
             $result = ErrorCode::E_NOT_SUPPORT;  //这里做错误处理，只是不产生收益，有可能是已经处理过收益逻辑的用户
             return $result;
 
         }elseif(ErrorCode::BABY_SHARE_SUCCESS == $tmpShareStatus){
-            //没有收益者信息
-            Log::info("backUserCoin: share status already done product_code=" . $proCode  . ' user_id=' . $userId . ' code(被邀请码)=' . $tmpCode . ' tmpFatherCode=' . $tmpFatherCode);
+            //已经处理过收益者信息
+            Log::info("backUserCoin: share status already done product_code=" . $proCode
+                . ' user_id=' . $userId . ' code(被邀请码)=' . $tmpCode . ' tmpFatherCode=' . $tmpFatherCode);
             $result = ErrorCode::CODE_OK;  //这里不做错误处理，只是不产生收益，有可能是已经处理过收益逻辑的用户
             return $result;
         }
@@ -1284,7 +1294,7 @@ class BasicBaby extends Controller
     protected function miniRedPackage($userId, $orderNum, $total_fee, $reMark)
     {
         //获取openid
-        $openId = self::getOpenId($userId);
+        $openId = $this->getOpenId($userId);
 
         Log::info("miniRedPackage start: order_num= " . $orderNum . ' openid=' . $openId);
 

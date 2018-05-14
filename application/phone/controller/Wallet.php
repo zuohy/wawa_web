@@ -54,7 +54,6 @@ class Wallet extends BasicBaby
      */
     public function recharge()
     {
-
         $userId = session('user_id');
         $tmpUserInfo = $this->getUserInfo($userId);
         $userCoin = isset($tmpUserInfo['coin']) ? $tmpUserInfo['coin'] : '';
@@ -99,7 +98,9 @@ class Wallet extends BasicBaby
             //收益账单
             $this->title = '收益账单';
             $db = Db::name('TUserIncome');
-            $db->where('user_id', $userId);
+            $field = ["user_id" => $userId, "i_status" => ErrorCode::BABY_PAY_SUCCESS];
+
+            $db->where($field);
             return parent::_list($db);
         }
 
