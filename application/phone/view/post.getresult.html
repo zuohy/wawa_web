@@ -37,11 +37,11 @@
             <p>收货人：{$name}<i>电话：{$phone}</i></p>
             <span>地址：{$address}</span>
             <div class="mo button">
-                <a data-href='{:url("phone/post/address")}?address_id={$address_id}&is_choose=1' href="javascript:void(0)" class="liji">更换地址</a>
+                <a data-href='{:url("phone/post/address")}?address_id={$address_id}&is_choose=1' href="javascript:void(0)" class="liji" style="float: none;margin: 0 auto;">更换地址</a>
             </div>
             {else}
             <div class="mo button">
-                <a data-href='{:url("phone/post/address")}?address_id={$address_id}&is_choose=1' href="javascript:void(0)" class="lip">添加地址</a>
+                <a data-href='{:url("phone/post/address")}?address_id={$address_id}&is_choose=1' href="javascript:void(0)" class="lip" style="float: none;margin: 0 auto;">添加地址</a>
             </div>
             {/if}
 

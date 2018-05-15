@@ -1,7 +1,7 @@
 @charset "utf-8";
 /* CSS Document */
 
-body{ background:#ececec;}
+body{ background:#FFA07A;}
 
 .top{ height:3em; position:fixed; top:0; left:0; width:100%; z-index:10;}
 .local{ background:rgba(255,255,255,0.7); display:block; height:2.163em; border-radius:4px; line-height:2.163em; margin-top:0.571em; font-size:0.857em;}
@@ -52,7 +52,7 @@ body{ background:#ececec;}
 .dao i{ display:block; font-size:1.571em; color:#7b7b7b; margin-top:2px; text-align:center;}
 
 /*便民服务*/
-.top_c{height:3em; position:fixed; top:0; left:0; width:100%; z-index:20; background:#fff; border-bottom:1px solid #ccc;}
+.top_c{height:3em; position:fixed; top:0; left:0; width:100%; z-index:20; background:  url("../../proom/img/gr_bg.png");background-size:100%; border-bottom:1px solid #ccc;}
 .ss_c{ overflow:hidden; background:#f1f1f1; border-radius:4px; height:2em; margin-top:0.5em;}
 .ss_c input{ float:left; width:89%; border:0; background:none; height:2em; padding-left:0.714em;}
 .ss_c a{ float:right; font-size:1.286em; color:#333; line-height:1.5em; margin-right:0.571em;}
@@ -72,7 +72,7 @@ body{ background:#ececec;}
 .jian{ font-size:0.857em; color:#999;}
 
 /*钱包*/
-.titi{ font-size:1.286em; color:#333; line-height:2.3em; margin:0; text-align:center; font-weight:600;}
+.titi{ font-size:1.286em; color:#ffffff; line-height:2.3em; margin:0; text-align:center; font-weight:600;}
 .tou{ background:#246fc0; width:100%; margin-top:3em; padding:2.429em 0 1.286em;}
 .tou span{ font-size:0.857em; text-align:center; color:#f5f5f5; display:block; margin-bottom:0.286em;}
 .tou p{ text-align:center; color:#fff; font-size:2.143em;}
