@@ -25,9 +25,11 @@
     </div>
     <!-- 悬浮按钮 -->
     <div class="xuan_btn xuan_rules"><a href=".rules">规则</a></div>
-    <div class="xuan_btn xuan_tudi">徒弟列表<img src="__STATIC__/plugs/phone/act_images/normal_turn_in_icon.png"/></div>
+    <div class="xuan_btn xuan_tudi" onclick="getDisciple('{$product_code}', '{$code}')">徒弟列表<img src="__STATIC__/plugs/phone/act_images/normal_turn_in_icon.png"/>
 
-    <!-- 我的徒弟 -->
+    </div>
+
+    <!-- 我的徒弟数量 -->
     <div class="tudi">
         <img class="tudi_title" src="__STATIC__/plugs/phone/act_images/default_pupil_title.png" width="50%"/>
         <div class="tudi_icon">
@@ -48,7 +50,7 @@
     </div>
     <!-- 我的徒弟end -->
 
-    <!-- 排行 -->
+    <!-- 排行top3 -->
     <div class="rank">
         <div class="rank_list rank_two rank_list2">
             <div class="rank_num">{$list[1]['share_valid']|default="-"}</div>
@@ -80,139 +82,8 @@
     </div>
 
     <!-- 上榜 -->
-    <div class="go_rank">
+    <div class="go_rank" onclick="updateShareList('{$code}', '')">
         <img src="__STATIC__/plugs/phone/act_images/default_rule_into_btn.png" width="100%"/>
-    </div>
-    <!-- 阶段奖励 -->
-    <div class="award hidden">
-        <img class="award_title" src="__STATIC__/plugs/phone/act_images/default_list_title.png"/>
-        <div class="aw_title_font">本阶段奖励<span>999</span>元</div>
-        <div class="award_main">
-            <div class="award_main_title">
-                <div class="award_main_name">第<span>一</span>阶段进行中：</div>
-                <div class="award_main_progess">
-                    <div class="a_mian_p_p">
-                        <div class="a_mian_fill"></div>
-                    </div>
-                    <div class="a_mian_pic">
-                        <img src="__STATIC__/plugs/phone/act_images/default_list_header_icon.png"/>
-                        <span class="a_mian_oder">1</span>/<span class="a_mian_oder2">2</span>
-                    </div>
-                </div>
-            </div>
-            <div class="award_main_content">
-                <!-- 绝对定位铺路 -->
-                <img class="road road1" src="__STATIC__/plugs/phone/act_images/default_road_1.png"/>
-                <img class="road road2" src="__STATIC__/plugs/phone/act_images/default_road_1.png"/>
-                <img class="road road3" src="__STATIC__/plugs/phone/act_images/default_road_3.png"/>
-                <img class="road road4" src="__STATIC__/plugs/phone/act_images/default_road_2.png"/>
-                <img class="road road5" src="__STATIC__/plugs/phone/act_images/default_road_2.png"/>
-                <img class="road road6" src="__STATIC__/plugs/phone/act_images/default_road_3.png"/>
-                <img class="road road7" src="__STATIC__/plugs/phone/act_images/default_road_1.png"/>
-                <img class="road road8" src="__STATIC__/plugs/phone/act_images/default_road_1.png"/>
-                <img class="road road9" src="__STATIC__/plugs/phone/act_images/default_road_3.png"/>
-                <img class="road road10" src="__STATIC__/plugs/phone/act_images/default_road_2.png"/>
-                <img class="road road11" src="__STATIC__/plugs/phone/act_images/default_road_2.png"/>
-                <img class="road road12" src="__STATIC__/plugs/phone/act_images/default_road_3.png"/>
-
-                <div class="award_con_list">
-                    <img class="award_bg" src="__STATIC__/plugs/phone/act_images/default_wait_reward_img_1.png"/>
-                    <div class="aw_con_list_font">
-                        <div><span>9</span>元</div>
-                        <span class="aw_tudi">收徒<font>2</font>名</span>
-                    </div>
-                </div>
-                <div class="award_con_list award_con_middle">
-                    <img class="award_bg" src="__STATIC__/plugs/phone/act_images/default_wait_reward_img_1.png"/>
-                    <div class="aw_con_list_font">
-                        <div><span>14</span>元</div>
-                        <span class="aw_tudi">收徒<font>3</font>名</span>
-                    </div>
-                </div>
-                <div class="award_con_list">
-                    <img class="award_bg" src="__STATIC__/plugs/phone/act_images/default_wait_reward_img_1.png"/>
-                    <div class="aw_con_list_font">
-                        <div><span>30</span>元</div>
-                        <span class="aw_tudi">收徒<font>6</font>名</span>
-                    </div>
-                </div>
-
-                <div class="award_con_list">
-                    <img class="award_bg" src="__STATIC__/plugs/phone/act_images/default_wait_reward_img_1.png"/>
-                    <div class="aw_con_list_font">
-                        <div><span>50</span>元</div>
-                        <span class="aw_tudi">收徒<font>9</font>名</span>
-                    </div>
-                </div>
-                <div class="award_con_list award_con_middle">
-                    <img class="award_bg" src="__STATIC__/plugs/phone/act_images/default_wait_reward_img_1.png"/>
-                    <div class="aw_con_list_font">
-                        <div><span>90</span>元</div>
-                        <span class="aw_tudi">收徒<font>15</font>名</span>
-                    </div>
-                </div>
-                <div class="award_con_list">
-                    <img class="award_bg" src="__STATIC__/plugs/phone/act_images/default_wait_reward_img_1.png"/>
-                    <div class="aw_con_list_font">
-                        <div><span>126</span>元</div>
-                        <span class="aw_tudi">收徒<font>20</font>名</span>
-                    </div>
-                </div>
-
-                <div class="award_con_list">
-                    <img class="award_bg" src="__STATIC__/plugs/phone/act_images/default_wait_reward_img_1.png"/>
-                    <div class="aw_con_list_font">
-                        <div><span>224</span>元</div>
-                        <span class="aw_tudi">收徒<font>35</font>名</span>
-                    </div>
-                </div>
-                <div class="award_con_list award_con_middle">
-                    <img class="award_bg" src="__STATIC__/plugs/phone/act_images/default_wait_reward_img_1.png"/>
-                    <div class="aw_con_list_font">
-                        <div><span>420</span>元</div>
-                        <span class="aw_tudi">收徒<font>60</font>名</span>
-                    </div>
-                </div>
-                <div class="award_con_list">
-                    <img class="award_bg" src="__STATIC__/plugs/phone/act_images/default_wait_reward_img_1.png"/>
-                    <div class="aw_con_list_font">
-                        <div><span>900</span>元</div>
-                        <span class="aw_tudi">收徒<font>120</font>名</span>
-                    </div>
-                </div>
-
-                <div class="award_con_list">
-                    <img class="award_bg" src="__STATIC__/plugs/phone/act_images/default_wait_reward_img_1.png"/>
-                    <div class="aw_con_list_font">
-                        <div><span>2280</span>元</div>
-                        <span class="aw_tudi">收徒<font>300</font>名</span>
-                    </div>
-                </div>
-                <div class="award_con_list award_con_middle">
-                    <img class="award_bg" src="__STATIC__/plugs/phone/act_images/default_wait_reward_img_1.png"/>
-                    <div class="aw_con_list_font">
-                        <div><span>4600</span>元</div>
-                        <span class="aw_tudi">收徒<font>600</font>名</span>
-                    </div>
-                </div>
-                <div class="award_con_list">
-                    <img class="award_bg" src="__STATIC__/plugs/phone/act_images/default_wait_reward_img_1.png"/>
-                    <div class="aw_con_list_font">
-                        <div><span>6400</span>元</div>
-                        <span class="aw_tudi">收徒<font>800</font>名</span>
-                    </div>
-                </div>
-
-                <div class="award_con_list_last">
-                    <img src="__STATIC__/plugs/phone/act_images/default_wait_reward_img_2.png"/>
-                    <div class="aw_con_list_font">
-                        <div><span>9999</span>元</div>
-                        <span class="aw_tudi">收徒<font>1200</font>名</span>
-                    </div>
-                </div>
-
-            </div>
-        </div>
     </div>
 
     <!-- 活动规则 -->
@@ -238,6 +109,70 @@
 </div>
 
 
+<!-- 收徒列表 -->
+<div class="tudi_all">
+    <div class="tudi_all_banner">
+        <img src="__STATIC__/plugs/phone/act_images/tudi_bg.png"/>
+    </div>
+    <div class="xuan_btn xuan_home"><img src="__STATIC__/plugs/phone/act_images/normal_return_icon.png"/>活动首页</div>
+    <div class="tudi_content">
+        <div class="tudi_con_table">
+            <table>
+                <tr class="tudi_con_tab_tr">
+                    <td>昵称</td>
+                    <td>邀请状态</td>
+                    <td>注册时间</td>
+                </tr>
+                <tr class="tudi_false"></tr>
+            </table>
+        </div>
+        <div class="table_page">
+            <div class="table_page_left">上一页</div>
+            <div class="table_page_middle">
+                <span>1</span>/<font>20</font>
+            </div>
+            <div class="table_page_right">下一页</div>
+        </div>
+    </div>
+    <div class="r_page_invite">
+        <ul>
+            <li>什么是有效徒弟?<br>
+                <span>活动期间每收取1个新徒弟在任意1天给师傅贡献阅读奖励5次，即视为有效徒弟。</span></li>
+            <li>如何快速收徒弟?<br>
+                <span>可以通过QQ,微信朋友圈等线上渠道邀请好友，也可以尝试面对面扫码邀请好友,<a href="http://dwz.cn/7QVycX">查看收徒教程>></a></span></li>
+        </ul>
+    </div>
+</div>
+
+<!-- 邀请总榜 -->
+<div class="rank_page">
+    <div class="rank_page_banner">
+        <img src="images/list_bg.png" width="100%"/>
+    </div>
+    <div class="xuan_btn xuan_home"><img src="images/normal_return_icon.png"/>活动首页</div>
+    <div class="rank_page_png">
+        <img src="images/list_board_img.png" width="100%"/>
+    </div>
+    <div class="rank_page_main">
+        <div class="rank_page_main_font">有效徒弟排行榜，每十分钟更新一次<br>活动结束后，前三名可以获得丰富奖励</div>
+        <div class="rank_page_now">
+            您当前排名:<span>600</span>, 距离前一名差<font>50</font>人
+        </div>
+        <div class="rank_page_three">
+
+        </div>
+        <div class="r_page_table">
+            <table cellspacing="0">
+                <tr class="r_page_t1">
+                    <td>排名</td>
+                    <td>昵称</td>
+                    <td>有效徒弟</td>
+                </tr>
+                <tr class="r_false"></tr>
+            </table>
+        </div>
+    </div>
+</div>
 
 
 <script>
@@ -249,6 +184,7 @@
             $(".go_rank").click(function() {
                 $(".home_page").hide();
                 $(".rank_page").fadeIn(500);
+
             });
             $(".footer_left").click(function() {
                 $(".cover,.zhuanpan").fadeIn(100);
@@ -279,10 +215,95 @@
 
     });
 
+    //购买支付
     var act_pay = function(proCode, payType){
         var payUrl = "{:url('phone/apiwawa/index')}";
         console.log('pay url ' + payUrl)
         mini_send(payUrl, proCode, payType);
+    }
+
+    //更新邀请排名 top3
+    function updateShareList(curUserCode, shareList){
+
+        //top 3
+        for (var i=0;i<3; i++){
+            var tmpShare = shareList[i];
+
+            //排名奖励信息
+            var s_img_reward = '<img src="__STATIC__/plugs/phone/act_images/n_one2x.png"/>';
+            var s_span_reward = '<span>'+ '娃娃' + '</span>';
+            var s_div_reward = '<div class="r_page_list_pic">' + s_img_reward + s_span_reward + '</div>';
+
+            //排名用户信息
+            var s_div_tudi_num = '<div class="r_duti_num">' + tmpShare['share_valid'] + '</div>'
+            var s_div_name = ' <div class="r_page_web_name">' + tmpShare['name'] + '</div>'
+            var s_div_user = '<div class="r_page_list_name">' + s_div_tudi_num + s_div_name + '</div>';
+
+            //排名
+            var shareNum = i+1;
+            var s_div_num = '<div class="r_page_list_num r_page_num3">' + shareNum + '</div>';
+            var s_div_wap = '<div class="rank_page_lists">' + s_div_num + s_div_reward + s_div_user + '</div>'
+
+        }
+
+        $('.rank_page_three').html(s_div_wap);
+
+
+
+
+
+    }
+
+    //更新徒弟列表页面
+    function updateTudiList(tudiList)
+    {
+        var t_td_header = '<td>昵称</td>' + '<td>邀请状态</td>' + '<td>注册时间</td>'
+        var t_tr_header = '<tr class="tudi_con_tab_tr">' + t_td_header + '</tr>';
+        var t_tr_end = '<tr class="tudi_false"></tr>'
+
+        var t_tr_all = '';
+        for (var i=0;i<tudiList.length;i++)
+        {
+            var tmpTudi = tudiList[i];
+            var tmpDate = /\d{4}-\d{1,2}-\d{1,2}/g.exec(tmpTudi['update_at']);  //去除时间
+            var t_td_name = '<td>' + tmpTudi['name'] + '</td>'
+            var t_td_status = '<td>' + tmpTudi['s_status'] + '</td>'
+            var t_td_date =  '<td>' + tmpDate + '</td>'
+            var t_tr_data = '<tr class="tudi_con_tab_tr">' + t_td_name + t_td_status + t_td_date + '</tr>';
+            t_tr_all = t_tr_all + t_tr_data;
+        }
+        var t_table = '<table>' + t_tr_header + t_tr_all + t_tr_end + '</table>';
+
+        $('.tudi_con_table').html(t_table);
+
+
+    }
+
+    function getDisciple(proCode, userCode)
+    {
+        $.ajax({
+            //几个参数需要注意一下
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: "{:url('phone/activity/disciple')}" ,//url
+            data: {product_code: proCode, code: userCode},
+            success: function (result) {
+                console.log(result);//打印服务端返回的数据(调试用)
+                if (result.code == 1) {
+                    console.log("成功！");
+                    //更新徒弟列表页面
+                    tudi_list = result.data;
+                    updateTudiList(tudi_list)
+
+                }else{
+                    console.log("失败！");
+                }
+            },
+            error : function() {
+                alert("网络异常！");
+            }
+        });
+
     }
 
 </script>

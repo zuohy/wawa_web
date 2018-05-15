@@ -65,6 +65,7 @@ class Activity extends BasicBaby
         $tmpUserInfo = $this->getUserInfo($userId);
         $tmpCode = isset($tmpUserInfo['code']) ? $tmpUserInfo['code'] : '';
         $tmpPhone = isset($tmpUserInfo['phone']) ? $tmpUserInfo['phone'] : '';
+        $this->assign('code', $tmpCode);
         $this->assign('phone', $tmpPhone);
         $this->assign('product_code', $proCode);
 
@@ -90,7 +91,7 @@ class Activity extends BasicBaby
         $this->assign('des_arr', $desArr);
         //分享 排名 top3
         $db_num = Db::name('TUserShareNum');
-        $dbArr = $db_num->where('product_code', $proCode)->order('share_valid desc');
+        $dbArr = $db_num->where('product_code', $proCode)->order('share_valid update_at desc');
 
         $this->title = '活动';
         return parent::_list($dbArr);
@@ -104,7 +105,10 @@ class Activity extends BasicBaby
     {
 
         foreach ($list as &$vo) {
-            //转换为中文字符
+            //转换 去掉 时间
+            $endTime = isset($vo['act_end']) ? $vo['act_end'] : '';
+            $endDate = explode(' ', $endTime);
+            $vo['act_end_date'] = $endDate[0];
 
         }
 
@@ -146,6 +150,29 @@ class Activity extends BasicBaby
        }else{
            $this->error("保存失败，请稍后再试");
        }
+    }
+
+
+    /**
+     * 分享徒弟列表
+     * @return View
+     */
+    public function disciple()
+    {
+        $userId = session('user_id');
+        $proCode = $this->request->post('product_code');
+        $userCode = $this->request->post('code');
+
+        $tudiList = ActivityService::getShareHisList($proCode, $userCode, '', 0);  //获取成功分享和失败分享所有记录
+
+        $logData = json_encode($tudiList);
+        Log::info("disciple: get disciple= " . $logData );
+
+        $this->assign('title', '徒弟列表');
+
+        $this->success("成功！", null, $tudiList);
+
+
     }
 
 }
