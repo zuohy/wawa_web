@@ -55,10 +55,10 @@ class Personal extends BasicBaby
      * 个人地址
      * @return View
      */
-    public function collection()
+    public function edit()
     {
-
-        return view('', ['title' => '我的收藏']);
+        $userId = session('user_id');
+        return $this->_form('TUserConfig', 'form', 'user_id', [], ['user_id'=> $userId]);
     }
 
     /**
