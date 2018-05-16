@@ -118,6 +118,57 @@ class ActivityService
     }
 
     /**
+     * 获取指定用户分享人数 排名
+     * @param string $productCode 产品编码
+     * @param string $userId 用户ID
+     * @return bool|string
+     */
+    public static function getUserSharePos($productCode, $code)
+    {
+        //分享 排名 top3
+        $db_num = Db::name('TUserShareNum');
+        $shareArr = $db_num->where('product_code', $productCode)
+            ->order('share_valid desc, update_at desc')->select();
+
+        $name = '';
+        $pos = 0;     //指定用户排名位置
+        $curNum = 0;  //指定用户 有效分享人数
+        $preNum = 0;  //上一位排名 有效分享人数
+        $czNum = 0;  //与上一位排名差
+
+        $preUserInfo = '';  //上一位用户
+        foreach($shareArr as $key => $user){
+            if($user['code'] == $code){
+                //找到指定用户
+                $pos = $key+1;
+                $name = $user['name'];
+                $curNum = $user['share_valid'];
+                if($preUserInfo != ''){
+                    $preNum = $preUserInfo['share_valid'];
+                    $czNum = $preNum - $curNum;   //与上一位排名差
+                }
+                break;
+            }
+            //保存为上一位用户
+            $preUserInfo = $user;
+
+        }
+
+        if($czNum <= 0){
+            $czNum = 0;
+        }
+        $retInfo = array(
+            'name' => $name,
+            'pos' => $pos,
+            'curNum' => $curNum,
+            'czNum' => $czNum,
+        );
+
+        return $retInfo;
+
+    }
+
+    /**
      * 获取分享 数量信息
      * @param string $productCode 产品编码
      * @param string $userId 用户ID

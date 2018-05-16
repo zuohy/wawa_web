@@ -94,10 +94,10 @@
     <!-- END OF Slideshow Background -->
 
     <!-- Solid color as background -->
-    <div class="cover-bg pos-abs full-size bg-color" data-bgcolor="rgb(254, 175, 27)"></div>
+    <div class="cover-bg pos-abs full-size bg-color" data-bgcolor="rgb(254, 175, 27)" style="background:url('__STATIC__/plugs/proom/img/gr_bg.png');"></div>
 
-    <div style="height: 70%; border-radius: 20px;border:1px solid red" id="test" class="cover-bg pos-abs full-size">
-        <video id="remoteVideo" autoplay="autoplay" style="height: 100%; width: 100%" ></video>
+    <div style="height: 75%; border-radius: 20px;border:1px solid red" id="test" class="cover-bg pos-abs full-size">
+        <video id="remoteVideo" autoplay="autoplay" style="height: 100%; width: 100%; object-fit: fill" ></video>
 
         <video class="hidden" id="localVideo" autoplay="autoplay" muted="muted" style="height: 100px; width: 100px"></video>
 
@@ -161,14 +161,15 @@
     <!-- Begin of Control page   -->
     <div class="section page-contact page page-cent bg-color" data-bgcolor="rgba(95, 25, 208, 0.88)s" id="s-control">
         <!-- Begin of contact information -->
-            <section class="content" style="margin-top: 285px">
+            <section class="content" style="margin-top: 400px">
                 <header class="p-title" >
 
                     <h6 style="float: left">
-
-                        <a title="金币">金币数量：{$coin}</a>
+                        <a title="金币">金币：{$coin}</a>
+                        <a title="娃娃币">&nbsp娃娃币：{$free_coin}</a>
                     </h6>
-                    <div style="background:white;color:#824211;width: 65px;border: 1px solid;border-radius: 80px;text-align: center;float: right;"> <img src="__STATIC__/plugs/proom/img/coin.png" width="20%">  充值</div>
+                    <div style="background:white;color:#824211;width: 65px;border: 1px solid;border-radius: 80px;text-align: center;float: right;">
+                        <img src="__STATIC__/plugs/proom/img/coin.png" width="20%">  充值</div>
 
                 </header>
                 <!-- Begin Of Page SubSction -->
@@ -176,7 +177,7 @@
 
                     <div class="contact" style="height: 60px">
                        <div id="m_coins" class="contact" style="text-align:center; ">
-                           <a href="#" style="float: left;">
+                           <a href="#contact" style="float: left;">
                                <img src="__STATIC__/plugs/proom/img/msg.png" style="height: 35px">
                            </a>
                            <a url={$control_url|default=''} data-coins='{"type":"publish","room_id":"{$room_id}","dev_room_id":"{$dev_room_id}","user_id":"{$user_id}", "price":"{$price}", "to":"abc"}' class="button button-glow button-rounded button-caution" style="border-radius: 22px">开始抓</a>

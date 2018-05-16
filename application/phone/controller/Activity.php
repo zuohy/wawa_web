@@ -89,9 +89,16 @@ class Activity extends BasicBaby
         //规则说明数组
         $desArr = ActivityService::createDesArr($actInfo['describe']);
         $this->assign('des_arr', $desArr);
+
+        //获取当前用户的排名，与上一排名分享差值
+        $sharePosInfo = ActivityService::getUserSharePos($proCode, $tmpCode);
+        $this->assign('share_pos', $sharePosInfo);
+
         //分享 排名 top3
         $db_num = Db::name('TUserShareNum');
-        $dbArr = $db_num->where('product_code', $proCode)->order('share_valid update_at desc');
+        $dbArr = $db_num->where('product_code', $proCode)->order('share_valid desc, update_at desc')->limit(3);
+
+
 
         $this->title = '活动';
         return parent::_list($dbArr);
@@ -107,8 +114,18 @@ class Activity extends BasicBaby
         foreach ($list as &$vo) {
             //转换 去掉 时间
             $endTime = isset($vo['act_end']) ? $vo['act_end'] : '';
-            $endDate = explode(' ', $endTime);
-            $vo['act_end_date'] = $endDate[0];
+            $sStatus = isset($vo['s_status']) ? $vo['s_status'] : ''; // 分享状态
+
+            if($endTime != ''){
+                $endDate = explode(' ', $endTime);
+                $vo['act_end_date'] = $endDate[0];
+            }
+            if($sStatus == ErrorCode::BABY_SHARE_SUCCESS){
+                $vo['s_status_c'] = '成功';
+            }elseif($sStatus > ErrorCode::BABY_SHARE_SUCCESS){
+                $vo['s_status_c'] = '未成功';
+            }
+
 
         }
 
