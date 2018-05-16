@@ -56,10 +56,11 @@
         <div class="recharge" style="float: right">
         {/if}
             <a onclick="recharge_pay('', '{$vo.icons_type}')">
-                <div style="color: #000000"> {$vo.icons_name}</div>
-                <div class="rec_div"> {$vo.free_value}娃娃币</div>
+                <div style="color: #f58e15"> {$vo.icons_name}</div>
+                <div class="rec_div"> {$vo.pay_value*10}&nbsp币</div>
+                <div style="color: #f53813"class="rec_div"> 多送&nbsp{$vo.free_value}&nbsp币</div>
                 <div class="rec_div"><img width="60px" height="60px" src="__STATIC__/{$vo.coin_pic}"></div>
-                <div class="rec_div" style="width: 50%;background:#ffd800;border: 1px solid #ffd800;border-radius: 10px ">￥{$vo.pay_value}</div>
+                <div class="rec_div" style="width: 80%;background:#ffd800;border: 1px solid #ffd800;border-radius: 10px ">￥{$vo.pay_value}</div>
 
             </a>
         </div>
