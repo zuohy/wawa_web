@@ -322,7 +322,28 @@ class ActivityService
         return $curShareHis;
     }
 
+    /**
+     * 获取分享者 收徒的列表记录
+     * @param array $productCode 产品编码 默认为A-00001 应用分享
+     * @param array $userCode 当前分享者code
+     * @param int $isShare 是否有效分享
+     * @param int $check 是否需要加入isShare 查询 0 默认不限制 1 加入isShare
+     * @return array
+     */
+    public static function getShareHisList($productCode=ErrorCode::BABY_HEADER_SEQ_APP, $userCode, $isShare, $check=0){
+        $db_share_his = Db::name('TUserShareHis');
+        $db_where = $db_share_his->where('product_code', $productCode)
+            ->where('code_father', $userCode)
+            ->order('update_at desc');   //获取最新的 分享者记录
 
+
+        if($check){
+            $db_where->where('s_status', $isShare);
+        }
+        $listShareHis = $db_where->select();   //分享信息  这里有可能有多个分享者记录
+
+        return $listShareHis;
+    }
     /**
      * 添加收益记录
      * @param string $userId   用户ID
@@ -353,6 +374,7 @@ class ActivityService
             'reason' => $reason,
             'remark' => $remark,
             'i_status' => $iStatus,  //默认为 0 生成收益
+            'update_at'=> date('Y-m-d H:m:s')    //记录更新时间
         );
 
         $jsonData = json_encode($data_income);
