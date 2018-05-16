@@ -16,6 +16,7 @@ namespace app\phone\controller;
 
 use controller\BasicBaby;
 use service\HttpService;
+use service\RoomService;
 use service\WxBizDataCrypt;
 use service\ErrorCode;
 use think\Db;
@@ -185,14 +186,21 @@ class Index extends BasicBaby
     public function device()
     {
         $uRoomId = $this->request->get('room_id');
+        $uGiftId = $this->request->get('gift_id');
+        $uPrice = $this->request->get('price');
         //$uRoomId = isset($uRoomId) ? $uRoomId : '';
         Log::info("device: uRoomId= " . $uRoomId);
 
         //保存用户房间ID
         session('room_id', $uRoomId);
 
-        //拉取设备列表
+        //房间 礼物信息
+        $giftInfo = RoomService::getGiftInfo($uGiftId);
+        $giftName = isset($giftInfo['gift_name']) ? $giftInfo['gift_name'] : '';
+        $this->assign('gift_name', $giftName);
+        $this->assign('price', $uPrice);
 
+        //拉取设备列表
         $this->title = '设备列表' . $uRoomId;
 
         $db = Db::name('TDevRoomInfo')->where(['is_deleted' => '0'])

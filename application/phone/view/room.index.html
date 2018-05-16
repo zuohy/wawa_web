@@ -35,7 +35,7 @@
 <nav class="quick-link count-4 nav-left">
     <div class="logo">
         <a href="#home">
-            <img src="__STATIC__/plugs/proom/img/logo_only.png" alt="Logo Brand">
+            <img src="__STATIC__/plugs/proom/img/adou.png" alt="Logo Brand">
         </a>
     </div>
     <ul  class="quser">
@@ -123,7 +123,7 @@
 <div class="pane-when " id="s-when">
     <div class="content">
         <!-- Clock -->
-        <div class="clock clock-countdown hidden" id="m_sec" >
+        <div class="clock clock-countdown hidden" id="m_sec">
             <div class="site-config"
                  data-date="04/18/2018 10:55:00"
                  data-date-timezone="+0"
@@ -165,8 +165,8 @@
                 <header class="p-title" >
 
                     <h6 style="float: left">
-                        <a title="金币">金币：{$coin}</a>
-                        <a title="娃娃币">&nbsp娃娃币：{$free_coin}</a>
+                        <a id="u_coin" title="金币">金币：{$coin}</a>
+                        <a id="u_free_coin" title="娃娃币">&nbsp娃娃币：{$free_coin}</a>
                     </h6>
                     <div style="background:white;color:#824211;width: 65px;border: 1px solid;border-radius: 80px;text-align: center;float: right;">
                         <img src="__STATIC__/plugs/proom/img/coin.png" width="20%">  充值</div>
@@ -748,7 +748,7 @@
             var imgSrc = userPic;
 
         }else{
-            imgSrc = '__STATIC__/plugs/proom/img/logo_only.png';
+            imgSrc = '__STATIC__/plugs/proom/img/adou.png';
         }
 
         var m_span = '<span class="title">' + userName + '</span>';
@@ -806,7 +806,7 @@
             }
 
             var m_span = '<span class="title">' + u_name + '</span>';
-            var m_img = '<img src=' + u_pic + '>';
+            var m_img = '<img style="border-radius:28px" src=' + u_pic + '>';
             var m_a = '<a >' + m_img + '</a>';
             var m_li = '<li data-menuanchor="">' + m_a + m_span + '</li>';
 

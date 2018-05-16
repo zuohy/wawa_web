@@ -127,7 +127,7 @@
         {if $vo.status eq '0' || $vo.status eq '3'}
         <a href="#">
         {else}
-        <a data-href='{:url("phone/index/device")}?room_id={$vo.room_id}' href="javascript:void(0)">
+        <a data-href='{:url("phone/index/device")}?room_id={$vo.room_id}&price={$vo.price}&gift_id={$vo.gift_id}' href="javascript:void(0)">
         {/if}
 
 
