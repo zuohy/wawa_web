@@ -96,11 +96,9 @@
     <!-- Solid color as background -->
     <div class="cover-bg pos-abs full-size bg-color" data-bgcolor="rgb(254, 175, 27)"></div>
 
-    <div style="height: 70%; border-radius: 20px;" id="test" class="cover-bg pos-abs full-size">
+    <div style="height: 70%; border-radius: 20px;border:1px solid red" id="test" class="cover-bg pos-abs full-size">
         <video id="remoteVideo" autoplay="autoplay" style="height: 100%; width: 100%" ></video>
-        <div style="">
-            <img style="border-radius: 20px; height: 80px;width: 100%" src="__STATIC__/plugs/proom/img/bg-default.jpg">
-        </div>
+
         <video class="hidden" id="localVideo" autoplay="autoplay" muted="muted" style="height: 100px; width: 100px"></video>
 
     </div>
@@ -163,29 +161,29 @@
     <!-- Begin of Control page   -->
     <div class="section page-contact page page-cent bg-color" data-bgcolor="rgba(95, 25, 208, 0.88)s" id="s-control">
         <!-- Begin of contact information -->
-            <section class="content">
+            <section class="content" style="margin-top: 285px">
                 <header class="p-title" >
 
-                    <h3>
-                        <a title="金币"><i id="u_coin" class="ion ion-social-reddit-outline">{$coin}</i></a>
-                        <a title="娃娃币"><i id="u_free_coin" class="ion ion-happy">{$free_coin}</i></a>
-                    </h3>
+                    <h6 style="float: left">
 
-                    <ul class="buttons">
-                        <li>
-                            <a title="充值" href="#"><i class="ion ion-social-usd-outline"></i></a>
-                        </li>
-                        <li>
-                            <a title="分享" href="#"><i class="ion ion-share"></i></a>
-                        </li>
-                    </ul>
+                        <a title="金币">金币数量：{$coin}</a>
+                    </h6>
+                    <div style="background:white;color:#824211;width: 65px;border: 1px solid;border-radius: 80px;text-align: center;float: right;"> <img src="__STATIC__/plugs/proom/img/coin.png" width="20%">  充值</div>
+
                 </header>
                 <!-- Begin Of Page SubSction -->
-                <div class="contact" style="margin-top:10px;">
+                <div class="contact" style="margin-top:50px;">
 
                     <div class="contact" style="height: 60px">
                        <div id="m_coins" class="contact" style="text-align:center; ">
-                           <a url={$control_url|default=''} data-coins='{"type":"publish","room_id":"{$room_id}","dev_room_id":"{$dev_room_id}","user_id":"{$user_id}", "price":"{$price}", "to":"abc"}' class="button button-glow button-rounded button-caution">投币<br>({$price}个)</a>
+                           <a href="#" style="float: left;">
+                               <img src="__STATIC__/plugs/proom/img/msg.png" style="height: 35px">
+                           </a>
+                           <a url={$control_url|default=''} data-coins='{"type":"publish","room_id":"{$room_id}","dev_room_id":"{$dev_room_id}","user_id":"{$user_id}", "price":"{$price}", "to":"abc"}' class="button button-glow button-rounded button-caution" style="border-radius: 22px">开始抓</a>
+                           <a href="#" style="float: right;">
+                               <img src="__STATIC__/plugs/proom/img/share.png" style="height: 35px">
+                           </a>
+
                        </div>
                         <div id="m_coins_none" class="contact hidden" style="text-align:center;">
                             <a class="button disabled button-glow button-rounded button-highlight">请等待<br>({$price}个)</a>
