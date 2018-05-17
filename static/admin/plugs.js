@@ -176,11 +176,18 @@ define(['jquery'], function () {
         };
         // 加载HTML到弹出层
         this.modal = function (url, data, title, callback, loading, tips) {
+            //检测手机端弹出层宽度
+            var phoneWidth = "800px"
+            var searchStr = 'phone';
+            var isPhone = url.match(searchStr);
+            if(isPhone){
+                phoneWidth = "300px";
+            }
             this.load(url, data, 'GET', function (res) {
                 if (typeof (res) === 'object') {
                     return $.msg.auto(res);
                 }
-                var layerIndex = layer.open({type: 1, btn: false, area: "800px", content: res, title: title || '', success: function (dom, index) {
+                var layerIndex = layer.open({type: 1, btn: false, area: phoneWidth, content: res, title: title || '', success: function (dom, index) {
                         $(dom).find('[data-close]').off('click').on('click', function () {
                             if ($(this).attr('data-confirm')) {
                                 return $.msg.confirm($(this).attr('data-confirm'), function () {
