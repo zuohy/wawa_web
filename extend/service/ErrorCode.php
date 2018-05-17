@@ -49,6 +49,7 @@ class ErrorCode
     const BABY_INCOME_FAILED = 2;    //处理收益异常
     const BABY_INCOME_BACK_CNY = 1;    //收益直接返现金
     const BABY_INCOME_BACK_COIN = 0;    //收益返金币
+    const BABY_INCOME_BACK_TRUE = 9;    //是为充值收益金币
 
     //支付常量
     const BABY_PAY_SUCCESS = 1;      //支付成功  微信接口

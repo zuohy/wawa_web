@@ -837,7 +837,7 @@ class BasicBaby extends Controller
         if($isCNY == ErrorCode::BABY_INCOME_BACK_CNY){
             $result = $this->miniRedPackage($inUserId, $orderNum, $payValue, '活动收益');
         }else{
-            $this->freeUserCoin($proCode, $inUserId, $iconsType);
+            $this->freeUserCoin($proCode, $inUserId, $iconsType, Error::BABY_INCOME_BACK_TRUE);
         }
 
         if(ErrorCode::CODE_OK == $result){
@@ -1039,14 +1039,22 @@ class BasicBaby extends Controller
      * @param string $proCode   产品编码
      * @param string $userId   用户ID
      * @param string $freeType  优惠类型
+     * @param string $isBack  收益充值标志
      * @return bool
      */
-    protected function freeUserCoin($proCode, $userId, $freeType){
+    protected function freeUserCoin($proCode, $userId, $freeType, $isBack=0){
         $retStatus = ErrorCode::CODE_OK;
         //获取充值优惠
         $receiptFreeInfo = $this->getPayValue($freeType);
-        $lastFreeValue = isset($receiptFreeInfo['free_value']) ? $receiptFreeInfo['free_value'] : 0;
-        $lastCoinValue = isset($receiptFreeInfo['coin_value']) ? $receiptFreeInfo['coin_value'] : 0;
+        if($isBack == Error::BABY_INCOME_BACK_TRUE){
+            //为收益充值
+            $lastFreeValue = isset($receiptFreeInfo['b_free_value']) ? $receiptFreeInfo['b_free_value'] : 0;
+            $lastCoinValue = isset($receiptFreeInfo['b_coin_value']) ? $receiptFreeInfo['b_coin_value'] : 0;
+        }else{
+            $lastFreeValue = isset($receiptFreeInfo['free_value']) ? $receiptFreeInfo['free_value'] : 0;
+            $lastCoinValue = isset($receiptFreeInfo['coin_value']) ? $receiptFreeInfo['coin_value'] : 0;
+        }
+
 
         Log::info("freeUserCoin:  lastFreeValue= " . $lastFreeValue . ' lastCoinValue=' . $lastCoinValue);
 

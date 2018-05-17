@@ -73,7 +73,7 @@ class Apiwawa extends BasicBaby
 
                     $faUserInfo = $this->getUserInfoByCode($codeFather);
                     if($faUserInfo && ($faUserInfo['code'] == $codeFather ) ){
-                        $this->freeUserCoin($proCode, $faUserInfo['user_id'], ErrorCode::BABY_COIN_TYPE_SHARE);
+                        $this->freeUserCoin($proCode, $faUserInfo['user_id'], ErrorCode::BABY_COIN_TYPE_SHARE, Error::BABY_INCOME_BACK_TRUE);
                     }
 
                 }
