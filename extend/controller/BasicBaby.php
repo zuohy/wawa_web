@@ -920,7 +920,8 @@ class BasicBaby extends Controller
 
                 //$saveCoin = $userInfo['coin'] + $lastCoinValue;   //充值全部 为娃娃币 金币只有在产生收益时候增加
                 $saveFree = $userInfo['free_coin'] + $lastFreeValue + $lastCoinValue;
-                $data_userCoin = array('id'=> $userInfo['id'], 'coin'=> $userInfo['coin'], 'free_coin'=> $saveFree);
+                //$data_userCoin = array('id'=> $userInfo['id'], 'coin'=> $userInfo['coin'], 'free_coin'=> $saveFree);
+                $data_userCoin = array('id'=> $userInfo['id'], 'free_coin'=> $saveFree,  'is_recharge'=> ErrorCode::BABY_USER_OK_RECHARGE);
                 $retBool = DataService::save($db_user, $data_userCoin);
             }
 

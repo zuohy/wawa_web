@@ -39,6 +39,9 @@ class ErrorCode
 
 
     //常量
+    //用户相关
+    const BABY_USER_NO_RECHARGE = 0;  //不是为充值用户
+    const BABY_USER_OK_RECHARGE = 1;  //是为充值用户
 
     //收益 常量
     const BABY_INCOME_NEW = 0;    //生成收益记录
@@ -71,7 +74,7 @@ class ErrorCode
     const BABY_COVER_TYPE_CNY = 3;    //金币 转换为元
     const BABY_COVER_TYPE_FEE = 4;    //金币 转换为分
 
-    const BABY_COIN_TYPE_REG_1 = 1;    //充值类型1
+    const BABY_COIN_TYPE_REG_1 = 1;    //充值类型1  首次充值 固定
     const BABY_COIN_TYPE_REG_2 = 2;    //充值类型2
     const BABY_COIN_TYPE_SHARE = 20;  //分享类型
     //const BABY_COIN_TYPE_CNY = 100;  //分享类型 直接存入金币 暂时未用
@@ -132,6 +135,7 @@ class ErrorCode
     const E_USER_COUNT_COIN_ERROR = -2007;  //用户消费金额计算错误
     const E_USER_INCOME_MAX = -2008;  //用户返现超过最大值 10元
     const E_USER_INCOME_FAIL = -2009;  //用户增加 币 失败
+    const E_USER_NOT_FIRST_RECHARGE = -2010;  //用户不是首次充值
 
     const E_ROOM_STATUS_ERROR = -2101;       //房间状态不正确
     const E_ROOM_USER_STATUS_ERROR = -2102;  //房间成员状态不正确
@@ -159,6 +163,7 @@ class ErrorCode
         self::E_USER_INSERT_COIN_ERROR => 'user insert coin error',
         self::E_USER_EMPLOY_COIN_ERROR => 'user employ coin error',
         self::E_USER_COUNT_COIN_ERROR => 'user employ coin count error',
+        self::E_USER_NOT_FIRST_RECHARGE => 'user is not first recharge',
 
         self::E_ROOM_STATUS_ERROR => 'room status error',
         self::E_ROOM_USER_STATUS_ERROR => 'room member status error',
@@ -187,6 +192,7 @@ class ErrorCode
         self::E_USER_INSERT_COIN_ERROR => '投币金额错误',
         self::E_USER_EMPLOY_COIN_ERROR => '消费金额错误',
         self::E_USER_COUNT_COIN_ERROR => '消费金额计算错误',
+        self::E_USER_NOT_FIRST_RECHARGE => '您不是首充用户，请选择其它充值',
 
         self::E_ROOM_STATUS_ERROR => '房间状态错误',
         self::E_ROOM_USER_STATUS_ERROR => '用户状态错误',
@@ -197,7 +203,7 @@ class ErrorCode
 
         self::E_NOT_SUPPORT => '未知操作',
         self::E_PAY_ALREADY_SUCCESS => '支付已经完成',
-        self::E_PAY_PICKER_FAILED => '创建微信预支付订单失败',
+        self::E_PAY_PICKER_FAILED => '创建预支付订单失败',
     );  //error code msg
 
     //通知消息

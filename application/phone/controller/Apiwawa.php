@@ -383,6 +383,17 @@ class Apiwawa extends BasicBaby
                     $lastPay = isset($iconsArr['pay_value']) ? $iconsArr['pay_value'] : -1;
                 }
 
+                //检查是否为首充
+                $tmpUserInfo = $this->getUserInfo($userId);
+                $isCharge = isset($tmpUserInfo['is_recharge']) ? $tmpUserInfo['is_recharge'] : ErrorCode::BABY_USER_NO_RECHARGE;
+                if($iconsType == ErrorCode::BABY_COIN_TYPE_REG_1
+                && ($isCharge == ErrorCode::BABY_USER_OK_RECHARGE) ){
+                    //用户已经充值过，选择为首次充值优惠 不能充值
+                    $this->retMsg['code'] = ErrorCode::E_USER_NOT_FIRST_RECHARGE;
+                    $this->retMsg['msg'] = ErrorCode::$ERR_MSG_C[ErrorCode::E_USER_NOT_FIRST_RECHARGE];
+                    Log::error("index: payment error retMsg= " . $this->retMsg['msg']);
+                }
+
                 //数据库中充值单位为元， 支付接口单位为 分， 所以这里需要转换金额 1元= 100分
                 $payValue = $this->coverPayValue(ErrorCode::BABY_COVER_TYPE_PAY, $lastPay);
                 $payValue = 1; //测试支付
@@ -393,6 +404,11 @@ class Apiwawa extends BasicBaby
                 Log::info("payment: options code= " . $optionsArr['code']);
                 if( $optionsArr['code'] == ErrorCode::CODE_OK ){
                     $this->saveReceipt($userId, $optionsArr['prepayId'], $lastPay, $iconsType, $optionsArr['order_no'], $productCode);
+                }else{
+                    //用户创建订单失败
+                    $this->retMsg['code'] = $optionsArr['code'];
+                    $this->retMsg['msg'] = ErrorCode::$ERR_MSG_C[$optionsArr['code']];
+                    Log::error("index: payment error retMsg= " . $this->retMsg['msg']);
                 }
                 //订单 返回支付订单信息
                 $this->retMsg['data'] = $optionsArr;

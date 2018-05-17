@@ -15,9 +15,14 @@
                 var retObj = $.parseJSON(ret)
                 perOrderPara = retObj.data;
 
+                //判断是否为首次充值错误
+                if(retObj.code != 0){
+                    alert('recharge error: ' + retObj.msg);
+                    return retObj.code;
+                }
                 if(perOrderPara.code != 0){
                     console.log('payment error')
-                    return;
+                    return perOrderPara.code;
                 }
                 if( perOrderPara.length <= 0 ){
                     alert('order para is null');
