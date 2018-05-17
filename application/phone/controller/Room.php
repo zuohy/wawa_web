@@ -82,6 +82,10 @@ class Room extends BasicBaby
         return view('', ['title' => '房间']);
     }
 
-
+    public function edit()
+    {
+        $userId = session('user_id');
+        return $this->_form('TUserConfig', 'form', 'user_id', [], ['user_id'=> $userId]);
+    }
 
 }

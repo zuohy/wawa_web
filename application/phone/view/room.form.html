@@ -1,0 +1,21 @@
+<form class="layui-form layui-box" style='padding:25px 0px 20px 0;background: #fff9eb' action="__SELF__" data-auto="true" method="post">
+    <div class="layui-form-item" style="text-align: center;margin-top: 40px">
+        <img class="success-group" src="__STATIC__/plugs/proom/img/success.png" style="height: 100px;width: auto;">
+        <div class="success-group" style="margin-top: 20px;color:#ff5a00;font-size: 20px">太棒了，抓到了~</div>
+
+        <img class="fail-group hidden" src="__STATIC__/plugs/proom/img/fail.png" style="height: 100px;width: auto;">
+        <div class="fail-group hidden" style="margin-top: 20px;color:#ff5a00;font-size: 20px">很遗憾，没抓到~</div>
+    </div>
+
+
+    <div class="hr-line-dashed"></div>
+
+    <div class="layui-form-item text-center">
+        {if isset($vo['id'])}<input type='hidden' value='{$vo.id}' name='id'/>{/if}
+        <button style="font-size:18px;text-align:center;border-radius: 50px !important;background: #fff9eb;color: #dacaa6;border: 2px solid #d6cdb9"  class="layui-btn" type='button' data-close>离开</button>
+        <button style="font-size:18px;text-align:center;border-radius: 50px !important;background: #ffd800;color: white" class="layui-btn" type='button'  data-close>再玩一次</button>
+    </div>
+</form>
+
+
+
