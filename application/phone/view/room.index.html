@@ -2,6 +2,11 @@
 
 {block name="header"}
 
+<style>
+    .page-contact .contact img{
+        height: 40px;
+    }
+</style>
 
 
 {/block}
@@ -189,41 +194,41 @@
                         <div id="m_coins_none" class="contact hidden" style="text-align:center;">
                             <a class="button disabled button-glow button-rounded button-highlight">请等待<br>({$price}个)</a>
                         </div>
-                       <div id="m_catch" class="contact hidden" style="text-align:center;">
-                           <a url={$control_url|default=''} data-coins='{"type":"control","dev_room_id":"{$dev_room_id}","to":"g"}' class="button button-glow button-border button-rounded button-primary">
-                               Go
-                           </a>
-                       </div>
                    </div>
 
                 <div id="m_control" class="contact hidden" style="text-align:center;">
+                    <div style="float: left">
+                        <div class="row" >
+                            <button class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","dev_room_id":"{$dev_room_id}","to":"u"}' data-up='{"type":"control","dev_room_id":"{$dev_room_id}","to":"ur"}'>
+                                <img  id="top_1" class="z_fx" src="__STATIC__/plugs/proom/img/z_up.png" alt="m_up">
+                                <img  id="top_2" style="display: none;" src="__STATIC__/plugs/proom/img/z_up.png" alt="m_up">
+                            </button>
+                        </div>
+                        <div class="row" >
+                            <button style="margin-left:0px;" class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","dev_room_id":"{$dev_room_id}","to":"l"}' data-up='{"type":"control","dev_room_id":"{$dev_room_id}","to":"lr"}'>
+                                <img  id="left_1" class="z_fx" src="__STATIC__/plugs/proom/img/z_left.png" alt="m_left">
+                                <img  id="left_2" style="display: none;" src="__STATIC__/plugs/proom/img/z_left.png" alt="m_left">
+                            </button>
+                            <button style="margin-left:30px;" class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","dev_room_id":"{$dev_room_id}","to":"r"}' data-up='{"type":"control","dev_room_id":"{$dev_room_id}","to":"rr"}'>
+                                <img  id="right_1" class="z_fx" src="__STATIC__/plugs/proom/img/z_right.png" alt="m_right">
+                                <img  id="right_2" style="display: none; " src="__STATIC__/plugs/proom/img/z_right.png" alt="m_right">
+                            </button>
+                        </div>
+                        <div class="row" >
+                            <button class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","dev_room_id":"{$dev_room_id}","to":"d"}' data-up='{"type":"control","dev_room_id":"{$dev_room_id}","to":"dr"}'>
+                                <img  id="bottom_1" class="z_fx" src="__STATIC__/plugs/proom/img/z_down.png" alt="m_down">
+                                <img  id="bottom_2" style="display: none;" src="__STATIC__/plugs/proom/img/z_down.png" alt="m_down">
+                            </button>
+                        </div>
+                    </div>
 
-                    <div class="row" >
-                        <button class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","dev_room_id":"{$dev_room_id}","to":"u"}' data-up='{"type":"control","dev_room_id":"{$dev_room_id}","to":"ur"}'>
-                            <img  id="top_1" src="__STATIC__/plugs/proom/img/m_up.png" alt="m_up">
-                            <img  id="top_2" style="display: none;" src="__STATIC__/plugs/proom/img/m_up.png" alt="m_up">
-                        </button>
-                    </div>
-                    <div class="row" >
-                        <button style="margin-left:0px;" class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","dev_room_id":"{$dev_room_id}","to":"l"}' data-up='{"type":"control","dev_room_id":"{$dev_room_id}","to":"lr"}'>
-                            <img  id="left_1" src="__STATIC__/plugs/proom/img/m_left.png" alt="m_left">
-                            <img  id="left_2" style="display: none;" src="__STATIC__/plugs/proom/img/m_left.png" alt="m_left">
-                        </button>
-                        <button style="margin-left:30px;" class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","dev_room_id":"{$dev_room_id}","to":"r"}' data-up='{"type":"control","dev_room_id":"{$dev_room_id}","to":"rr"}'>
-                            <img  id="right_1" src="__STATIC__/plugs/proom/img/m_right.png" alt="m_right">
-                            <img  id="right_2" style="display: none; " src="__STATIC__/plugs/proom/img/m_right.png" alt="m_right">
-                        </button>
-                    </div>
-                    <div class="row" >
-                        <button class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","dev_room_id":"{$dev_room_id}","to":"d"}' data-up='{"type":"control","dev_room_id":"{$dev_room_id}","to":"dr"}'>
-                    <img  id="bottom_1" src="__STATIC__/plugs/proom/img/m_down.png" alt="m_down">
-                    <img  id="bottom_2" style="display: none;" src="__STATIC__/plugs/proom/img/m_down.png" alt="m_down">
-                    </button>
+                    <div style="float: right;margin-top: 25px">
+                        <a url={$control_url|default=''} data-coins='{"type":"control","dev_room_id":"{$dev_room_id}","to":"g"}' >
+                            <img style="width: 74px;height: auto"  src="__STATIC__/plugs/proom/img/go.png">
+                        </a>
                     </div>
 
                 </div>
-
-
                 </div>
                 <!-- End of page SubSection -->
             </section>
