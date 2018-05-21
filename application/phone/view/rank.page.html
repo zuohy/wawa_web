@@ -16,12 +16,12 @@
 <!--top-->
 <div class="top_c">
     <a data-href='{:url("phone/index/main")}' href="javascript:void(0)" class="iconfont icon-jiantou-copy-copy" ></a>
-    <p class="titi">活动</p>
+    <p class="titi">排行榜</p>
 </div>
 <!-- 首页 -->
-<div class="home_page" value="{$product_code}">
+<div class="home_page">
     <div class="top_banner">
-        <img src="__STATIC__/{$act_pic_show}"/>
+        <img src="#"/>
     </div>
     <!-- 悬浮按钮 -->
     <div class="xuan_btn xuan_rules"><a href=".rules">规则</a></div>
@@ -199,11 +199,6 @@
 <script>
     $(function() {
         function init() {
-            var homeValue = $(".home_page").attr('value');
-            if(homeValue != 'A-00001'){
-
-                $(".home_page").css('background', '#f4324d');
-            }
             var H = $(window).height(),
                     W = $(window).width();
             $(".cover").css({"width": W, "height": H});
@@ -243,9 +238,10 @@
 
     //购买支付
     var act_pay = function(proCode, payType){
-        var payUrl = "{:url('phone/apiwawa/index')}";
-        console.log('pay url ' + payUrl)
-        mini_send(payUrl, proCode, payType);
+        return;  //不需要购买
+        //var payUrl = "{:url('phone/apiwawa/index')}";
+        //console.log('pay url ' + payUrl)
+        //mini_send(payUrl, proCode, payType);
     }
     //更新邀请排名 top3
     function act_luck(curUserCode, shareList){
