@@ -115,13 +115,13 @@ $(document).ready(function() {
     }
 	
 	/* Init Slidesow background */
-	 $('.slide-show').vegas({
+	 /*$('.slide-show').vegas({
         delay: 5000,
         shuffle: true,
         slides: imageSlides,
     	//transition: [ 'zoomOut', 'burn' ],
 		animation: [ 'kenburnsUp', 'kenburnsDown', 'kenburnsLeft', 'kenburnsRight' ]
-    });
+    });*/
 	
 	/* Init video background */
 	$('.video-container video, .video-container object').maximage('maxcover');

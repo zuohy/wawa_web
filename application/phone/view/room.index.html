@@ -324,10 +324,6 @@
                                     </div>
                                 </div>
                             </form>
-                        <button class="button hidden"   onclick="testFun()">111</button>
-                        <button data-modal='{:url("$classuri/edit")}' data-title="抓取结果" class='layui-btn layui-btn-small'>
-                            <i class='fa fa-plus'></i> 编辑用户
-                        </button>
                         <button id="dev_info" class="button hidden" >{$dev_info}</button>
                     </div>
                 </div>
@@ -352,6 +348,10 @@
                 <!-- Begin Of Page SubSction -->
 
                 <div class="page-block c-right v-zoomIn">
+                    <button class="button"   onclick="testFun()">111</button>
+                    <button class="btn_result hidden" data-modal='{:url("$classuri/edit")}' data-title="抓取结果" class='layui-btn layui-btn-small'>
+                        <i class='fa fa-plus'></i> 抓取结果
+                    </button>
 
                 </div>
                 <!-- End Of Page SubSction -->
@@ -447,21 +447,6 @@
 
     require(['proom.toast', 'proom.barrager', 'proom.downcount'], function (iziToast) {
     $(function(){
-
-       /* var reqData = {type:'room_servers'}
-        $.ajax("{:url('phone/apiwawa/index')}", {
-            dataType: 'json', method: 'post', data: {json: reqData},
-            success: function (ret) {
-                console.log("servers:", ret);
-                var retObj = $.parseJSON(ret)
-                console.log("servers: code= ", retObj.code);
-                if(retObj.code == 0){
-                    //返回房间服务器信息
-                    var retData = retObj.data
-                    chatStart(retData.wa_chat_url, retData.wa_chat_port)
-                }
-            }
-        });*/
 
         var devInfo = $('#dev_info').text();
         b_deviceInfo = $.parseJSON(devInfo);
@@ -672,8 +657,8 @@
             case 'dev_notify_result':
                     //收到抓取结果 投币按钮
                 showCoinsPage();
-                toastInfo('center', '抓取结果', notifyMsg);
-
+                toastCustom2('center', '', '抓取结果', notifyMsg);
+                //$('.btn_result').click();
                     //清除游戏用户头像
                     updateMemberPic('game_down', '', '');
                 break;
@@ -830,7 +815,7 @@
     //消息弹幕显示
     var chatMsgShow = function(msg, pic){
 
-        onRunBarrager(0, pic, msg);
+        onRunBarrager(0, '', msg);
 
         var m_span = '<span >' + msg + '</span>';
         var m_li = '<li>' + m_span + '</li>';
@@ -896,6 +881,7 @@
                 image: pic,
                 imageWidth: 70,
                 layout:2,
+                close: false,
                 onClose: function(){
                     console.info('onClose');
                 },
@@ -908,7 +894,7 @@
             var pos = 300;   //固定距离底部高度300px
 
             if( pic.length <= 0){
-                pic = '__STATIC__/' + b_roomInfo.room_pic;
+                pic = '__STATIC__/plugs/proom/img/adou.png';
             }
             var item={
                 img: pic, //图片
@@ -942,8 +928,9 @@
 
             $('body').barrager(item);
 
-            toastInfo('center', 'test title', 'test msg');
-            toastCustom2('topCenter', '', 'test title', 'test custom msg');
+            var pic = '__STATIC__/plugs/proom/img/success.png';
+            toastInfo('topCenter', 'test title', 'test msg');
+            toastCustom2('center', pic, '抓取结果', '恭喜，抓取成功');
 
 
         }
