@@ -124,7 +124,7 @@ $(document).ready(function() {
     });*/
 	
 	/* Init video background */
-	$('.video-container video, .video-container object').maximage('maxcover');
+	/*$('.video-container video, .video-container object').maximage('maxcover');*/
 	
 	/* Init youtube video background */
 	if(backgroundVideoUrl != 'none'){

@@ -31,7 +31,7 @@
         <a id="exit_room" onclick="chat_send('exit_room')" data-href='{:url("phone/index/main")}' href="javascript:void(0)">退出<i class="ion ion-reply-all"></i></a>
 
         <!-- Add other menu similar to "about" here -->
-        <a href="#contact">聊天</a>
+        <a id="memberCount">{$member_count}人围观</a>
     </div>
 </header>
 <!-- END OF site header Menu-->
@@ -166,37 +166,43 @@
     <!-- Begin of Control page   -->
     <div class="section page-contact page page-cent bg-color" data-bgcolor="rgba(95, 25, 208, 0.88)s" id="s-control">
         <!-- Begin of contact information -->
-            <section class="content" style="margin-top: 400px">
+            <section class="content" style="margin-top: 80%">
                 <header class="p-title" >
 
                     <h6 style="float: left">
-                        <a id="u_coin" title="金币">金币：{$coin}</a>
-                        <a id="u_free_coin" title="娃娃币">&nbsp娃娃币：{$free_coin}</a>
+                        <a title="金币">金币：<i id="u_coin">{$coin}</i> </a>
+                        <a title="娃娃币">&nbsp娃娃币：<i id="u_free_coin">{$free_coin}</i></a>
                     </h6>
+                    <a data-href='{:url("phone/wallet/recharge")}' href="javascript:void(0)">
                     <div style="background:white;color:#824211;width: 65px;border: 1px solid;border-radius: 80px;text-align: center;float: right;">
-                        <img src="__STATIC__/plugs/proom/img/coin.png" width="20%">  充值</div>
 
+                            <img src="__STATIC__/plugs/proom/img/coin.png" width="20%">
+                            充值
+                    </div>
+                    </a>
                 </header>
                 <!-- Begin Of Page SubSction -->
-                <div class="contact" style="margin-top:50px;">
+                <div class="contact" style="margin-top:20%;">
 
-                    <div class="contact" style="height: 60px">
+                    <div class="contact" style="margin-top:10%;">
                        <div id="m_coins" class="contact" style="text-align:center; ">
                            <a href="#contact" style="float: left;">
                                <img src="__STATIC__/plugs/proom/img/msg.png" style="height: 35px">
                            </a>
-                           <a url={$control_url|default=''} data-coins='{"type":"publish","room_id":"{$room_id}","dev_room_id":"{$dev_room_id}","user_id":"{$user_id}", "price":"{$price}", "to":"abc"}' class="button button-glow button-rounded button-caution" style="border-radius: 22px">开始抓</a>
+                           <a url={$control_url|default=''} data-coins='{"type":"publish","room_id":"{$room_id}","dev_room_id":"{$dev_room_id}","user_id":"{$user_id}", "price":"{$price}", "to":"abc"}' class="button button-glow button-rounded button-caution" style="border-radius: 22px">
+                               开始抓<br>({$price}币)
+                           </a>
                            <a href="#" style="float: right;">
                                <img src="__STATIC__/plugs/proom/img/share.png" style="height: 35px">
                            </a>
 
                        </div>
                         <div id="m_coins_none" class="contact hidden" style="text-align:center;">
-                            <a class="button disabled button-glow button-rounded button-highlight">请等待<br>({$price}个)</a>
+                            <a class="button disabled button-glow button-rounded button-highlight"  style="border-radius: 22px; color: orangered">请等待<br>({$price}币)</a>
                         </div>
                    </div>
 
-                <div id="m_control" class="contact hidden" style="text-align:center;">
+                   <div id="m_control" class="contact hidden" style="margin-top:25%; text-align:center;">
                     <div style="float: left">
                         <div class="row" >
                             <button class="button button-large button-plain button-borderless" url={$control_url|default=''} data-down='{"type":"control","dev_room_id":"{$dev_room_id}","to":"u"}' data-up='{"type":"control","dev_room_id":"{$dev_room_id}","to":"ur"}'>
@@ -396,6 +402,11 @@
 <script src="__STATIC__/plugs/proom/js/jquery.maximage.js"></script>
 <script src="__STATIC__/plugs/proom/js/okvideo.min.js"></script>-->
 
+
+
+{/block}
+
+{block name="script"}
 <!-- Javascript toast files -->
 <link rel="stylesheet" href="__STATIC__/plugs/proom/js/izitoast/iziToast.css?ver={:date('ymd')}">
 <!-- <script src="__STATIC__/plugs/proom/js/izitoast/iziToastHandle.js?ver={:date('ymd')}"></script>  -->
@@ -403,6 +414,9 @@
 <!-- Javascript barrager files -->
 <link rel="stylesheet" href="__STATIC__/plugs/proom/js/izibarrager/barrager.css?ver={:date('ymd')}">
 <script src="__STATIC__/plugs/proom/js/izibarrager/jquery.barrager.js?ver={:date('ymd')}"></script>
+
+<!-- Javascript video controller files -->
+<script src="__STATIC__/plugs/proom/js/wv_controller.js?ver={:date('ymd')}"></script>
 
 <!-- Downcount JS -->
 <script src="__STATIC__/plugs/proom/js/jquery.downCount.js?ver={:date('ymd')}"></script>
@@ -414,12 +428,6 @@
 <script src="__STATIC__/plugs/proom/js/main.js?ver={:date('ymd')}"></script>
 
 
-{/block}
-
-{block name="script"}
-
-<!-- Javascript video controller files -->
-<script src="__STATIC__/plugs/proom/js/wv_controller.js?ver={:date('ymd')}"></script>
 <script>
 
     //房间视频服务全局变量
@@ -451,11 +459,39 @@
     var chat_send, testFun;
 
     require(['proom.toast', 'proom.barrager', 'proom.downcount'], function (iziToast) {
-    $(function(){
+     $(document).ready(function() {
+         var chatStart = function(serverUrl, serverPort){
+             var chatServer = "wss://" + serverUrl + '/wss';//":" + serverPort;
+             console.log('chatServer=' + chatServer);
+             ws_chat = new WebSocket(chatServer);
+             // 服务端主动推送消息时会触发这里的onmessage
+
+             // 当socket连接打开
+             //ws_chat.onopen = onopen;
+
+             ws_chat.onmessage = chat_onmessage;
+
+             ws_chat.onclose = function() {
+                 console.log("连接关闭");
+
+             };
+             ws_chat.onerror = function() {
+                 alert('出现错误' );
+                 console.log("出现错误");
+             };
+
+
+         }
 
         var devInfo = $('#dev_info').text();
-        b_deviceInfo = $.parseJSON(devInfo);
-        chatStart(b_deviceInfo.dev_chat_url, b_deviceInfo.dev_chat_port);
+        console.log('devInfo=' + devInfo);
+
+         b_deviceInfo = $.parseJSON(devInfo);
+         console.log('devInfo url=' + b_deviceInfo.dev_chat_url + ' devInfo port=' + b_deviceInfo.dev_chat_port);
+
+         chatStart(b_deviceInfo.dev_chat_url, b_deviceInfo.dev_chat_port);
+
+
 
     });
 
@@ -490,27 +526,6 @@
 
     }
 
-    var chatStart = function(serverUrl, serverPort){
-        var chatServer = "wss://" + serverUrl + '/wss';//":" + serverPort;
-        ws_chat = new WebSocket(chatServer);
-        // 服务端主动推送消息时会触发这里的onmessage
-
-        // 当socket连接打开
-        //ws_chat.onopen = onopen;
-
-        ws_chat.onmessage = chat_onmessage;
-
-        ws_chat.onclose = function() {
-            console.log("连接关闭");
-
-        };
-        ws_chat.onerror = function() {
-            console.log("出现错误");
-        };
-
-
-    }
-
         chat_send = function(msgType){
         console.log("chat_send: msg type= ", msgType);
         if(null == ws_chat){
@@ -525,10 +540,13 @@
 
                 }, 'json');
 
+                exitVideoRoom()
+
+                    //回退上一个页面
                 $('#exit_room').attr('data-href' , '{:url("phone/index/main")}')
                 $('#exit_room').attr('href' , 'javascript:void(0)')
                 //data-href='{:url("phone/index/main")}' href="javascript:void(0)"
-                exitVideoRoom()
+
                 break;
             default :
                 break;
@@ -579,14 +597,16 @@
 
                 }else if(notifyType == 'join_room'){
                    var tmpMember = chatData.move_member;
+                   var onlineNum = chatData.member_count;
 
                     //刷新用户列表
-                    updateMembersShow(b_memberList, b_curMember, tmpMember, 'join_room')
+                    updateMembersShow(onlineNum, b_memberList, b_curMember, tmpMember, 'join_room')
                 }else if(notifyType == 'exit_room'){
                     var tmpMember = chatData.move_member;
+                    var onlineNum = chatData.member_count;
 
                     //刷新用户列表
-                    updateMembersShow(b_memberList, b_curMember, tmpMember, 'exit_room')
+                    updateMembersShow(onlineNum, b_memberList, b_curMember, tmpMember, 'exit_room')
                 }
 
                 break;
@@ -730,7 +750,7 @@
         }
 
         //刷新用户列表
-        updateMembersShow(b_memberList, b_curMember, '', '')
+        updateMembersShow(b_roomInfo.member_count, b_memberList, b_curMember, '', '')
     }
 
         //设置 或清除游戏用户头像
@@ -754,13 +774,20 @@
     }
 
     //更新房间成员列表top5
-    var updateMembersShow = function( memberList, curUser, movUser, type){
+    var updateMembersShow = function( onlineNum, memberList, curUser, movUser, type){
 
         var showMembers = '';
         var index = 0;
 
         if( null == memberList ||  '' == memberList ){
             return;
+        }
+
+        //更新房间人数显示
+        b_roomInfo.member_count = onlineNum;
+        if(b_roomInfo.member_count){
+
+            $('#memberCount').html(onlineNum + ' 人围观');
         }
 
         if(movUser){
@@ -943,7 +970,6 @@
 
 
     }); //require(['proom.toast', 'proom.barrager'], function (iziToast) {
-
 
 
     ////////////////////////////////////////video interface////////////////////////////////////////////////////////

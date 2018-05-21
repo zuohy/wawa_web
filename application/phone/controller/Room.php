@@ -53,6 +53,7 @@ class Room extends BasicBaby
         $userId = session('user_id');
         $tmpUser = $this->getUserInfo($userId);
 
+        $memberCount = isset($tmpRoom['member_count']) ? $tmpRoom['member_count'] : '';
         $price = isset($tmpRoom['price']) ? $tmpRoom['price'] : '';
         $coin = isset($tmpUser['coin']) ? $tmpUser['coin'] : '';
         $free_coin = isset($tmpUser['free_coin']) ? $tmpUser['free_coin'] : '';
@@ -68,7 +69,7 @@ class Room extends BasicBaby
         $controlUrl = 'http://' . $controlAddress . ':' . $controlPort;
 
         return view('', ['title' => '房间', 'control_url' =>$controlUrl,
-                     'price' =>$price, 'coin' => $coin, 'free_coin' => $free_coin,  'user_id' => $userId,
+            'member_count' =>$memberCount, 'price' =>$price, 'coin' => $coin, 'free_coin' => $free_coin,  'user_id' => $userId,
                      'room_id' => $uRoomId, 'dev_room_id' => $devRoomId, 'dev_info' => $devInfo]);
     }
 

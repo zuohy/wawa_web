@@ -129,7 +129,8 @@ class Apiwawa extends BasicBaby
                     'notify_type' => 'join_room',
                     'move_member' =>  $tmpMembers[$userId],   //进入房间的用户信息 通知房间所有人
                     'name' => $userName,
-                    'pic' => $userPic
+                    'pic' => $userPic,
+                    'member_count' => $tmpRoomInfo['member_count']
                 );
                 $chatData = RoomService::gateWayBuildMsg('chat_msg', $showMsg, $paraArr);
                 RoomService::gateWaySendMsg($roomId, '', $chatData);
@@ -166,6 +167,7 @@ class Apiwawa extends BasicBaby
                     'name' => $name,
                     'pic' => $pic,
                     'move_member' =>  $userInfo,   //退出房间的用户信息 通知房间所有人
+                    'member_count' => RoomService::$curMemberCount,
                 );
                 $chatData = RoomService::gateWayBuildMsg('chat_msg', $showMsg, $paraArr);
                 RoomService::gateWaySendMsg($roomId, '', $chatData);

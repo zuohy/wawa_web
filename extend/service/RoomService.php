@@ -35,6 +35,7 @@ class RoomService
         'price' => '',
         'room_pic' => '',
         'gift_id' => '',
+        'member_count' => '0'   //房间成员人数
     );
     public static $memberInfo = array(    //当前成员信息
         'room_id' => '',
@@ -47,6 +48,7 @@ class RoomService
         'v_client_type' => '',
         'c_client_id' => '',
     );
+    public static $curMemberCount = 0;   //当前房间人数
     public static $memberList = array();
     public static $giftInfo = array(
         'gift_id' => '',
@@ -70,8 +72,8 @@ class RoomService
      */
     public static function runRoom($roomId, $userId, $clientId, $devRoomId){
 
-        $tmpRoom = self::getRoomInfo($roomId);
         $ret = self::joinRoom($roomId, $userId, $clientId, $devRoomId);
+        $tmpRoom = self::getRoomInfo($roomId);
         if( !empty($tmpRoom) ){
             self::getGiftInfo($tmpRoom['gift_id']);
         }
@@ -140,6 +142,74 @@ class RoomService
 
         return $result;
 
+    }
+
+    /**
+     * 更新房间在线人数
+     * @param string $roomId 房间ID
+     * @param int $type  进入房间或退出房间
+     * @return int
+     */
+    public static function updateRoomNum($roomId, $type){
+        Log::info("updateRoomNum: start room_id= " . $roomId . " status=" . $type);
+        $result = ErrorCode::CODE_OK;
+
+        if($type == ErrorCode::BABY_ROOM_MEMBER_STATUS_OUT
+        || $type == ErrorCode::BABY_ROOM_MEMBER_STATUS_IN){
+            //update status
+        }else{
+            Log::info("updateRoomNum: not need handle room_id= " . $roomId  . " status=" . $type);
+            return $result;
+        }
+        //更新房间成员人数
+        $db_member = Db::name('TRoomMemberInfo');
+        $memberOnline = $db_member->where('room_id', $roomId)
+            ->where('user_status', ErrorCode::BABY_ROOM_MEMBER_STATUS_IN)
+            ->count();
+
+        //获取随机数 作为房间人数的基数
+        if( ($memberOnline <= 1) && ($type == ErrorCode::BABY_ROOM_MEMBER_STATUS_IN) ){
+            //由于是先更新成员状态，再更新在线人数，所以最小有一个围观用户
+            //房间人数为0 时，生成基础人数
+            $baseNum = rand(50, 160);
+        }else{
+            $baseNum = 0;
+        }
+        $roomInfo = self::getRoomInfo($roomId);
+        self::$curMemberCount =  isset($roomInfo['member_count']) ? $roomInfo['member_count'] : 0;
+
+        Log::info("updateRoomNum: baseNum= " . $baseNum . " curMemberCount=" . self::$curMemberCount);
+
+        if($type == ErrorCode::BABY_ROOM_MEMBER_STATUS_OUT){
+            //退出房间
+            self::$curMemberCount = self::$curMemberCount  - 1; //增加成员计数
+            $roomData['member_count'] = self::$curMemberCount;
+
+        }elseif($type == ErrorCode::BABY_ROOM_MEMBER_STATUS_IN){
+            //加入房间
+            self::$curMemberCount = $baseNum + self::$curMemberCount  + 1; //减少成员计数
+            $roomData['member_count'] = self::$curMemberCount;
+
+        }
+
+        //获取成员人数
+        if( ($memberOnline <= ErrorCode::CODE_OK) && ($type == ErrorCode::BABY_ROOM_MEMBER_STATUS_OUT) ){
+            //全部退出房间
+            self::$curMemberCount = ErrorCode::CODE_OK; //清空成员计数
+            $roomData['member_count'] = self::$curMemberCount;
+        }
+
+        Log::info("updateRoomNum: member_count= " . $roomData['member_count'] . " memberOnline=" . $memberOnline);
+        $result = self::updateRoomInfo($roomId, $roomData);
+
+        if($result){
+            Log::info("updateRoomNum: end ok room_id= " . $roomId );
+            $result = ErrorCode::CODE_OK;
+        }else{
+            Log::error("updateRoomNum: end failed room_id= " . $roomId );
+            $result = ErrorCode::E_ROOM_UPDATE_FAIL;
+        }
+        return $result;
     }
 
     /**
@@ -331,6 +401,20 @@ class RoomService
         //更新top成员列表
         self::getTopMemberList($roomId, $userId);
 
+        //更新房间成员人数
+        self::updateRoomNum($roomId, ErrorCode::BABY_ROOM_MEMBER_STATUS_IN);
+/*        self::$curMemberCount = $db_member->where('room_id', $roomId)->count();
+        //获取随机数 作为房间人数的基数
+        if(self::$curMemberCount == ErrorCode::CODE_OK){
+            //房间人数为0 时，生成基础人数
+            $baseNum = rand(50, 160);
+        }else{
+            $baseNum = 0;
+        }
+        self::$curMemberCount = self::$curMemberCount  + 1 + $baseNum; //增加成员计数
+        $roomData['member_count'] = self::$curMemberCount;
+        self::updateRoomInfo($roomId, $roomData);
+*/
         if($result){
             Log::info("joinRoom: end ok room_id= " . $roomId . ' user_id= ' . $userId);
             $result = ErrorCode::CODE_OK;
@@ -384,6 +468,9 @@ class RoomService
             return $result;
         }
 
+        //更新房间在线人数
+        self::updateRoomNum($roomId, $memberStatus);
+
         if($result == ErrorCode::CODE_OK){
             Log::info("updateMemberStatus: end ok room_id= " . $roomId . ' user_id= ' . $userId);
             $result = ErrorCode::CODE_OK;
@@ -426,7 +513,8 @@ class RoomService
             return $result;
         }
 
-        $result = self::updateMemberInfo($roomId, $userId, $memberInfo);
+        $result = self::updateMemberStatus($roomId, $userId, $memberInfo['user_status']);
+        //$result = self::updateMemberInfo($roomId, $userId, $memberInfo);
         if($result != ErrorCode::CODE_OK){
             Log::error("updateGameStatus: end failed room_id= " . $roomId . ' user_id= ' . $userId);
             $result = ErrorCode::E_ROOM_STATUS_UPDATE_ERROR;
@@ -569,6 +657,7 @@ class RoomService
         );
         // 向网站页面发送数据
         $chatData = json_encode($chatArr);
+        Log::debug("gateWayBuildMsg: chatData= " . $chatData );
         return $chatData;
     }
 

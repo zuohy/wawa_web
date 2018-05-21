@@ -217,7 +217,7 @@ class ErrorCode
         self::I_USER_JOIN_ROOM => '进入房间',
         self::I_USER_EXIT_ROOM => '退出房间',
         self::I_USER_INSERT_COINS_FROZEN => '投币冻结',
-        self::I_USER_CATCH_FAIL => '很遗憾，抓取失败',
+        self::I_USER_CATCH_FAIL => '很遗憾抓取失败',
         self::I_USER_CATCH_SUCCESS => '恭喜抓取成功',
     );  //error code msg
 

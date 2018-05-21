@@ -129,5 +129,8 @@ $('.window').click(function(){
 	$('.tis').css('display','none');
 	})
 
+$('.pageBack').click(function(){
+    window.history.back(-1);
+})
 
 
