@@ -21,14 +21,14 @@ use think\View;
 use think\Log;
 use service\ActivityService;
 /**
- * 活动 统计等
+ * 排行榜 统计等
  * Class Index
  * @package app\admin\controller
  * @author Anyon <zoujingli@qq.com>
  * @date 2017/02/15 10:41
  */
 
-class Activity extends BasicBaby
+class Rank extends BasicBaby
 {
 
 
@@ -38,21 +38,6 @@ class Activity extends BasicBaby
      */
     public $table = 'TActConfig';
 
-    /**
-     * 活动列表
-     * @return View
-     */
-    public function index()
-    {
-
-        $userId = session('user_id');
-
-        $this->title = '活动' . $userId;
-        $db = Db::name($this->table)->where(['is_deleted' => '0'])
-            ->whereBetween('icons_type', [ErrorCode::BABY_COIN_TYPE_SHARE+1, "1000"]);;
-
-        return parent::_list($db);
-    }
 
     /**
      * 活动详情
@@ -80,12 +65,10 @@ class Activity extends BasicBaby
         //活动信息
         $actInfo = ActivityService::getActInfo($proCode);
         //活动价格
-        $actPicShow = isset($actInfo['act_pic_show']) ? $actInfo['act_pic_show'] : '';
         $iconsType = isset($actInfo['icons_type']) ? $actInfo['icons_type'] : '';
         $actPrice = isset($actInfo['act_price']) ? $actInfo['act_price'] : '';
         $payPrice = $this->coverPayValue(ErrorCode::BABY_COVER_TYPE_CNY, $actPrice);
 
-        $this->assign('act_pic_show', $actPicShow);
         $this->assign('pay_price', $payPrice);
         $this->assign('icons_type', $iconsType);
 
@@ -114,8 +97,7 @@ class Activity extends BasicBaby
     protected function _data_filter(&$list)
     {
 
-        foreach ($list as $key => &$vo) {
-
+        foreach ($list as &$vo) {
             //转换 去掉 时间
             $endTime = isset($vo['act_end']) ? $vo['act_end'] : '';
             $sStatus = isset($vo['s_status']) ? $vo['s_status'] : ''; // 分享状态

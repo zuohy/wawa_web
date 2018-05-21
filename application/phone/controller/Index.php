@@ -259,7 +259,16 @@ class Index extends BasicBaby
         $this->success('登录成功，正在进入系统...');
     }
 
+    /**
+     * 游戏规则说明
+     * @return View
+     */
+    public function rule()
+    {
 
+
+        return view('', ['title' => '游戏说明']);
+    }
 
 }
 
