@@ -83,10 +83,12 @@ class Room extends BasicBaby
         return view('', ['title' => '房间']);
     }
 
-    public function edit()
+    public function catchResult()
     {
         $userId = session('user_id');
-        return $this->_form('TUserConfig', 'form', 'user_id', [], ['user_id'=> $userId]);
+        $isCatch = $this->request->get('is_catch');
+
+        return $this->_form('t_room_game_result', 'form', '', [], ['result' => $isCatch]);
     }
 
 }

@@ -31,7 +31,7 @@
         <a id="exit_room" onclick="chat_send('exit_room')" data-href='{:url("phone/index/main")}' href="javascript:void(0)">退出<i class="ion ion-reply-all"></i></a>
 
         <!-- Add other menu similar to "about" here -->
-        <a id="memberCount">{$member_count}人围观</a>
+        <a id="memberCount" style="color: orangered">{$member_count}人围观</a>
     </div>
 </header>
 <!-- END OF site header Menu-->
@@ -359,8 +359,8 @@
                 <!-- Begin Of Page SubSction -->
 
                 <div class="page-block c-right v-zoomIn">
-                    <button class="button"   onclick="testFun()">111</button>
-                    <button class="btn_result hidden" data-modal='{:url("$classuri/edit")}' data-title="抓取结果" class='layui-btn layui-btn-small'>
+                    <button class="button "   onclick="testFun()">111</button>
+                    <button class="btn_result hidden" data-modal='{:url("$classuri/result")}' data-title="抓取结果" class='layui-btn layui-btn-small'>
                         <i class='fa fa-plus'></i> 抓取结果
                     </button>
 
@@ -456,7 +456,8 @@
     //房间长连接全局变量
     var ws_chat=null, name, client_list={};
 
-    var chat_send, testFun;
+    var chat_send, room_timeout, testFun;
+    var timeCount = 120000;   //120秒超时
 
     require(['proom.toast', 'proom.barrager', 'proom.downcount'], function (iziToast) {
      $(document).ready(function() {
@@ -482,6 +483,18 @@
 
 
          }
+         //房间超时退出
+         var roomTimeout = function (){
+             console.log("超时 退出房间");
+             chat_send('exit_room');
+
+             $('#exit_room').click();
+         }
+         document.getElementsByTagName('body')[0].addEventListener('touchstart', function(e) {
+             //重置房间超时定时器
+             window.clearTimeout(room_timeout);
+             room_timeout = window.setTimeout(roomTimeout, timeCount);
+         });
 
         var devInfo = $('#dev_info').text();
         console.log('devInfo=' + devInfo);
@@ -492,8 +505,12 @@
          chatStart(b_deviceInfo.dev_chat_url, b_deviceInfo.dev_chat_port);
 
 
+         //设置1分钟 定时器， 如果用户没有投币操作 自动退出房间
+         room_timeout = window.setTimeout(roomTimeout, timeCount);
+
 
     });
+
 
     var myCountDown = function(){
         var date = new Date();
@@ -545,6 +562,7 @@
                     //回退上一个页面
                 $('#exit_room').attr('data-href' , '{:url("phone/index/main")}')
                 $('#exit_room').attr('href' , 'javascript:void(0)')
+
                 //data-href='{:url("phone/index/main")}' href="javascript:void(0)"
 
                 break;
@@ -682,8 +700,10 @@
             case 'dev_notify_result':
                     //收到抓取结果 投币按钮
                 showCoinsPage();
-                toastCustom2('center', '', '抓取结果', notifyMsg);
-                //$('.btn_result').click();
+                //toastCustom2('center', '', '抓取结果', notifyMsg);
+                //data-modal='{:url("$classuri/result")}'
+                $('.btn_result').attr('data-modal' , '{:url("$classuri/catchresult")}?is_catch='+ notifyData.is_catch)
+                $('.btn_result').click();
                     //清除游戏用户头像
                     updateMemberPic('game_down', '', '');
                 break;
@@ -705,6 +725,10 @@
 
         }
         var showControlPage = function(){
+            //重置房间超时定时器
+            window.clearTimeout(room_timeout);
+            room_timeout = window.setTimeout(roomTimeout, timeCount);
+
             $('#m_sec').removeClass('hidden');
             $('#m_catch').removeClass('hidden');
             $('#m_control').removeClass('hidden');
@@ -964,7 +988,8 @@
             toastInfo('topCenter', 'test title', 'test msg');
             toastCustom2('center', pic, '抓取结果', '恭喜，抓取成功');
 
-
+            $('.btn_result').attr('data-modal' , '{:url("$classuri/catchresult")}?is_catch='+ '1' )
+            $('.btn_result').click();
         }
         /////////
 

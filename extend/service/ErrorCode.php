@@ -150,6 +150,7 @@ class ErrorCode
     const E_NOT_SUPPORT = -3001;  //通用错误 不支持的操作
     const E_PAY_ALREADY_SUCCESS = -3002;      //已经支付成功
     const E_PAY_PICKER_FAILED = -3003;      //创建微信支付订单失败
+    const E_NOTIFY_MSG_NULL = -3004;       //没有需要通知的消息
 
     public static $ERR_MSG = array(
         self::CODE_OK => 'ok',
@@ -177,6 +178,7 @@ class ErrorCode
         self::E_NOT_SUPPORT => 'not support this step',
         self::E_PAY_ALREADY_SUCCESS => 'pay already done',
         self::E_PAY_PICKER_FAILED => 'create picker failed',
+        self::E_NOTIFY_MSG_NULL => 'no notify message',
     );  //error code msg
 
     //返回客户端的错误文案

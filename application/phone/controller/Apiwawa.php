@@ -342,6 +342,7 @@ class Apiwawa extends BasicBaby
 
                 $paraArr = array(
                     'notify_type' => 'dev_notify_result',
+                    'is_catch' => $isCatch
                 );
                 $chatData = RoomService::gateWayBuildMsg('notify_msg', $showMsg, $paraArr);
                 RoomService::gateWaySendMsg('', $userId, $chatData);
@@ -438,6 +439,61 @@ class Apiwawa extends BasicBaby
 
                 break;
 ///////////////end 支付接口////////////////////////
+            case 'user_notify':
+                //用户首页通知
+                $notifyType = isset($jPack['notify_type']) ? $jPack['notify_type'] : 0;  //默认为抓取结果通知
+                $curDate = date('Y-m-d H:m:s');
+                $startDate = date("Y-m-d",strtotime("-1 day"));
+                if($notifyType != 0){
+                    //获取当天收益记录
+                    $notifyList = ActivityService::getIncomeNotify($startDate, $curDate);
+                }else{
+                    //获取当天抓取成功记录
+                    $notifyList = $this->getResultNotify($startDate, $curDate);
+                }
+
+                //随机选中一条
+                $maxPos = count($notifyList);
+                if($maxPos <= 1){
+                    //少于一条不通知
+                    $this->retMsg['code'] = ErrorCode::E_NOTIFY_MSG_NULL;
+                    break;
+                }
+                $fixPos = rand(0, $maxPos-1);
+
+                //获取通知相关信息
+                $nInfo = $notifyList[$fixPos];
+                $userId = isset($nInfo['user_id']) ? $nInfo['user_id'] : '';
+                $uValue = isset($nInfo['i_value']) ? $nInfo['i_value'] : '';
+                $uCoin = isset($nInfo['coin']) ? $nInfo['coin'] : '';
+                $uFreeCoin = isset($nInfo['free_coin']) ? $nInfo['free_coin'] : '';
+                $uGiftId = isset($nInfo['gift_id']) ? $nInfo['gift_id'] : '';
+                $giftInfo = RoomService::getGiftInfo($uGiftId);
+                $gName = isset($giftInfo['gift_name']) ? $giftInfo['gift_name'] : '';
+
+                $userInfo = $this->getUserInfo($userId);
+                $uName = isset($userInfo['name']) ? $userInfo['name'] : '';
+
+
+
+                //生成通知
+                $msgHeader = $uName . ' 获得 ';
+                if($gName){
+                    $msgBody = '礼品 ' . $gName;
+                }elseif($uValue){
+                    $msgBody = '返现' . $uValue;
+                }else{
+                    if($uCoin){
+                        $msgBody = '金币 ' . $uCoin;
+                    }
+                    if($uFreeCoin){
+                        $msgBody = $msgBody . ' 娃娃币 ' . $uFreeCoin;
+                    }
+
+                }
+                $this->retMsg['msg'] = $msgHeader . $msgBody;
+
+                break;
             default:
                 $this->retMsg['code'] = ErrorCode::CODE_NOT_SUPPORT;
                 $this->retMsg['msg'] = ErrorCode::$ERR_MSG[ErrorCode::CODE_NOT_SUPPORT];

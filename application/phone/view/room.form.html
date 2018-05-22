@@ -1,12 +1,13 @@
 <form class="layui-form layui-box" style='padding:25px 0px 20px 0;background: #fff9eb' action="__SELF__" data-auto="true" method="post">
     <div class="layui-form-item" style="text-align: center;margin-top: 40px">
+        {if $vo and isset($vo.result) and $vo.result == 1}
         <img class="success-group" src="__STATIC__/plugs/proom/img/success.png" style="height: 100px;width: auto;">
         <div class="success-group" style="margin-top: 20px;color:#ff5a00;font-size: 20px">太棒了，抓到了~</div>
-
-        <img class="fail-group hidden" src="__STATIC__/plugs/proom/img/fail.png" style="height: 100px;width: auto;">
-        <div class="fail-group hidden" style="margin-top: 20px;color:#ff5a00;font-size: 20px">很遗憾，没抓到~</div>
+        {else}
+        <img class="fail-group" src="__STATIC__/plugs/proom/img/fail.png" style="height: 100px;width: auto;">
+        <div class="fail-group" style="margin-top: 20px;color:#ff5a00;font-size: 20px">很遗憾，没抓到~</div>
+        {/if}
     </div>
-
 
     <div class="hr-line-dashed"></div>
 

@@ -479,6 +479,20 @@ class ActivityService
 
     }
 
+    /**
+     * 获取通知的收益记录
+     * @param string $curDate   收益时间
+     * @param int $iStatus  收益状态
+     * @return bool
+     */
+    public static function getIncomeNotify($startDate, $endDate, $iStatus=ErrorCode::BABY_INCOME_DONE){
+        $db_income = Db::name('TUserIncome');
+        $incomeList = $db_income->where('i_status', $iStatus)
+            ->whereBetween('create_at', [$startDate, $endDate])
+            ->select();
+
+        return $incomeList;
+    }
 
  }
 

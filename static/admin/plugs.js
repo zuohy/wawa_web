@@ -181,7 +181,7 @@ define(['jquery'], function () {
             var searchStr = 'phone';
             var isPhone = url.match(searchStr);
             if(isPhone){
-                phoneWidth = "300px";
+                phoneWidth = "260px";
             }
             this.load(url, data, 'GET', function (res) {
                 if (typeof (res) === 'object') {

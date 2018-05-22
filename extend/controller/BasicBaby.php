@@ -1326,6 +1326,25 @@ class BasicBaby extends Controller
 
    ////////////////////////////////////start 抓取结果 相关函数 ////////////////////////////////////
     /**
+     * 获取通知 抓取成功记录列表
+     * @param string $startDate 起始时间
+     * @param string $endDate   结束时间
+     * @param string $status   抓取结果 1为成功 0 为失败
+     * @return array
+     */
+    protected function getResultNotify($startDate, $endDate, $status=ErrorCode::BABY_CATCH_SUCCESS){
+        //获取用户信息
+        $db_result = Db::name('TRoomGameResult');
+
+        $resultList = $db_result->where('result', $status)
+            ->whereBetween('create_at', [$startDate, $endDate])
+            ->select();
+
+        return $resultList;
+
+    }
+
+    /**
      * 获取抓取记录信息
      * @param string $userId
      * @param string $orderId   抓取消费订单

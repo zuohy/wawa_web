@@ -54,7 +54,7 @@
         <div class="item" data-href='{:url("phone/wallet/recharge")}' href="javascript:void(0)">
             <img style="width:100%" class="img-responsive big" src="__STATIC__/plugs/phone/images/banner2.png">
         </div>
-        <div class="item" data-href='{:url("phone/activity/index")}?product_code=H-00001' href="javascript:void(0)">
+        <div class="item" data-href='{:url("phone/activity/index")}' href="javascript:void(0)">
             <img style="width:100%" class="img-responsive big" src="__STATIC__/plugs/phone/images/banner3.png">
         </div>
     </div>
@@ -86,26 +86,18 @@
             <div class="col-xs-4">
                 <a class="sp" data-href='{:url("phone/rank/page")}?product_code=A-00001' href="javascript:void(0)">
                     <img src="__STATIC__/plugs/phone/images/sf4.jpg">
-                    <p>排行榜</p>
-                    <span>￥<em>10.00</em></span>
+
                 </a>
             </div>
             <div class="col-xs-4">
-                <a  class="sp" data-href='{:url("phone/activity/index")}?product_code=H-00001' href="javascript:void(0)">
+                <a  class="sp" data-href='{:url("phone/activity/page")}?product_code=H-00001' href="javascript:void(0)">
                     <img src="__STATIC__/plugs/phone/images/787554.jpg">
-                    <div>
-                        <p>iPhone6数据线苹果6s二合一拖7plus伸缩5s</p>
-                        <span>￥<em>29.00</em></span>
-                    </div>
+
                 </a>
             </div>
             <div class="col-xs-4">
                 <a  class="sp" href="#">
                     <img src="__STATIC__/plugs/phone/images/454554.jpg">
-                    <div>
-                        <p>英国jellycat小男孩幼儿童女孩Cordy Roy大象毛绒玩具</p>
-                        <span>￥<em>145.00</em></span>
-                    </div>
                 </a>
             </div>
 
@@ -160,17 +152,93 @@
 
 </div>
 
+<!-- Javascript toast files -->
+<link rel="stylesheet" href="__STATIC__/plugs/proom/js/izitoast/iziToast.css?ver={:date('ymd')}">
 
     <script src="__STATIC__/plugs/phone/js/jquery.min.js" type="text/javascript"></script>
     <script type="text/javascript" src="__STATIC__/plugs/phone/js/iscroll.js"></script>
 
     <script>
+        var g_type = 0;  //全局变量 互斥 0 1
         $(function(){
             var t_shu=$(".scroll a").width();
             var g_shu=$(".scroll a").length;
             var u_shu=g_shu*t_shu+g_shu*28+'px';
             $(".scroll").css({width:u_shu});
             var Scroll = new iScroll('wrapper',{hScrollbar:false, vScrollbar:false,hScroll:true,vScroll:false});
+
+            require(['proom.toast'], function (iziToast) {
+
+                var t1 = window.setTimeout(userNotify, 3000)
+                var t2 = window.setInterval(userNotify, 30000);
+
+                function userNotify(){
+                    if(g_type == 0){
+                        g_type = 1;
+                    }else{
+                        g_type = 0;
+                    }
+                    var reqData = {type:'user_notify', notify_type: g_type}
+                    $.post("{:url('phone/apiwawa/index')}", {json: reqData}, function(ret){
+                        console.log(ret);
+                        var retObj = $.parseJSON(ret)
+                        if(retObj.code == 0){
+                            toastCustom2('topCenter', '', '好消息', retObj.msg);
+                        }
+
+                    }, 'json');
+
+
+
+                }
+
+                /////////
+                iziToast.settings({
+                    timeout: 3000,
+                    // position: 'center',
+                    // imageWidth: 50,
+                    pauseOnHover: true,
+                    // resetOnHover: true,
+                    close: true,
+                    progressBar: true
+                    // layout: 1,
+                    // balloon: true,
+                    // target: '.target',
+                    // icon: 'material-icons',
+                    // iconText: 'face',
+                    // animateInside: false,
+                    // transitionIn: 'flipInX',
+                    // transitionOut: 'flipOutX',
+                });
+
+                var toastCustom2 = function(position, pic, title, msg){
+
+                    if( pic.length <= 0){
+                        pic = '__STATIC__/plugs/proom/img/adou.png';
+                    }
+                    iziToast.show({
+                        class: 'test',
+                        color: 'red',
+                        icon: 'icon-contacts',
+                        title: title,
+                        message: msg,
+                        position: position, //'topCenter',
+                        transitionIn: 'flipInX',
+                        transitionOut: 'flipOutX',
+                        progressBarColor: 'rgb(0, 255, 184)',
+                        image: pic,
+                        imageWidth: 70,
+                        layout:1,
+                        close: false,
+                        onClose: function(){
+                            console.info('onClose');
+                        },
+                        iconColor: 'rgb(0, 255, 184)'
+                    });
+                }
+
+            })
+
         })
 
     </script>
