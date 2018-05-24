@@ -4,7 +4,8 @@
 
 $(".scroll a").click(function(){
 	$(this).addClass('currer').siblings().removeClass('currer');
-	})
+	});
+
 
 
 $(window.document).scroll(function () {
@@ -22,11 +23,13 @@ $(window.document).scroll(function () {
 			};
 })
 
-
+//底部图标切换
 $(".dao").click(function(){
-	$('.dao i,.dao span').css('color','#7b7b7b');
-	$(this).find('i,span').css('color','#246fc0');
-	})
+	$('.dao i,.dao span').css('color','##adadad');
+    $('.xz-logo').hide();
+	$(this).find('i,span').css('color','#852d1b');
+	$(this).find('.xz-logo').show();
+	});
 
 $(".left_c li").click(function(){
 	$('.left_c li a').css('color','#484848');
@@ -39,7 +42,7 @@ $(".left_c li").click(function(){
 $(".titll .col-xs-4,.titll .col-xs-2").click(function(){
 	$('.titll .col-xs-2').css('color','#666');
 	$(this).css('color','#246fc0').siblings().css('color','#666');
-	})
+	});
 
 $(".sp_s").click(function(){
 	$('.lie').css('display','block').siblings().css('display','none');
