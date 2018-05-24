@@ -1,0 +1,72 @@
+{extend name="extra@phone/main"}
+{block name="header"}
+<head>
+
+    <link href="http://at.alicdn.com/t/font_l6a0fwucxvzehfr.css" rel="stylesheet" type="text/css" />
+
+    <style>
+        .form-group{ border-bottom:1px solid #ececec; overflow:hidden; padding:0.429em 0 0.286em; margin-bottom:0;}
+        .form-group .col-xs-4{ padding-left:0; padding-right:0.714em; color:#333;}
+        .form-group .col-xs-8{ padding:0;}
+        .control-label{ line-height:2.143em; text-align:right;}
+        .form-control{ box-shadow:none; padding:0 0.429em; height:2.143em; border:none;}
+    </style>
+
+</head>
+{/block}
+
+{block name="body"}
+
+<!--top-->
+<div class="top_c">
+    <a class="pageBack iconfont icon-jiantou-copy-copy" ></a>
+    <p class="titi">提现</p>
+</div>
+
+<!--内容-->
+<div class="cong">
+    <form id="outcash-form" class="form message magic send_message_form" method="post" action="##">
+        <div class="cong">
+         <p>您的当前账户余额：<em>{$coin/10}元</em></p>
+        <div class="zhi">
+            <div class="container">
+                <span>金额</span>
+                <input type="text" name="address" size="60" maxlength="60" style="color:#ccc" value="请输入您的提现金额" onfocus="if(this.value=='请输入您的提现金额'){this.value=''};this.style.color='black';" onblur="if(this.value==''||this.value=='请输入您的提现金额'){this.value='请输入您的提现金额';this.style.color='#ccc';}">
+            </div>
+        </div>
+        </div>
+
+        <input type="hidden" name="order_id" value=''/>
+    <div class="container">
+        <input type="button"  class="deng"  value="提 交" onclick="applyCash()" style="margin-top:3em;">
+    </div>
+    </form>
+</div>
+
+
+
+
+
+<script src="__STATIC__/plugs/phone/js/jquery.min.js?ver={:date('ymd')}" type="text/javascript"></script>
+
+<script src="__STATIC__/plugs/phone/js/bootstrap.min.js?ver={:date('ymd')}" type="text/javascript"></script>
+<script src="__STATIC__/plugs/phone/js/index.js?ver={:date('ymd')}" type="text/javascript"></script>
+
+<script>
+    function applyCash()
+    {
+        var reqData = {type:'apply_cash', value: ''}
+        $.post("{:url('phone/apiwawa/index')}", {json: reqData}, function(ret){
+            console.log(ret);
+            var retObj = $.parseJSON(ret)
+            if(retObj.code == 0){
+
+            }
+            alert(retObj.msg);
+        }, 'json');
+
+    }
+</script>
+
+
+{/block}

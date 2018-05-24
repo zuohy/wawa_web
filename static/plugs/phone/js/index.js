@@ -25,10 +25,12 @@ $(window.document).scroll(function () {
 
 //底部图标切换
 $(".dao").click(function(){
-	$('.dao i,.dao span').css('color','##adadad');
-    $('.xz-logo').hide();
+	$('.dao i,.dao span').css('color','#adadad');
+
 	$(this).find('i,span').css('color','#852d1b');
-	$(this).find('.xz-logo').show();
+    $(this).find('.wx-logo').addClass('hidden');
+    $(this).find('.xz-logo').removeClass('hidden');
+
 	});
 
 $(".left_c li").click(function(){

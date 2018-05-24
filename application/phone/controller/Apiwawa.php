@@ -438,6 +438,10 @@ class Apiwawa extends BasicBaby
                 Log::info("paymentResult: end orderNo=" . $orderNo . " result=" . $result);
 
                 break;
+            case 'apply_cash':
+                $this->retMsg['code'] = ErrorCode::CODE_NOT_SUPPORT;
+                $this->retMsg['msg'] = ErrorCode::$ERR_MSG_C[ErrorCode::CODE_NOT_SUPPORT];
+                break;
 ///////////////end 支付接口////////////////////////
             case 'user_notify':
                 //用户首页通知
@@ -492,7 +496,7 @@ class Apiwawa extends BasicBaby
 
                 }
                 $this->retMsg['msg'] = $msgHeader . $msgBody;
-
+                Log::info("user_notify: end msg=" . $this->retMsg['msg']);
                 break;
             default:
                 $this->retMsg['code'] = ErrorCode::CODE_NOT_SUPPORT;

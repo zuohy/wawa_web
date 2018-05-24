@@ -84,14 +84,14 @@ class Wallet extends BasicBaby
             $this->title = '充值账单';
             $db = Db::name('TUserCommonpayReceipt');
             $field = ["user_id" => $userId, "receipt_type" => ErrorCode::BABY_PAY_SUCCESS];
-            $db->where($field);
+            $db->where($field)->order('create_at desc');
             return parent::_list($db);
         }elseif( $inType == 2 ){
             //消费账单
 
             $this->title = '消费账单';
             $db = Db::name('TUserBill');
-            $db->where('user_id', $userId);
+            $db->where('user_id', $userId)->order('create_at desc');
             return parent::_list($db);
 
         }elseif( $inType == 3 ){
@@ -100,14 +100,14 @@ class Wallet extends BasicBaby
             $db = Db::name('TUserIncome');
             $field = ["user_id" => $userId, "i_status" => ErrorCode::BABY_PAY_SUCCESS];
 
-            $db->where($field);
+            $db->where($field)->order('create_at desc');
             return parent::_list($db);
         }
 
         //默认消费账单
         $this->title = '账单';
         $db = Db::name('TUserBill');
-        $db->where('user_id', $userId);
+        $db->where('user_id', $userId)->order('create_at desc');
         return parent::_list($db);
 
     }
@@ -225,7 +225,12 @@ class Wallet extends BasicBaby
      */
     public function outCash()
     {
+        $userId = session('user_id');
+        $userInfo = $this->getUserInfo($userId);
+        $isRecharge = isset($userInfo['is_recharge']) ? $userInfo['is_recharge'] : '';
+        $coin = isset($userInfo['coin']) ? $userInfo['coin'] : '';
 
+        return view('', ['title' => '提现', 'coin' => $coin]);
         //$ret = $this->miniRedPackage('ovFkn4x7bI7CI0vcy8XqEer8zQYk', '');
         //return $ret;
 

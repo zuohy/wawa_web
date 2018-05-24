@@ -1,7 +1,7 @@
 @charset "utf-8";
 /* CSS Document */
 
-body{ background:#FFA07A;}
+body{ background:#fff5bf;}
 
 .top{ height:3em; position:fixed; top:0; left:0; width:100%; z-index:10;}
 .local{ background:rgba(255,255,255,0.7); display:block; height:2.163em; border-radius:4px; line-height:2.163em; margin-top:0.571em; font-size:0.857em;}

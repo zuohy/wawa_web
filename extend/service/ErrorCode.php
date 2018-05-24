@@ -185,7 +185,7 @@ class ErrorCode
     public static $ERR_MSG_C = array(
         self::CODE_OK => '成功',
         self::CODE_NOT_POST => 'no post msg',
-        self::CODE_NOT_SUPPORT => 'no support msg',
+        self::CODE_NOT_SUPPORT => '不支持的请求',
 
         //web code  msg
         self::E_USER_NOT_FOUND => '请先登录',

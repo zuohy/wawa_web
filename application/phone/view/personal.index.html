@@ -30,12 +30,12 @@
                 </div>
                 <div class="yong" style="margin-top: 1.743em">
                     <p>{$name|default=""}</p>
-                    <span>娃娃币：{$free_coin|default=""}</span>
+                    <span style="color: orange">娃娃币：{$free_coin|default=""}</span>
                 </div>
             </a>
             <a data-href='{:url("phone/wallet/recharge")}' href="javascript:void(0)">
                 <div class="yong" style="margin-top: 1.743em">
-                    <p>({$min_user_id|default=""})</p>
+                    <p>(ID:{$min_user_id|default=""})</p>
                     <span class="re_bt">+去充值</span>
                 </div>
 
@@ -112,14 +112,7 @@
                 <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/shdz.png" class="icon-img"/></span>收货地址<i class="iconfont icon-jiantou"></i></p>
             </a>
         </div>
-       <div class="one">
-            <a href="capital.html">
-                <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/sz.png" class="icon-img"/></span>资金流水<i class="iconfont icon-jiantou"></i></p>
-            </a>
-           <button data-modal='{:url("$classuri/edit")}' data-title="编辑用户" class='layui-btn layui-btn-small'>
-               <i class='fa fa-plus'></i> 编辑用户
-           </button>
-        </div>
+
          <!-- <div class="one" style="border-bottom:none;margin-bottom: 70px">
             <a href="center.html">
                 <p class="biao"><span class="iconfont"><img src="__STATIC__/plugs/proom/img/sjzx.png" class="icon-img"/></span>商家中心<i class="iconfont icon-jiantou"></i></p>
@@ -128,12 +121,26 @@
     </div>
 </div>
 
+{/block}
 
 
+{block name="foot"}
+{include file="extra@phone/foot"}
+{/block}
+
+{block name="script"}
 <script src="__STATIC__/plugs/phone/js/jquery.min.js?ver={:date('ymd')}" type="text/javascript"></script>
 
 <script src="__STATIC__/plugs/phone/js/bootstrap.min.js?ver={:date('ymd')}" type="text/javascript"></script>
 <script src="__STATIC__/plugs/phone/js/index.js?ver={:date('ymd')}" type="text/javascript"></script>
+
+<script>
+    $(function(){
+        //选中 菜单点击事件
+        $(".xz_wd").click();
+
+    })
+</script>
 
 
 {/block}

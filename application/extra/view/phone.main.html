@@ -18,6 +18,7 @@
 
         <script src="__STATIC__/plugs/require/require.js?ver={:date('ymd')}"></script>
         <script src="__STATIC__/admin/app.js?ver={:date('ymd')}"></script>
+
         <script>window.ROOT_URL='__PUBLIC__';</script>
     </head>
     {block name="bodyTag"}
@@ -25,10 +26,6 @@
         {block name="header"}{/block}
         {block name="body"}{/block}
         {block name="foot"}
-        {if $title eq '活动'}
-        {else}
-        {include file="extra@phone/foot"}
-        {/if}
         {/block}
         {block name="script"}{/block}
     </body>

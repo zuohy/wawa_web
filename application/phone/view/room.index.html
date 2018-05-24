@@ -31,14 +31,14 @@
         <a id="exit_room" onclick="chat_send('exit_room')" data-href='{:url("phone/index/main")}' href="javascript:void(0)">退出<i class="ion ion-reply-all"></i></a>
 
         <!-- Add other menu similar to "about" here -->
-        <a id="memberCount" style="color: orangered">{$member_count}人围观</a>
+        <a id="memberCount" style="color: #ff7d15">{$member_count}人围观</a>
     </div>
 </header>
 <!-- END OF site header Menu-->
 
 <!-- BEGIN OF Quick nav icons at left -->
-<nav class="quick-link count-4 nav-left">
-    <div class="logo">
+<nav class="quick-link count-4 nav-left" style="background: none; box-shadow: none">
+    <div class="logo" style="background: #ffd800">
         <a href="#home">
             <img src="__STATIC__/plugs/proom/img/adou.png" alt="Logo Brand">
         </a>
@@ -51,7 +51,7 @@
         </li>
     </ul>
 
-    <ul id="qmenu" class="qmenu">
+    <ul id="qmenu" class="qmenu" style="top: 90%">
 
         <li data-menuanchor="control">
             <a href="#control" class=""><i class="icon ion ion-game-controller-b"></i>
@@ -101,7 +101,7 @@
     <!-- Solid color as background -->
     <div class="cover-bg pos-abs full-size bg-color" data-bgcolor="rgb(254, 175, 27)" style="background:url('__STATIC__/plugs/proom/img/gr_bg.png');"></div>
 
-    <div style="height: 75%; border-radius: 20px;border:1px solid red" id="test" class="cover-bg pos-abs full-size">
+    <div style="height: 75%; border-radius: 20px;border:1px solid #ff7d15;" id="test" class="cover-bg pos-abs full-size">
         <video id="remoteVideo" autoplay="autoplay" style="height: 100%; width: 100%; object-fit: fill" ></video>
 
         <video class="hidden" id="localVideo" autoplay="autoplay" muted="muted" style="height: 100px; width: 100px"></video>
@@ -167,7 +167,7 @@
     <div class="section page-contact page page-cent bg-color" data-bgcolor="rgba(95, 25, 208, 0.88)s" id="s-control">
         <!-- Begin of contact information -->
             <section class="content" style="margin-top: 80%">
-                <header class="p-title" >
+                <header id="m_header" class="p-title" >
 
                     <h6 style="float: left">
                         <a title="金币">金币：<i id="u_coin">{$coin}</i> </a>
@@ -265,7 +265,11 @@
                     <li>
                         <span >...</span>
                     </li>
-
+                    <li>
+                        <img src="__STATIC__/plugs/proom/img/wawa/momotu1.jpg">
+                        <img src="__STATIC__/plugs/proom/img/wawa/momotu2.jpg">
+                        <img src="__STATIC__/plugs/proom/img/wawa/momotu3.jpg">
+                    </li>
                 </ul>
 
 
@@ -359,7 +363,7 @@
                 <!-- Begin Of Page SubSction -->
 
                 <div class="page-block c-right v-zoomIn">
-                    <button class="button "   onclick="testFun()">111</button>
+                    <button class="button hidden"   onclick="testFun()">111</button>
                     <button class="btn_result hidden" data-modal='{:url("$classuri/result")}' data-title="抓取结果" class='layui-btn layui-btn-small'>
                         <i class='fa fa-plus'></i> 抓取结果
                     </button>
@@ -380,7 +384,7 @@
 <!-- Begin of site footer -->
 <footer class="page-footer">
     <div>
-
+        <audio class="hidden" src="__STATIC__/plugs/proom/vid/dj1.mp3" controls loop autoplay></audio>
     </div>
 </footer>
 <!-- End of site footer -->
@@ -716,6 +720,7 @@
 
         var showCoinsPage = function(){
             $('#m_coins').removeClass('hidden');
+            $('#m_header').removeClass('hidden');
 
             $('#m_coins_none').addClass('hidden');
             $('#m_catch').addClass('hidden');
@@ -725,9 +730,6 @@
 
         }
         var showControlPage = function(){
-            //重置房间超时定时器
-            window.clearTimeout(room_timeout);
-            room_timeout = window.setTimeout(roomTimeout, timeCount);
 
             $('#m_sec').removeClass('hidden');
             $('#m_catch').removeClass('hidden');
@@ -735,6 +737,7 @@
 
             $('#m_coins_none').addClass('hidden');
             $('#m_coins').addClass('hidden');
+            $('#m_header').addClass('hidden');
         }
         var showWaitPage = function(){
             $('#m_coins_none').removeClass('hidden');

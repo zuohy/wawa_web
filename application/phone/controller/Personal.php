@@ -51,15 +51,6 @@ class Personal extends BasicBaby
 
     }
 
-    /**
-     * 个人地址
-     * @return View
-     */
-    public function edit()
-    {
-        $userId = session('user_id');
-        return $this->_form('TUserConfig', 'form', 'user_id', [], ['user_id'=> $userId]);
-    }
 
     /**
      * 抓取记录

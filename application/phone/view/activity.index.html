@@ -40,24 +40,30 @@
 
     </div>
 
-
-
-
-
 </div>
 
-    <script src="__STATIC__/plugs/phone/js/jquery.min.js" type="text/javascript"></script>
-    <script type="text/javascript" src="__STATIC__/plugs/phone/js/iscroll.js"></script>
 
-    <script src="__STATIC__/plugs/phone/js/bootstrap.min.js" type="text/javascript"></script>
-    <script src="__STATIC__/plugs/phone/js/index.js" type="text/javascript"></script>
+
+{/block}
+
+
+{block name="foot"}
+{include file="extra@phone/foot"}
+{/block}
+
+{block name="script"}
+<script src="__STATIC__/plugs/phone/js/jquery.min.js?ver={:date('ymd')}" type="text/javascript"></script>
+
+<script src="__STATIC__/plugs/phone/js/bootstrap.min.js?ver={:date('ymd')}" type="text/javascript"></script>
+<script src="__STATIC__/plugs/phone/js/index.js?ver={:date('ymd')}" type="text/javascript"></script>
 
 <script>
+    $(function(){
+        //选中 菜单点击事件
+        $(".xz_wawa").click();
 
-    var  mini_send = function(){
-
-    }
-
+    })
 </script>
 
-    {/block}
+
+{/block}
