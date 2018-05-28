@@ -411,7 +411,7 @@
 <!-- Begin of site footer -->
 <footer class="page-footer">
     <div>
-        <audio class="hidden" src="__STATIC__/plugs/proom/vid/dj1.mp3" controls loop autoplay></audio>
+        <audio id="roomAudio" class="hidden" src="__STATIC__/plugs/proom/vid/dj1.mp3" controls loop autoplay></audio>
     </div>
 </footer>
 <!-- End of site footer -->
@@ -525,11 +525,11 @@
          //房间超时退出
          var roomTimeout = function (){
              console.log("超时 退出房间");
-             //chat_send('exit_room');
-
-             //$('#exit_room').click();
+             chat_send('exit_room');
+             $('#exit_room').click();
          }
 
+         //监听触摸事件
          document.getElementsByTagName('body')[0].addEventListener('touchstart', function(e) {
              //重置房间超时定时器
              window.clearTimeout(room_timeout);
@@ -537,6 +537,17 @@
 
              //用户触摸 关闭礼物图片
              $('#gift_on').addClass("hidden");
+         });
+
+         //监听切换后台事件
+         document.addEventListener('webkitvisibilitychange',function(){
+             if (document.hidden) {
+
+                 $('#roomAudio')[0].pause();
+             } else  {
+                 $('#roomAudio')[0].play();
+             }
+
          });
 
         var devInfo = $('#dev_info').text();
@@ -1091,6 +1102,11 @@
 
             $('.btn_result').attr('data-modal' , '{:url("$classuri/catchresult")}?is_catch='+ '1' )
             $('.btn_result').click();
+
+            var myAudio = $('#roomAudio')[0]
+            myAudio.pause();
+            var isPlay = myAudio.paused
+            myAudio.play();
         }
         /////////
 

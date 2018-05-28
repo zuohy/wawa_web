@@ -186,13 +186,11 @@ class Activity extends BasicBaby
 
         $tudiList = ActivityService::getShareHisList($proCode, $userCode, '', 0);  //获取成功分享和失败分享所有记录
 
-        $logData = json_encode($tudiList);
-        Log::info("disciple: get disciple= " . $logData );
+        //$logData = json_encode($tudiList);
+       // Log::info("disciple: get disciple= " . $logData );
 
         $this->assign('title', '徒弟列表');
-
         $this->success("成功！", null, $tudiList);
-
 
     }
 

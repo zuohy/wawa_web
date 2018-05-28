@@ -203,8 +203,7 @@ class Index extends BasicBaby
         //拉取设备列表
         $this->title = '设备列表' . $uRoomId;
 
-        $db = Db::name('TDevRoomInfo')->where(['is_deleted' => '0'])
-            ->whereBetween('dev_status', ["1", "2"]);
+        $db = Db::name('TDevRoomInfo')->where(['is_deleted' => '0']);
 
         return parent::_list($db);
 

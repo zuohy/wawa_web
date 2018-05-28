@@ -67,7 +67,7 @@
 
 
             {if $vo.dev_pic eq ''}
-            <img src="__STATIC__/plugs/proom/img/bg-default.jpg">
+            <img src="__STATIC__/plugs/proom/img/room_bg.png">
             {else}
             <img src="__STATIC__/{$vo.dev_pic}">
             {/if}
@@ -75,7 +75,7 @@
             <div class="text_p" style="margin-top: 10px">
                 <p>{$vo.dev_room_id}</p>
             </div>
-            {if $vo.dev_status eq 0}
+            {if $vo.dev_status eq 0 || $vo.dev_status eq '3'}
             <div class="jul" style="background: red;color: white">{$vo.status_c}</div>
             {else}
             <div class="jul" style="background: green;color: white">{$vo.status_c}</div>

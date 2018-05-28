@@ -26,7 +26,6 @@
     <!-- 悬浮按钮 -->
     <div class="xuan_btn xuan_rules"><a href=".rules">规则</a></div>
     <div class="xuan_btn xuan_tudi" onclick="getDisciple('{$product_code}', '{$code}')">徒弟列表<img src="__STATIC__/plugs/phone/act_images/normal_turn_in_icon.png"/>
-
     </div>
 
     <!-- 我的徒弟数量 -->
@@ -86,6 +85,12 @@
         <img src="__STATIC__/plugs/phone/act_images/default_rule_into_btn.png" width="100%"/>
     </div>
 
+    <!-- 商家图片 -->
+    <div class="rules" >
+        <img src="__STATIC__/plugs/phone/act_images/act1_vender.jpg" width="100%"/>
+        <img src="__STATIC__/plugs/phone/act_images/act1_pro.jpg" width="100%"/>
+    </div>
+
     <!-- 活动规则 -->
     <div class="rules">
         <img src="__STATIC__/plugs/phone/act_images/rules.png"/>
@@ -96,9 +101,11 @@
             <li class="rules_specil">特别说明:为保证活动的公平性，对于存在违规收徒行为的用户，平台将取消其参加活动的资格，并扣除所有奖励，请遵守平台规则，正常邀请收徒。本活动最终解释权归阿斗夹娃娃所有。</li>
         </ul>
     </div>
+
     <div class="display_block"></div>
     <!-- 底部btn -->
     <div class="footer">
+
         <div class="footer_btn footer_left" onclick="act_luck()">幸运大抽奖</div>
         {if $phone eq ''}
         <div class="footer_btn footer_right"><a data-href='{:url("phone/activity/phone")}' href="javascript:void(0)">立领购买({$pay_price}元)</a></div>
@@ -294,9 +301,15 @@
         for (var i=0;i<tudiList.length;i++)
         {
             var tmpTudi = tudiList[i];
+
+            var tmpTuStatus = '未成功';
+            if(tmpTudi['s_status'] == 1){
+                //收徒成功
+                tmpTuStatus = '成功';
+            }
             var tmpDate = /\d{4}-\d{1,2}-\d{1,2}/g.exec(tmpTudi['update_at']);  //去除时间
             var t_td_name = '<td>' + tmpTudi['name'] + '</td>'
-            var t_td_status = '<td>' + tmpTudi['s_status_c'] + '</td>'
+            var t_td_status = '<td>' + tmpTuStatus + '</td>'
             var t_td_date =  '<td>' + tmpDate + '</td>'
             var t_tr_data = '<tr class="tudi_con_tab_tr">' + t_td_name + t_td_status + t_td_date + '</tr>';
             t_tr_all = t_tr_all + t_tr_data;

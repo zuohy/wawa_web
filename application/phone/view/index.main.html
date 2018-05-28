@@ -71,9 +71,9 @@
 </div>
 
 <!--hot-->
-<div class="hot">
+<div class="hot" style="padding-bottom: 0px;">
     <div class="container">
-        <div class="title" style="color: red">
+        <div class="title" style="color: red; margin-bottom: 3px;margin-top: 3px;">
             <span class="glyphicon glyphicon-star" ></span>
             <span class="glyphicon glyphicon-star" ></span>
             <span class="glyphicon glyphicon-star" ></span>
@@ -85,13 +85,13 @@
         <div class="row">
             <div class="col-xs-4">
                 <a class="sp" data-href='{:url("phone/rank/page")}?product_code=A-00001' href="javascript:void(0)">
-                    <img src="__STATIC__/plugs/phone/images/sf4.jpg">
+                    <img src="__STATIC__/plugs/phone/act_images/list_bg.png">
 
                 </a>
             </div>
             <div class="col-xs-4">
                 <a  class="sp" data-href='{:url("phone/activity/page")}?product_code=H-00001' href="javascript:void(0)">
-                    <img src="__STATIC__/plugs/phone/images/787554.jpg">
+                    <img src="__STATIC__/plugs/phone/act_images/act1_pro.jpg">
 
                 </a>
             </div>
@@ -116,7 +116,7 @@
 </div>
 
 
-<div class="product">
+<div class="product" style="margin-top: 3px;">
 
     {foreach $list as $key=>$vo}
     <div class="sp_pr">
@@ -138,7 +138,7 @@
                 <span class="yue">价格<em class="em_s">{$vo.price}/次</em>
                 </span>
             </div>
-            {if $vo.status eq 0}
+            {if $vo.status eq 0 || $vo.status eq '3'}
             <div class="jul" style="background: red;color: white">{$vo.status_c}</div>
             {else}
             <div class="jul" style="background: green;color: white">{$vo.status_c}</div>

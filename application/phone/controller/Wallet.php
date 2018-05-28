@@ -65,7 +65,7 @@ class Wallet extends BasicBaby
         $db = Db::name('TUserReceiptFree');
         $minType = ErrorCode::BABY_COIN_TYPE_REG_1;
         $maxType = ErrorCode::BABY_COIN_TYPE_SHARE - 1;
-        $db->whereBetween('icons_type', [$minType, $maxType]);
+        $db->whereBetween('icons_type', [$minType, $maxType])->order('icons_type asc');
         return parent::_list($db);
     }
 
