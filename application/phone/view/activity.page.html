@@ -102,10 +102,11 @@
         </ul>
     </div>
 
-    <div class="display_block"></div>
+    <div class="display_block">
+        <audio id="actAudio" class="hidden" src="__STATIC__/{$act_audio}" controls loop autoplay></audio>
+    </div>
     <!-- 底部btn -->
     <div class="footer">
-
         <div class="footer_btn footer_left" onclick="act_luck()">幸运大抽奖</div>
         {if $phone eq ''}
         <div class="footer_btn footer_right"><a data-href='{:url("phone/activity/phone")}' href="javascript:void(0)">立领购买({$pay_price}元)</a></div>
@@ -244,7 +245,16 @@
         init();
 
 
-        //获取分享徒弟 数量
+        //控制音乐
+        //监听切换后台事件
+        document.addEventListener('webkitvisibilitychange',function(){
+            if (document.hidden) {
+                $('#actAudio')[0].pause();
+            } else  {
+                $('#actAudio')[0].play();
+            }
+
+        });
 
     });
 

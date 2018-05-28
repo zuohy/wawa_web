@@ -411,7 +411,7 @@
 <!-- Begin of site footer -->
 <footer class="page-footer">
     <div>
-        <audio id="roomAudio" class="hidden" src="__STATIC__/plugs/proom/vid/dj1.mp3" controls loop autoplay></audio>
+        <audio id="roomAudio" class="hidden" src="__STATIC__/{$room_audio}" controls loop autoplay></audio>
     </div>
 </footer>
 <!-- End of site footer -->
@@ -858,6 +858,8 @@
         </li>*/
 
         //礼物详细图片信息
+        var g_price_text = '<span >' + '兑换价格：' + giftInfo.gift_price + '</span>';
+        var g_price_li_text = '<li>' + g_price_text + '</li>';
         var g_des_text = '<span >' + '详细信息' + '</span>';
         var g_des_li_text = '<li>' + g_des_text + '</li>';
 
@@ -875,7 +877,7 @@
         }
         var g_des_li_img = '<li>' + g_des_allImg + '</li>';
 
-        var g_des_li_list = g_des_li_text + g_des_li_img;
+        var g_des_li_list = g_price_li_text + g_des_li_text + g_des_li_img;
         $('.gift_detail').html(g_des_li_list);    //礼物详细页面 详细图片信息
         /*<li>
         <span >...</span>

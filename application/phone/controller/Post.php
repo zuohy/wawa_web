@@ -95,9 +95,11 @@ class Post extends BasicBaby
                 $giftInfo = RoomService::getGiftInfo($vo['gift_id']);
                 $vo['gift_pic_show'] = isset($giftInfo['gift_pic_show']) ? $giftInfo['gift_pic_show'] : '';
                 $vo['gift_name'] = isset($giftInfo['gift_name']) ? $giftInfo['gift_name'] : '';
+                $vo['gift_price'] = isset($giftInfo['gift_price']) ? $giftInfo['gift_price'] : '';
             }else{
                 $vo['gift_pic_show'] =  '';
                 $vo['gift_name'] = '';
+                $vo['gift_price'] = '';
             }
             if($isCatch == ErrorCode::BABY_CATCH_SUCCESS){
                 $vo['result_c'] = '抓取成功';

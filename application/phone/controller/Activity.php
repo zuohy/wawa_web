@@ -80,10 +80,15 @@ class Activity extends BasicBaby
         //活动信息
         $actInfo = ActivityService::getActInfo($proCode);
         //活动价格
+        $actAudio = isset($actInfo['act_audio']) ? $actInfo['act_audio'] : '';
         $actPicShow = isset($actInfo['act_pic_show']) ? $actInfo['act_pic_show'] : '';
         $iconsType = isset($actInfo['icons_type']) ? $actInfo['icons_type'] : '';
         $actPrice = isset($actInfo['act_price']) ? $actInfo['act_price'] : '';
         $payPrice = $this->coverPayValue(ErrorCode::BABY_COVER_TYPE_CNY, $actPrice);
+
+        //提供商图片
+        //活动音乐
+        $this->assign('act_audio', $actAudio);
 
         $this->assign('act_pic_show', $actPicShow);
         $this->assign('pay_price', $payPrice);

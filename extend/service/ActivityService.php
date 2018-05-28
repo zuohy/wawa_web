@@ -34,6 +34,7 @@ class ActivityService
         'act_pic_3' => '',
         'act_form_1' => '',
         'act_form_2' => '',
+        'act_audio' => '',
         'act_name' => '',
         'describe' => '',
         'act_price' => '',
