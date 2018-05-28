@@ -6,6 +6,22 @@
     .page-contact .contact img{
         height: 40px;
     }
+    .award_title {
+        position: absolute;
+        width: 50%;
+        left: 25%;
+        top: -3.8%;
+    }
+    .aw_title_font {
+        position: absolute;
+        width: 50%;
+        left: 25%;
+        top: -4%;
+        font-weight: bold;
+        color: white;
+        font-size: 3vw;
+        text-align: center;
+    }
 </style>
 
 
@@ -101,9 +117,10 @@
     <!-- Solid color as background -->
     <div class="cover-bg pos-abs full-size bg-color" data-bgcolor="rgb(254, 175, 27)" style="background:url('__STATIC__/plugs/proom/img/gr_bg.png');"></div>
 
-    <div style="height: 75%; border-radius: 20px;border:1px solid #ff7d15;" id="test" class="cover-bg pos-abs full-size">
-        <video id="remoteVideo" autoplay="autoplay" style="height: 100%; width: 100%; object-fit: fill" ></video>
 
+    <div style="height: 75%; border-radius: 20px;border:1px solid #ff7d15; background:url('__STATIC__/plugs/proom/img/room_bg.png') no-repeat center;" id="test" class="cover-bg pos-abs full-size" >
+        <img id="load_bg" class="" style="height: 100%; width: 100%; object-fit: fill" src="__STATIC__/plugs/proom/img/room_bg.png"/>
+        <video id="remoteVideo" autoplay="autoplay" style="height: 100%; width: 100%; object-fit: fill" ></video>
         <video class="hidden" id="localVideo" autoplay="autoplay" muted="muted" style="height: 100px; width: 100px"></video>
 
     </div>
@@ -119,7 +136,19 @@
 
 
     <!-- Solid color as filter -->
-    <div class="cover-bg-mask pos-abs full-size bg-color" data-bgcolor="rgba(0, 0, 0, 0.00)"></div>
+    <div style="height: 75%;" class="cover-bg-mask pos-abs full-size bg-color" data-bgcolor="rgba(0, 0, 0, 0.10)">
+        <div id="gift_on" class="hidden" style="position:absolute; left:20%;top:25%; text-align: center">
+            <li>
+                <img class="award_title" src="__STATIC__/plugs/proom/img/wawa/gift_name.png"/>
+                <span class="txt aw_title_font" style="text-align: center">礼物</span>
+            </li>
+            <li>
+                <img src="__STATIC__/plugs/proom/img/wawa/pipi.png" >
+            </li>
+
+        </div>
+
+    </div>
 
 </div>
 <!--END OF site Cover -->
@@ -166,7 +195,7 @@
     <!-- Begin of Control page   -->
     <div class="section page-contact page page-cent bg-color" data-bgcolor="rgba(95, 25, 208, 0.88)s" id="s-control">
         <!-- Begin of contact information -->
-            <section class="content" style="margin-top: 80%">
+            <section class="content" style="margin-top: 70%; padding-bottom: 20px;">
                 <header id="m_header" class="p-title" >
 
                     <h6 style="float: left">
@@ -260,19 +289,17 @@
 
             </header>
 
-            <div class="contact" style="margin-top:10px;">
+            <div class="contact" style="margin-top:10px; height: 500px">
+                <ul class="gift_detail">
+
+                </ul>
+
                 <ul class="chat_msg">
                     <li>
                         <span >...</span>
                     </li>
-                    <li>
-                        <img src="__STATIC__/plugs/proom/img/wawa/momotu1.jpg">
-                        <img src="__STATIC__/plugs/proom/img/wawa/momotu2.jpg">
-                        <img src="__STATIC__/plugs/proom/img/wawa/momotu3.jpg">
-                    </li>
+
                 </ul>
-
-
             </div>
 
         </section>
@@ -452,7 +479,7 @@
     var b_roomInfo = null;   //房间信息对象
     var b_memberList = null;  //房间成员列表 top5
     var b_giftInfo = null;  //房间商品信息
-    var b_giftShow = null;  //房间商品展示图，作为房间背景图片
+    var b_giftShow = null;  //房间商品展示图，作为房间弹出图片
     var b_curMember = null;  //房间当前用户信息
     var b_maxShowMember = 3;  //top 成员最大个数
     var b_deviceInfo = null;  //房间设备对象
@@ -460,10 +487,18 @@
     //房间长连接全局变量
     var ws_chat=null, name, client_list={};
 
-    var chat_send, room_timeout, testFun;
-    var timeCount = 120000;   //120秒超时
+    var chat_send, testFun;
+    var room_timeout, timeCount = 120000;   //120秒超时
+    var gift_timeout, funGiftTimeout, giftTimeCount = 3000; //3秒超时 关闭礼物图片
 
     require(['proom.toast', 'proom.barrager', 'proom.downcount'], function (iziToast) {
+        //礼物超时 关闭礼物图片
+        funGiftTimeout = function (){
+            console.log("礼物超时 关闭礼物图片");
+            $('#gift_on').addClass("hidden");
+            window.clearTimeout(gift_timeout);
+        }
+
      $(document).ready(function() {
          var chatStart = function(serverUrl, serverPort){
              var chatServer = "wss://" + serverUrl + '/wss';//":" + serverPort;
@@ -490,14 +525,18 @@
          //房间超时退出
          var roomTimeout = function (){
              console.log("超时 退出房间");
-             chat_send('exit_room');
+             //chat_send('exit_room');
 
-             $('#exit_room').click();
+             //$('#exit_room').click();
          }
+
          document.getElementsByTagName('body')[0].addEventListener('touchstart', function(e) {
              //重置房间超时定时器
              window.clearTimeout(room_timeout);
              room_timeout = window.setTimeout(roomTimeout, timeCount);
+
+             //用户触摸 关闭礼物图片
+             $('#gift_on').addClass("hidden");
          });
 
         var devInfo = $('#dev_info').text();
@@ -753,7 +792,7 @@
     //初始化房间信息变量
     var initRoomInfo = function( retData ){
         b_roomInfo = retData.room_info
-        b_giftShow = retData.gift_show
+        b_giftInfo = retData.gift_info
         b_memberList = retData.member_list
         b_curMember = retData.cur_member
 
@@ -761,14 +800,14 @@
         console.log(b_roomInfo)
         console.log('b_memberList:')
         console.log(b_memberList)
-        console.log('b_giftShow:')
-        console.log(b_giftShow)
+        console.log('b_giftInfo:')
+        console.log(b_giftInfo)
         console.log('b_curMember:')
         console.log(b_curMember)
         console.log('b_deviceInfo:')
         console.log(b_deviceInfo)
 
-        onRunBarrager(1, '', '欢迎加入房间');
+        //onRunBarrager(1, '', '欢迎加入房间');
 
         //根据房间状态 控制按钮显示
         if(b_deviceInfo.dev_status != 1){
@@ -778,14 +817,73 @@
 
         //刷新用户列表
         updateMembersShow(b_roomInfo.member_count, b_memberList, b_curMember, '', '')
+        //更新礼物信息
+        updateGiftInfo(b_giftInfo);
+    }
+
+        //展示礼物信息和图片
+    var updateGiftInfo = function(giftInfo){
+
+        //进入房间  礼物弹出图片
+        b_giftShow = giftInfo.gift_pic_show;   //用第一张作为弹出图片
+
+        //礼物名称
+        var g_name_img = '<img class="award_title" ' +  'src="__STATIC__/plugs/proom/img/wawa/gift_name.png" ' + '/>';
+        var g_name_span = '<span class="txt aw_title_font" style="text-align: center">' + giftInfo.gift_name + '</span>';
+        var g_name_li = '<li>' + g_name_img + g_name_span + '</li>';
+
+        var imgSrc = '__STATIC__/' + b_giftShow;
+        var g_show_img = '<img src=' + imgSrc + '>';
+        var g_pic_li = '<li>' + g_show_img + '</li>';
+        var g_show_li_list = g_pic_li + g_name_li;
+
+        $('#gift_on').html(g_show_li_list);   //背景层，显示礼物弹出图片信息
+        /*<li>
+        <img class="award_title" src="__STATIC__/plugs/proom/img/wawa/gift_name.png"/>
+        <span class="txt aw_title_font" style="text-align: center">礼物</span>
+        </li>
+        <li>
+        <img src="__STATIC__/plugs/proom/img/wawa/pipi.png" >
+        </li>*/
+
+        //礼物详细图片信息
+        var g_des_text = '<span >' + '详细信息' + '</span>';
+        var g_des_li_text = '<li>' + g_des_text + '</li>';
+
+        var g_des_allImg = '';
+        for(var i=1; i <=5; i++){
+            var gObj = 'giftInfo';
+            var attr = 'gift_pic_' + i;
+            var img_url = eval(gObj + '.' + attr);  //giftInfo.gift_pic_1 字符串转化为变量
+            if(img_url){
+                var desImgSrc = '__STATIC__/' + img_url;
+                var g_des_img = '<img style="width: 100%; " src=' + desImgSrc + '>';
+                g_des_allImg = g_des_allImg + g_des_img;
+            }
+
+        }
+        var g_des_li_img = '<li>' + g_des_allImg + '</li>';
+
+        var g_des_li_list = g_des_li_text + g_des_li_img;
+        $('.gift_detail').html(g_des_li_list);    //礼物详细页面 详细图片信息
+        /*<li>
+        <span >...</span>
+        </li>
+        <li>
+        <img src="__STATIC__/plugs/proom/img/wawa/momotu1.jpg">
+        <img src="__STATIC__/plugs/proom/img/wawa/momotu2.jpg">
+        <img src="__STATIC__/plugs/proom/img/wawa/momotu3.jpg">
+        </li>*/
+
     }
 
         //设置 或清除游戏用户头像
     var updateMemberPic = function(type, userName, userPic){
 
         //更新头像
+        var imgSrc ='';
         if('game_up' == type){
-            var imgSrc = userPic;
+            imgSrc = userPic;
 
         }else{
             imgSrc = '__STATIC__/plugs/proom/img/adou.png';
@@ -958,11 +1056,11 @@
             var item={
                 img: pic, //图片
                 info: msg, //文字
-                href:'', //链接
+                //href:'', //链接
                 close:true, //显示关闭按钮
                 speed:6, //延迟,单位秒,默认6
                 //bottom:300, //距离底部高度,单位px,默认随机
-                color:'#fff', //颜色,默认白色
+                color:'orange', //颜色,默认白色
                 old_ie_color:'#000000' //ie低版兼容色,不能与网页背景相同,默认黑色
             }
             if(posType){
@@ -977,7 +1075,7 @@
             var item={
                 img:'__STATIC__/plugs/proom/img/wawa/test1.jpg', //图片
                 info:'弹幕文字信息', //文字
-                href:'', //链接
+                //href:'', //链接
                 close:true, //显示关闭按钮
                 speed:6, //延迟,单位秒,默认6
                 //bottom:200, //距离底部高度,单位px,默认随机
@@ -1053,7 +1151,9 @@
 
                 case"JoinRoom":
                     console.log("JoinRoom");
-
+                    $('#load_bg').addClass("hidden");  //视频加载成功，隐藏加载页面
+                    $('#gift_on').removeClass("hidden");
+                    gift_timeout = window.setTimeout(funGiftTimeout, giftTimeCount);
                     break;
 
                 case"PeerConnected":

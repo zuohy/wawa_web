@@ -57,6 +57,11 @@ class Room extends BasicBaby
         $price = isset($tmpRoom['price']) ? $tmpRoom['price'] : '';
         $coin = isset($tmpUser['coin']) ? $tmpUser['coin'] : '';
         $free_coin = isset($tmpUser['free_coin']) ? $tmpUser['free_coin'] : '';
+        $giftId = isset($tmpUser['gift_id']) ? $tmpUser['gift_id'] : '';
+
+        //获取礼物信息  在接口 chat_bind 消息中获取
+        //$giftInfo = RoomService::getGiftInfo($giftId);
+
 
         //获取房间设备信息
         $tmpDevice = DeviceService::getDeviceInfo($devRoomId);
@@ -67,6 +72,8 @@ class Room extends BasicBaby
         //$controlAddress = sysconf('wa_control_url');
         //$controlPort = sysconf('wa_control_port');
         $controlUrl = 'http://' . $controlAddress . ':' . $controlPort;
+
+
 
         return view('', ['title' => '房间', 'control_url' =>$controlUrl,
             'member_count' =>$memberCount, 'price' =>$price, 'coin' => $coin, 'free_coin' => $free_coin,  'user_id' => $userId,

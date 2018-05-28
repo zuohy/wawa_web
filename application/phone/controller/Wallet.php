@@ -124,6 +124,7 @@ class Wallet extends BasicBaby
             $reason = isset($vo['reason']) ? $vo['reason'] : '';
             $iconsType = isset($vo['icons_type']) ? $vo['icons_type'] : '';
             $proCode = isset($vo['product_code']) ? $vo['product_code'] : '';
+            $remark = isset($vo['remark']) ? $vo['remark'] : '';
 
             if($reason == ErrorCode::BABY_EMPLOY_REASON_1){
                 $vo['reason_c'] = '投币游戏';
@@ -146,7 +147,8 @@ class Wallet extends BasicBaby
 
             //产品编码 加入 remark 字段
             if($proCode && $proCode != ErrorCode::BABY_HEADER_SEQ_APP){
-                $vo['remark'] = $vo['remark'] . ' 产品编码 ' . $proCode;
+
+                $vo['remark'] = $remark . ' 产品编码 ' . $proCode;
             }
             //字段保护
             if( empty($vo['reason_c']) ){

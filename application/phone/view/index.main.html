@@ -128,7 +128,7 @@
 
 
             {if $vo.room_pic eq ''}
-            <img src="__STATIC__/plugs/proom/img/bg-default.jpg">
+            <img src="__STATIC__/plugs/proom/img/room_bg.png">
             {else}
             <img src="__STATIC__/{$vo.room_pic}">
             {/if}
@@ -161,6 +161,7 @@
 {block name="script"}
 <!-- Javascript toast files -->
 <link rel="stylesheet" href="__STATIC__/plugs/proom/js/izitoast/iziToast.css?ver={:date('ymd')}">
+<script src="__STATIC__/plugs/proom/js/izitoast/iziToastHandle.js?ver={:date('ymd')}" type="text/javascript"></script>
 
 <script src="__STATIC__/plugs/phone/js/jquery.min.js?ver={:date('ymd')}" type="text/javascript"></script>
 <script type="text/javascript" src="__STATIC__/plugs/phone/js/iscroll.js?ver={:date('ymd')}"></script>
@@ -168,6 +169,11 @@
 <script src="__STATIC__/plugs/phone/js/index.js?ver={:date('ymd')}" type="text/javascript"></script>
 <script>
     var g_type = 0;  //全局变量 互斥 0 1
+    var g_pos = 0;   //消息序号
+    var g_result_msg = ''   //成功结果消息数组
+    var g_income_msg = ''   //收入消息数组
+    var g_t1 = '';  //定时器
+
     $(function(){
         //选中 菜单点击事件
         $(".xz_main").click();
@@ -180,75 +186,46 @@
 
         require(['proom.toast'], function (iziToast) {
 
-            var t1 = window.setTimeout(userNotify, 3000)
-            var t2 = window.setInterval(userNotify, 30000);
+            toastShow = toastController(iziToast);
+            g_type = 0;
+            var reqData = {type:'user_notify', notify_type: g_type}
+            $.post("{:url('phone/apiwawa/index')}", {json: reqData}, function(ret){
+                console.log(ret);
+                var retObj = $.parseJSON(ret)
+                if(retObj.code == 0){
+                    g_result_msg = retObj.data
+                    g_t1 = window.setInterval(userNotify, 3000)
+
+                }
+
+            }, 'json');
 
             function userNotify(){
-                if(g_type == 0){
-                    g_type = 1;
-                }else{
-                    g_type = 0;
+
+                if(g_pos >= g_result_msg.length){
+                    window.clearInterval(g_t1)
+                    return;
                 }
-                var reqData = {type:'user_notify', notify_type: g_type}
-                $.post("{:url('phone/apiwawa/index')}", {json: reqData}, function(ret){
-                    console.log(ret);
-                    var retObj = $.parseJSON(ret)
-                    if(retObj.code == 0){
-                        toastCustom2('topCenter', '', '好消息', retObj.msg);
-                    }
-
-                }, 'json');
-
-
-
+                toastShow.toastCustom('topCenter', '', '好消息', g_result_msg[g_pos], '__STATIC__');
+                g_pos = g_pos + 1;
             }
 
-            /////////
-            iziToast.settings({
-                timeout: 3000,
-                // position: 'center',
-                // imageWidth: 50,
-                pauseOnHover: true,
-                // resetOnHover: true,
-                close: true,
-                progressBar: true
-                // layout: 1,
-                // balloon: true,
-                // target: '.target',
-                // icon: 'material-icons',
-                // iconText: 'face',
-                // animateInside: false,
-                // transitionIn: 'flipInX',
-                // transitionOut: 'flipOutX',
-            });
-
-            var toastCustom2 = function(position, pic, title, msg){
-
-                if( pic.length <= 0){
-                    pic = '__STATIC__/plugs/proom/img/adou.png';
+            //获取每天第一次登录赠送币
+            g_type = 2;
+            var reqData = {type:'user_notify', notify_type: g_type}
+            $.post("{:url('phone/apiwawa/index')}", {json: reqData}, function(ret){
+                console.log(ret);
+                var retObj = $.parseJSON(ret)
+                if(retObj.code == 0){
+                    toastShow.toastCustom('center', '', '好消息', '每天首登 '+retObj.msg, '__STATIC__');
                 }
-                iziToast.show({
-                    class: 'test',
-                    color: 'red',
-                    icon: 'icon-contacts',
-                    title: title,
-                    message: msg,
-                    position: position, //'topCenter',
-                    transitionIn: 'flipInX',
-                    transitionOut: 'flipOutX',
-                    progressBarColor: 'rgb(0, 255, 184)',
-                    image: pic,
-                    imageWidth: 70,
-                    layout:1,
-                    close: false,
-                    onClose: function(){
-                        console.info('onClose');
-                    },
-                    iconColor: 'rgb(0, 255, 184)'
-                });
-            }
+
+            }, 'json');
+
 
         })
+
+
 
     })
 

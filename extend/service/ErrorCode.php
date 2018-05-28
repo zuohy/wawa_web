@@ -78,7 +78,9 @@ class ErrorCode
     const BABY_COIN_TYPE_REG_1 = 1;    //充值类型1  首次充值 固定
     const BABY_COIN_TYPE_REG_2 = 2;    //充值类型2
     const BABY_COIN_TYPE_SHARE = 20;  //分享类型
+    const BABY_COIN_TYPE_LOGIN = 1000;  //每天登录 免费送币
     //const BABY_COIN_TYPE_CNY = 100;  //分享类型 直接存入金币 暂时未用
+    const BABY_MAX_FREE_COIN = 300;    //最多免费赠送币 上限
 
     //房间 常量
     const BABY_ROOM_MEMBER_STATUS_OUT = 1;   //未进入房间
@@ -145,6 +147,7 @@ class ErrorCode
 
     const E_DEV_COINS_STATUS_ERROR = -2202;  //设备 投币错误
     const E_DEV_GAME_TIME_OUT = -2203;  //设备 操作超时
+    const E_DEV_GAME_RUN = -2204;  //设备 正在游戏控制
 
     //通用错误
     const E_NOT_SUPPORT = -3001;  //通用错误 不支持的操作
@@ -174,6 +177,7 @@ class ErrorCode
 
         self::E_DEV_COINS_STATUS_ERROR => 'device insert coins failed',
         self::E_DEV_GAME_TIME_OUT => 'device game time out',
+        self::E_DEV_GAME_RUN => 'device game running',
 
         self::E_NOT_SUPPORT => 'not support this step',
         self::E_PAY_ALREADY_SUCCESS => 'pay already done',
@@ -203,6 +207,7 @@ class ErrorCode
 
         self::E_DEV_COINS_STATUS_ERROR => '投币失败',
         self::E_DEV_GAME_TIME_OUT => '抓取超时失败',
+        self::E_DEV_GAME_RUN => '机器正在游戏，请等待',
 
         self::E_NOT_SUPPORT => '未知操作',
         self::E_PAY_ALREADY_SUCCESS => '支付已经完成',

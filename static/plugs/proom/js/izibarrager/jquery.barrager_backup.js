@@ -37,9 +37,9 @@
 
 		}
 		
-		var content = $("<a title=''  target='_blank'></a>").appendTo(id + " .barrage_box .p");
+		var content = $("<a title='' href='' target='_blank'></a>").appendTo(id + " .barrage_box .p");
 		content.attr({
-			//'href': barrage.href,
+			'href': barrage.href,
 			'id': barrage.id
 		}).empty().append(barrage.info);
 		if(navigator.userAgent.indexOf("MSIE 6.0")>0  ||  navigator.userAgent.indexOf("MSIE 7.0")>0 ||  navigator.userAgent.indexOf("MSIE 8.0")>0  ){

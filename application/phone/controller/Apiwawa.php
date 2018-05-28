@@ -73,7 +73,7 @@ class Apiwawa extends BasicBaby
 
                     $faUserInfo = $this->getUserInfoByCode($codeFather);
                     if($faUserInfo && ($faUserInfo['code'] == $codeFather ) ){
-                        $this->freeUserCoin($proCode, $faUserInfo['user_id'], ErrorCode::BABY_COIN_TYPE_SHARE, Error::BABY_INCOME_BACK_TRUE);
+                        $this->freeUserCoin($proCode, $faUserInfo['user_id'], ErrorCode::BABY_COIN_TYPE_SHARE, ErrorCode::BABY_INCOME_BACK_TRUE);
                     }
 
                 }
@@ -113,7 +113,7 @@ class Apiwawa extends BasicBaby
                 $retData = array(
                     'room_info' => $tmpRoomInfo,
                     'member_list' => $tmpMembers,
-                    'gift_show' => $tmpGift['gift_pic_show'],
+                    'gift_info' => $tmpGift,
                     'cur_member' =>  $tmpMembers[$userId]
                 );
                 $this->retMsg['data'] = $retData;
@@ -446,9 +446,40 @@ class Apiwawa extends BasicBaby
             case 'user_notify':
                 //用户首页通知
                 $notifyType = isset($jPack['notify_type']) ? $jPack['notify_type'] : 0;  //默认为抓取结果通知
+                $curUserId = session('user_id');
+                $notifyList = '';
+                Log::info("user_notify:" . " notifyType=" . $notifyType);
+
                 $curDate = date('Y-m-d H:m:s');
                 $startDate = date("Y-m-d",strtotime("-1 day"));
-                if($notifyType != 0){
+                if($notifyType == 2){
+                    //获取登录赠送金币
+                    $userInfo = $this->getUserInfo($curUserId);
+                    $uLoginTime = isset($userInfo['login_at']) ? $userInfo['login_at'] : $curDate;
+                    $uMaxFree = isset($userInfo['all_free']) ? $userInfo['all_free'] : '300';
+                    if($uMaxFree >= ErrorCode::BABY_MAX_FREE_COIN){
+                        //超出免费赠送币 上限
+                        $this->retMsg['code'] = ErrorCode::E_NOTIFY_MSG_NULL;
+                        break;
+                    }
+                    $lastDate = strtotime($uLoginTime);
+                    $preDate = strtotime("-1 day");
+                    if($lastDate <= $preDate){
+                        Log::info("user_notify: first login per date". " last_login=" . $uLoginTime);
+                        //每天第一次登录 免费送娃娃币
+                        $this->freeUserCoin(ErrorCode::BABY_HEADER_SEQ_APP, $curUserId, ErrorCode::BABY_COIN_TYPE_LOGIN);
+                        $receiptFreeInfo = $this->getPayValue(ErrorCode::BABY_COIN_TYPE_LOGIN);
+                        $freeCoin = isset($receiptFreeInfo['free_value']) ? $receiptFreeInfo['free_value'] : 0;
+                        $notifyList[0] = ['name' => $userInfo['name'], 'free_coin' => $freeCoin ];
+
+                        //更新用户表 赠送币
+                        $data_user = array('login_at' => $curDate, 'all_free' => $freeCoin,);
+                        $this->updateUserInfo($curUserId, $data_user);
+                    }else{
+                        Log::info("user_notify: not first login per date". " last_login=" . $uLoginTime);
+                    }
+
+                }elseif($notifyType == 1){
                     //获取当天收益记录
                     $notifyList = ActivityService::getIncomeNotify($startDate, $curDate);
                 }else{
@@ -456,17 +487,26 @@ class Apiwawa extends BasicBaby
                     $notifyList = $this->getResultNotify($startDate, $curDate);
                 }
 
-                //随机选中一条
+
                 $maxPos = count($notifyList);
-                if($maxPos <= 1){
+                if(empty($notifyList) || $maxPos <= 0){
                     //少于一条不通知
                     $this->retMsg['code'] = ErrorCode::E_NOTIFY_MSG_NULL;
                     break;
                 }
-                $fixPos = rand(0, $maxPos-1);
+
+                //随机选中一条
+                //$fixPos = rand(0, $maxPos-1);
+                //最新的 3条
+                $notifyMsg = array();
+                foreach($notifyList as $key => $record){
+                    if($key >  2){
+                        break;
+                    }
+
 
                 //获取通知相关信息
-                $nInfo = $notifyList[$fixPos];
+                $nInfo = $notifyList[$key];
                 $userId = isset($nInfo['user_id']) ? $nInfo['user_id'] : '';
                 $uValue = isset($nInfo['i_value']) ? $nInfo['i_value'] : '';
                 $uCoin = isset($nInfo['coin']) ? $nInfo['coin'] : '';
@@ -482,6 +522,7 @@ class Apiwawa extends BasicBaby
 
                 //生成通知
                 $msgHeader = $uName . ' 获得 ';
+                $msgBody = '';
                 if($gName){
                     $msgBody = '礼品 ' . $gName;
                 }elseif($uValue){
@@ -495,6 +536,11 @@ class Apiwawa extends BasicBaby
                     }
 
                 }
+
+                    $notifyMsg[] = $msgHeader . $msgBody;
+                }//foreach($notifyList as $key => $record){
+
+                $this->retMsg['data'] = $notifyMsg;
                 $this->retMsg['msg'] = $msgHeader . $msgBody;
                 Log::info("user_notify: end msg=" . $this->retMsg['msg']);
                 break;
@@ -663,6 +709,12 @@ class Apiwawa extends BasicBaby
             Log::error($logInfo
                 . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_ROOM_STATUS_ERROR]);
             return ErrorCode::E_ROOM_STATUS_ERROR;
+        }
+        if(ErrorCode::BABY_ROOM_STATUS_ON != $devStatus){
+            //设备房间状态不正确
+            Log::error($logInfo
+                . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_DEV_GAME_RUN]);
+            return ErrorCode::E_DEV_GAME_RUN;
         }
         if($price != $roomPrice){
             //投币金额不正确

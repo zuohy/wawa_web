@@ -151,6 +151,7 @@ class BasicBaby extends Controller
             $wxUser = $db_wx->where('open_id', $openId)->find();
         }
 
+        $curDate = date('Y-m-d H:m:s');
         if($wxUser == ''){
             //保存新用户信息
             $seqNum = DataService::createSequence(10, 'WXUSER');
@@ -159,7 +160,8 @@ class BasicBaby extends Controller
             $code = $seqCode;
 
             $data_user = array('user_id'=> $seqNum, 'name' => $name, 'pic' => $pic,
-                                'gender' => $gender, 'country' => $country, 'province' => $province, 'city' => $city, 'code'=> $code);
+                                'gender' => $gender, 'country' => $country, 'province' => $province, 'city' => $city, 'code'=> $code,
+                                'login_num' => 1,'update_at' => $curDate,);
             $result = DataService::save($db_user, $data_user);
 
             $data_wx = array('user_id'=> $seqNum, 'union_id' => $unionId, 'open_id' => $openId);
@@ -170,6 +172,12 @@ class BasicBaby extends Controller
 
         $userInfo = $db_user->where('user_id', $userId)->find();
         if($userInfo && $userInfo['user_id'] == $userId){
+            //更新登录时间 次数
+            $loginNum = $userInfo['login_num'] + 1;
+            $data_user = array('id'=> $userInfo['id'],
+                'login_num' => $loginNum,'update_at' => $curDate,);
+            $result = DataService::save($db_user, $data_user);
+
             $retData = array('user_id' => $userInfo['user_id'], 'code' => $userInfo['code'], );
             $retMsgArr = array('code' => '0', 'type' => '', 'msg' => 'ok', 'data' => $retData);
         }else{
@@ -1046,7 +1054,7 @@ class BasicBaby extends Controller
         $retStatus = ErrorCode::CODE_OK;
         //获取充值优惠
         $receiptFreeInfo = $this->getPayValue($freeType);
-        if($isBack == Error::BABY_INCOME_BACK_TRUE){
+        if($isBack == ErrorCode::BABY_INCOME_BACK_TRUE){
             //为收益充值
             $lastFreeValue = isset($receiptFreeInfo['b_free_value']) ? $receiptFreeInfo['b_free_value'] : 0;
             $lastCoinValue = isset($receiptFreeInfo['b_coin_value']) ? $receiptFreeInfo['b_coin_value'] : 0;

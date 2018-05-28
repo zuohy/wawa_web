@@ -181,6 +181,9 @@ define(['jquery'], function () {
             var searchStr = 'phone';
             var isPhone = url.match(searchStr);
             if(isPhone){
+                //var cw = $(window).width();//屏幕的宽度
+                //var objW = "260"; //this.width();//弹框对象的宽度
+                //var objL= (Number(cw)-Number(objW))/2;    // 滚动条到右边的距离+（屏幕的宽度-弹框的宽度）/2
                 phoneWidth = "260px";
             }
             this.load(url, data, 'GET', function (res) {
