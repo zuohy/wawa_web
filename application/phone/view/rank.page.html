@@ -290,9 +290,14 @@
         for (var i=0;i<tudiList.length;i++)
         {
             var tmpTudi = tudiList[i];
+            var tmpTuStatus = '未成功';
+            if(tmpTudi['s_status'] == 1){
+                //收徒成功
+                tmpTuStatus = '成功';
+            }
             var tmpDate = /\d{4}-\d{1,2}-\d{1,2}/g.exec(tmpTudi['update_at']);  //去除时间
             var t_td_name = '<td>' + tmpTudi['name'] + '</td>'
-            var t_td_status = '<td>' + tmpTudi['s_status_c'] + '</td>'
+            var t_td_status = '<td>' + tmpTuStatus + '</td>'
             var t_td_date =  '<td>' + tmpDate + '</td>'
             var t_tr_data = '<tr class="tudi_con_tab_tr">' + t_td_name + t_td_status + t_td_date + '</tr>';
             t_tr_all = t_tr_all + t_tr_data;

@@ -399,7 +399,6 @@ class Apiwawa extends BasicBaby
 
                 //数据库中充值单位为元， 支付接口单位为 分， 所以这里需要转换金额 1元= 100分
                 $payValue = $this->coverPayValue(ErrorCode::BABY_COVER_TYPE_PAY, $lastPay);
-                $payValue = 1; //测试支付
                 $optionsArr = $this->miniPay($openId, $payValue);
                 //$payOptions = json_encode($optionsArr);
 
@@ -462,18 +461,22 @@ class Apiwawa extends BasicBaby
                         $this->retMsg['code'] = ErrorCode::E_NOTIFY_MSG_NULL;
                         break;
                     }
-                    $lastDate = strtotime($uLoginTime);
-                    $preDate = strtotime("-1 day");
-                    if($lastDate <= $preDate){
+                    $tmpLoginDate = date("Y-m-d",strtotime($uLoginTime));  //转成年月日
+                    $loginDate = strtotime($tmpLoginDate);
+                    $tmpPreDate = date("Y-m-d",strtotime("-1 day"));
+                    $preDate = strtotime($tmpPreDate);
+                    if($loginDate <= $preDate){
                         Log::info("user_notify: first login per date". " last_login=" . $uLoginTime);
                         //每天第一次登录 免费送娃娃币
                         $this->freeUserCoin(ErrorCode::BABY_HEADER_SEQ_APP, $curUserId, ErrorCode::BABY_COIN_TYPE_LOGIN);
                         $receiptFreeInfo = $this->getPayValue(ErrorCode::BABY_COIN_TYPE_LOGIN);
                         $freeCoin = isset($receiptFreeInfo['free_value']) ? $receiptFreeInfo['free_value'] : 0;
+                        $newFreeCoin = $uMaxFree + $freeCoin;
+
                         $notifyList[0] = ['name' => $userInfo['name'], 'free_coin' => $freeCoin ];
 
                         //更新用户表 赠送币
-                        $data_user = array('login_at' => $curDate, 'all_free' => $freeCoin,);
+                        $data_user = array('login_at' => $curDate, 'all_free' => $newFreeCoin,);
                         $this->updateUserInfo($curUserId, $data_user);
                     }else{
                         Log::info("user_notify: not first login per date". " last_login=" . $uLoginTime);
