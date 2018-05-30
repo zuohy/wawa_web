@@ -159,9 +159,10 @@ class BasicBaby extends Controller
             $seqCode = DataService::createSequence(11, 'WXUSER-CODE');
             $code = $seqCode;
 
+            $preDate = date("Y-m-d",strtotime("-1 day"));  //新用户 登录时间为前一天，送首次登录币
             $data_user = array('user_id'=> $seqNum, 'name' => $name, 'pic' => $pic,
                                 'gender' => $gender, 'country' => $country, 'province' => $province, 'city' => $city, 'code'=> $code,
-                                'login_num' => 1,'update_at' => $curDate,);
+                                'login_num' => 1,'login_at' => $preDate, 'update_at' => $curDate,);
             $result = DataService::save($db_user, $data_user);
 
             $data_wx = array('user_id'=> $seqNum, 'union_id' => $unionId, 'open_id' => $openId);
@@ -1345,7 +1346,7 @@ class BasicBaby extends Controller
         $db_result = Db::name('TRoomGameResult');
 
         $resultList = $db_result->where('result', $status)
-            ->whereBetween('create_at', [$startDate, $endDate])
+            ->whereBetween('create_at', [$startDate, $endDate])->order('create_at desc')
             ->select();
 
         return $resultList;
