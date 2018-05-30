@@ -145,14 +145,21 @@ class BasicBaby extends Controller
         $db_user = Db::name('TUserConfig');
         $wxUser = '';
         if($unionId){
+            //暂时不支持$unionId
             $wxUser = $db_wx->where('union_id', $unionId)->find();
             $openId = $unionId;
+            $retMsgArr = array('code' => '-1', 'type' => '', 'msg' => 'error', 'data' => '');
+            $retMsg = json_encode($retMsgArr);
+            return $retMsg;
         }else{
             $wxUser = $db_wx->where('open_id', $openId)->find();
         }
 
         $curDate = date('Y-m-d H:m:s');
-        if($wxUser == ''){
+        if($wxUser && ($wxUser['open_id'] == $openId )){
+            $userId = $wxUser['user_id'];
+
+        }else{
             //保存新用户信息
             $seqNum = DataService::createSequence(10, 'WXUSER');
             $userId = $seqNum;
@@ -167,8 +174,6 @@ class BasicBaby extends Controller
 
             $data_wx = array('user_id'=> $seqNum, 'union_id' => $unionId, 'open_id' => $openId);
             $result = DataService::save($db_wx, $data_wx);
-        }else{
-            $userId = $wxUser['user_id'];
         }
 
         $userInfo = $db_user->where('user_id', $userId)->find();

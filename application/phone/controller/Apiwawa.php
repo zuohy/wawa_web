@@ -100,7 +100,7 @@ class Apiwawa extends BasicBaby
                 $devRoomId = session('dev_room_id');
 
                 $retStatus = RoomService::runRoom($roomId, $userId, $jPack['client_id'], $devRoomId);
-                $tmpMembers = RoomService::$memberList;
+                $tmpMembers = RoomService::$memberList;  //top3 的房间用户
                 $tmpRoomInfo = RoomService::$roomInfo;
                 $tmpGift = RoomService::$giftInfo;
                 if($retStatus != ErrorCode::CODE_OK){
