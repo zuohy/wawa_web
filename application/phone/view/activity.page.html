@@ -23,9 +23,19 @@
     <div class="top_banner">
         <img src="__STATIC__/{$act_pic_show}"/>
     </div>
+
     <!-- 悬浮按钮 -->
     <div class="xuan_btn xuan_rules"><a href=".rules">规则</a></div>
     <div class="xuan_btn xuan_tudi" onclick="getDisciple('{$product_code}', '{$code}')">徒弟列表<img src="__STATIC__/plugs/phone/act_images/normal_turn_in_icon.png"/>
+    </div>
+
+    <!-- 商家图片 -->
+    <div class="rules vendor" >
+        <div style="text-align: center; font-size: large; color: #ffffff">
+            <span>服务电话：{$vendor_phone|default=""}</span>
+        </div>
+        <img src="__STATIC__/{$vendor_pic1}" width="100%"/>
+        <img src="__STATIC__/{$vendor_pic2}" width="100%"/>
     </div>
 
     <!-- 我的徒弟数量 -->
@@ -83,12 +93,6 @@
     <!-- 上榜 -->
     <div class="go_rank" onclick="updateShareList('{$code}', '')">
         <img src="__STATIC__/plugs/phone/act_images/default_rule_into_btn.png" width="100%"/>
-    </div>
-
-    <!-- 商家图片 -->
-    <div class="rules" >
-        <img src="__STATIC__/plugs/phone/act_images/act1_vender.jpg" width="100%"/>
-        <img src="__STATIC__/plugs/phone/act_images/act1_pro.jpg" width="100%"/>
     </div>
 
     <!-- 活动规则 -->

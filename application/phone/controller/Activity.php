@@ -86,7 +86,16 @@ class Activity extends BasicBaby
         $actPrice = isset($actInfo['act_price']) ? $actInfo['act_price'] : '';
         $payPrice = $this->coverPayValue(ErrorCode::BABY_COVER_TYPE_CNY, $actPrice);
 
-        //提供商图片
+        //提供商图片 提供商信息
+        $vendorPic1 = isset($actInfo['act_form_1']) ? $actInfo['act_form_1'] : '';
+        $vendorPic2 = isset($actInfo['act_form_2']) ? $actInfo['act_form_2'] : '';
+        $vendorUserId = isset($actInfo['user_id']) ? $actInfo['user_id'] : '';
+        $tmpVendorUser = $this->getUserInfo($vendorUserId);
+        $vendorPhone = isset($tmpVendorUser['phone']) ? $tmpVendorUser['phone'] : '';
+
+        $this->assign('vendor_phone', $vendorPhone);
+        $this->assign('vendor_pic1', $vendorPic1);
+        $this->assign('vendor_pic2', $vendorPic2);
         //活动音乐
         $this->assign('act_audio', $actAudio);
 
