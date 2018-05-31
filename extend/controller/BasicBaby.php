@@ -817,8 +817,8 @@ class BasicBaby extends Controller
 
         //获取优惠记录
         $receiptFreeInfo = $this->getPayValue($iconsType);
-        $tmpCoinValue = isset($receiptFreeInfo['coin_value']) ? $receiptFreeInfo['coin_value'] : '';
-        $tmpFreeValue = isset($receiptFreeInfo['free_value']) ? $receiptFreeInfo['free_value'] : '';
+        $tmpCoinValue = isset($receiptFreeInfo['b_coin_value']) ? $receiptFreeInfo['b_coin_value'] : '';
+        $tmpFreeValue = isset($receiptFreeInfo['b_free_value']) ? $receiptFreeInfo['b_free_value'] : '';
         $InValue = 0;   //返现金
         $InCoin = 0;    //返金币
         if($isCNY == ErrorCode::BABY_INCOME_BACK_CNY){
