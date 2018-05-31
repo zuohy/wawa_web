@@ -706,8 +706,7 @@ class Apiwawa extends BasicBaby
         $roomPrice = isset($tmpRoom['price']) ? $tmpRoom['price'] : '';
         $logInfo = "_dev_authUser: room_id= " . $roomId . ' status= '. $roomStatus . ' dev_room_id= '. $devRoomId . ' dev_status= '. $devStatus;
         if( (ErrorCode::BABY_ROOM_STATUS_BUILD == $roomStatus)
-            || (ErrorCode::BABY_ROOM_STATUS_OFF == $roomStatus)
-            || (ErrorCode::BABY_ROOM_STATUS_ON != $devStatus) ){
+            || (ErrorCode::BABY_ROOM_STATUS_OFF == $roomStatus) ){
             //房间状态不正确
             Log::error($logInfo
                 . ' error= ' . ErrorCode::$ERR_MSG[ErrorCode::E_ROOM_STATUS_ERROR]);

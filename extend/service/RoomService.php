@@ -203,7 +203,7 @@ class RoomService
         Log::info("updateRoomNum: member_count= " . $roomData['member_count'] . " memberOnline=" . $memberOnline);
         $result = self::updateRoomInfo($roomId, $roomData);
 
-        if($result){
+        if($result == ErrorCode::CODE_OK){
             Log::info("updateRoomNum: end ok room_id= " . $roomId );
             $result = ErrorCode::CODE_OK;
         }else{
