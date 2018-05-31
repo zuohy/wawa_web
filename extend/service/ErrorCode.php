@@ -139,6 +139,7 @@ class ErrorCode
     const E_USER_INCOME_MAX = -2008;  //用户返现超过最大值 10元
     const E_USER_INCOME_FAIL = -2009;  //用户增加 币 失败
     const E_USER_NOT_FIRST_RECHARGE = -2010;  //用户不是首次充值
+    const E_USER_AlREADY_EXIST = -2011;  //用户已经存在
 
     const E_ROOM_STATUS_ERROR = -2101;       //房间状态不正确
     const E_ROOM_USER_STATUS_ERROR = -2102;  //房间成员状态不正确
@@ -169,6 +170,7 @@ class ErrorCode
         self::E_USER_EMPLOY_COIN_ERROR => 'user employ coin error',
         self::E_USER_COUNT_COIN_ERROR => 'user employ coin count error',
         self::E_USER_NOT_FIRST_RECHARGE => 'user is not first recharge',
+        self::E_USER_AlREADY_EXIST => 'user already exist',
 
         self::E_ROOM_STATUS_ERROR => 'room status error',
         self::E_ROOM_USER_STATUS_ERROR => 'room member status error',
@@ -200,6 +202,7 @@ class ErrorCode
         self::E_USER_EMPLOY_COIN_ERROR => '消费金额错误',
         self::E_USER_COUNT_COIN_ERROR => '消费金额计算错误',
         self::E_USER_NOT_FIRST_RECHARGE => '您不是首充用户，请选择其它充值',
+        self::E_USER_AlREADY_EXIST => '用户账号已占用，请联系管理员',
 
         self::E_ROOM_STATUS_ERROR => '房间状态错误',
         self::E_ROOM_USER_STATUS_ERROR => '用户状态错误',

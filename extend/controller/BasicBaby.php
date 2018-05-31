@@ -148,7 +148,8 @@ class BasicBaby extends Controller
             //暂时不支持$unionId
             $wxUser = $db_wx->where('union_id', $unionId)->find();
             $openId = $unionId;
-            $retMsgArr = array('code' => '-1', 'type' => '', 'msg' => 'error', 'data' => '');
+            Log::error("newUser: open_id= " . $openId . ' not support wx unionid');
+            $retMsgArr = array('code' => ErrorCode::E_USER_NOT_FOUND, 'type' => '', 'msg' => 'error', 'data' => '');
             $retMsg = json_encode($retMsgArr);
             return $retMsg;
         }else{
@@ -165,6 +166,16 @@ class BasicBaby extends Controller
             $userId = $seqNum;
             $seqCode = DataService::createSequence(11, 'WXUSER-CODE');
             $code = $seqCode;
+
+            //异常用户检查
+            $tmpUserInfo = $db_user->where('user_id', $userId)->find();
+            if($tmpUserInfo && $tmpUserInfo['user_id'] == $userId){
+                //用户随机ID 已经存在
+                Log::error("newUser: user_id= " . $userId . ' already exist');
+                $retMsgArr = array('code' => ErrorCode::E_USER_AlREADY_EXIST, 'type' => '', 'msg' => 'error', 'data' => '');
+                $retMsg = json_encode($retMsgArr);
+                return $retMsg;
+            }
 
             $preDate = date("Y-m-d",strtotime("-1 day"));  //新用户 登录时间为前一天，送首次登录币
             $data_user = array('user_id'=> $seqNum, 'name' => $name, 'pic' => $pic,
@@ -185,9 +196,9 @@ class BasicBaby extends Controller
             $result = DataService::save($db_user, $data_user);
 
             $retData = array('user_id' => $userInfo['user_id'], 'code' => $userInfo['code'], );
-            $retMsgArr = array('code' => '0', 'type' => '', 'msg' => 'ok', 'data' => $retData);
+            $retMsgArr = array('code' => ErrorCode::CODE_OK, 'type' => '', 'msg' => 'ok', 'data' => $retData);
         }else{
-            $retMsgArr = array('code' => '-1', 'type' => '', 'msg' => 'error', 'data' => '');
+            $retMsgArr = array('code' => ErrorCode::E_USER_NOT_FOUND, 'type' => '', 'msg' => 'error', 'data' => '');
         }
 
         $retMsg = json_encode($retMsgArr);
@@ -232,11 +243,12 @@ class BasicBaby extends Controller
             if($wxUser){
                 $openId = $wxUser['open_id'];
                 $unionId = $wxUser['union_id'];
+                session('open_id', $openId);
+                session('union_id', $unionId);
             }
+            session('user_id', $userId);
         }
-        session('user_id', $userId);
-        session('open_id', $openId);
-        session('union_id', $unionId);
+
 
     }
     ////////////////////////////////////start 用户管理 相关函数////////////////////////////////////
