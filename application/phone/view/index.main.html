@@ -170,8 +170,10 @@
     var g_type = 0;  //全局变量 互斥 0 1
     var g_pos = 0;   //消息序号
     var g_result_msg = ''   //成功结果消息数组
+    var g_in_pos = 0;   //收益消息序号
     var g_income_msg = ''   //收入消息数组
-    var g_t1 = '';  //定时器
+    var g_t1 = '';  //抓取结果定时器
+    var g_t2 = '';  //收益定时器
 
     $(function(){
         //选中 菜单点击事件
@@ -223,6 +225,34 @@
 
 
         })
+
+        //获取用户收益消息 3秒后请求服务器
+        var t_delay  = window.setTimeout(getInComeTop, 3000);
+        function getInComeTop(){
+            g_type = 1;
+            var reqData = {type:'user_notify', notify_type: g_type}
+            $.post("{:url('phone/apiwawa/index')}", {json: reqData}, function(ret){
+                console.log(ret);
+                var retObj = $.parseJSON(ret)
+                if(retObj.code == 0){
+                    g_income_msg = retObj.data
+                    g_t2 = window.setInterval(notifyIncome, 3000)
+
+                }
+
+            }, 'json');
+
+        }
+
+        function notifyIncome(){
+
+            if(g_in_pos >= g_income_msg.length){
+                window.clearInterval(g_t2)
+                return;
+            }
+            toastShow.toastCustom('topCenter', '', '好消息', g_income_msg[g_in_pos], '__STATIC__');
+            g_in_pos = g_in_pos + 1;
+        }
 
 
 
