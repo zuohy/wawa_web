@@ -138,7 +138,7 @@ class Post extends BasicBaby
         $this->assign('is_choose', $isChoose);
         $this->assign('address_id', $addressId);
 
-        $field = ["user_id" => $userId];
+        $field = ["user_id" => $userId, "is_deleted" => '0'];
         $db = Db::name('TUserPostalAddress');
         $db->where($field)->order('create_at desc');
         return parent::_list($db);
@@ -196,9 +196,9 @@ class Post extends BasicBaby
         $recordResult = $this->deleteAddressInfo($add_id, $userId);
         if($recordResult == ErrorCode::CODE_OK)
         {
-            $this->success("提交收货地址成功！");
+            $this->success("删除地址成功！");
         }else{
-            $this->error("提交失败，请稍后再试");
+            $this->error("请求失败，请稍后再试");
         }
     }
 
@@ -216,8 +216,11 @@ class Post extends BasicBaby
         $address_id = isset($_POST['address_id']) ? $_POST['address_id'] : '';
 
         //异常检查
-        if($order_id == '' || $address_id == ''){
+        if($order_id == ''){
             $this->error("提交失败，请稍后再试");
+        }
+        if($address_id == ''){
+            $this->error("提交失败，请填写地址！");
         }
         //大于两个娃娃才能申请邮寄
         $inCount = $this->getResultList($userId, ErrorCode::BABY_CATCH_SUCCESS, ErrorCode::BABY_POST_IN, 1);

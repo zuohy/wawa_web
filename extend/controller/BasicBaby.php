@@ -1480,7 +1480,7 @@ class BasicBaby extends Controller
         //获取用户信息
         $db_result = Db::name('TUserPostalAddress');
 
-        $field = ["id" => $addrId];
+        $field = ["id" => $addrId, "is_deleted" => '0'];
         $addrInfo = $db_result->where($field)->find();
         if($addrInfo && ($addrInfo['id'] == $addrId ) ){
             return $addrInfo;
@@ -1501,7 +1501,7 @@ class BasicBaby extends Controller
 
         //获取默认地址信息
 
-        $field = ["user_id" => $userId, "is_default" => 1];
+        $field = ["user_id" => $userId, "is_default" => 1, "is_deleted" => '0'];
         $addrInfo = $db_address->where($field)->find();
         if( empty($addrInfo) && ($isDefault != 0) ){
 
@@ -1509,7 +1509,8 @@ class BasicBaby extends Controller
 
         }elseif( empty($addrInfo) ){
             //没有默认信息 获取用户最新的地址信息
-            $addrInfo = $db_address->where("user_id", $userId)->order('create_at desc')->find();
+            $field = ["user_id" => $userId, "is_deleted" => '0'];
+            $addrInfo = $db_address->where($field)->order('create_at desc')->find();
 
         }
 

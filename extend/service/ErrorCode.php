@@ -112,7 +112,7 @@ class ErrorCode
     const BABY_POST_WAIT = 2;   //待邮寄
     const BABY_POST_TO = 3;   //已发货
     const BABY_POST_DONE = 4;   //已兑换
-    const BABY_POST_MIN_NUM = 2;   //最少邮寄娃娃数量
+    const BABY_POST_MIN_NUM = 3;   //最少邮寄娃娃数量
 
     const BABY_APPLY_HANDLE = 0;   //用户申请待处理
     const BABY_APPLY_DONE = 1;   //用户申请处理完成
