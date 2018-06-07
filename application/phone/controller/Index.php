@@ -173,6 +173,16 @@ class Index extends BasicBaby
         $this->setOpenId($userId);
 
         $this->title = '首页' . $userId;
+        $this->assign('user_id', $userId);
+
+        //获取轮播图信息
+        $db_banner = Db::name('TSysBanner');
+
+        $field = ['is_deleted' => '0'];
+        $bannerList = $db_banner->where($field)->order('create_at desc')->select();
+        $this->assign('banner_list', $bannerList);
+
+
         $db = Db::name($this->table)->where(['is_deleted' => '0']);
 
         return parent::_list($db);

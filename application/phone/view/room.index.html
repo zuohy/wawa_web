@@ -44,8 +44,9 @@
 <header class="header-top">
 
     <div class="menu clearfix">
-        <a id="exit_room" onclick="chat_send('exit_room')" data-href='{:url("phone/index/main")}' href="javascript:void(0)">退出<i class="ion ion-reply-all"></i></a>
-
+        <a id="exit_room" style="color: #ff7d15" onclick="chat_send('exit_room')" data-href='{:url("phone/index/main")}' href="javascript:void(0)">
+            退出<i class="ion ion-reply-all"></i>
+        </a>
         <!-- Add other menu similar to "about" here -->
         <a id="memberCount" style="color: #ff7d15">{$member_count}人围观</a>
     </div>
@@ -858,9 +859,9 @@
         </li>*/
 
         //礼物详细图片信息
-        var g_price_text = '<span >' + '兑换价格：' + giftInfo.gift_price + '</span>';
+        var g_price_text = '<span style="color: #ff7d15">' + '兑换价格：' + giftInfo.gift_price + '</span>';
         var g_price_li_text = '<li>' + g_price_text + '</li>';
-        var g_des_text = '<span >' + '详细信息' + '</span>';
+        var g_des_text = '<span style="color: #ff7d15">' + '详细信息：' + '</span>';
         var g_des_li_text = '<li>' + g_des_text + '</li>';
 
         var g_des_allImg = '';
@@ -987,7 +988,7 @@
 
         onRunBarrager(0, '', msg);
 
-        var m_span = '<span >' + msg + '</span>';
+        var m_span = '<span style="color: #ff7d15">' + msg + '</span>';
         var m_li = '<li>' + m_span + '</li>';
         var showMsg = m_li;
 

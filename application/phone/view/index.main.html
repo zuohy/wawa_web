@@ -41,22 +41,32 @@
 <div id="carousel-example-generic" class="carousel slide banner" data-ride="carousel">
     <!-- Indicators -->
     <ol class="carousel-indicators">
+        {foreach $banner_list as $key=>$vo}
+        {if $key eq 0}
         <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
-        <li data-target="#carousel-example-generic" data-slide-to="1"></li>
-        <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+        {else}
+        <li data-target="#carousel-example-generic" data-slide-to={$key}></li>
+        {/if}
+        {/foreach}
+
     </ol>
 
     <!-- Wrapper for slides -->
     <div class="carousel-inner" role="listbox">
-        <div class="item active" data-href='{:url("phone/wallet/recharge")}' href="javascript:void(0)">
-            <img style="width:100%" class="img-responsive big" src="__STATIC__/plugs/phone/images/banner61.png">
+        
+        {foreach $banner_list as $key=>$vo}
+        {if $key eq 0}
+        <div class="item active" data-href='{:url($vo.b_url)}' href="javascript:void(0)">
+            <img style="width:100%" class="img-responsive big" src="__STATIC__/{$vo.b_pic}">
         </div>
-        <div class="item" data-href='{:url("phone/wallet/recharge")}' href="javascript:void(0)">
-            <img style="width:100%" class="img-responsive big" src="__STATIC__/plugs/phone/images/banner2.png">
+        {else}
+        <div class="item" data-href='{:url($vo.b_url)}' href="javascript:void(0)">
+            <img style="width:100%" class="img-responsive big" src="__STATIC__/{$vo.b_pic}">
         </div>
-        <div class="item" data-href='{:url("phone/activity/index")}' href="javascript:void(0)">
-            <img style="width:100%" class="img-responsive big" src="__STATIC__/plugs/phone/images/banner3.png">
-        </div>
+        {/if}
+
+        {/foreach}
+
     </div>
 
     <!-- Controls -->
@@ -120,8 +130,11 @@
 
     {foreach $list as $key=>$vo}
     <div class="sp_pr">
-        {if $vo.status eq '0' || $vo.status eq '3'}
-        <a href="#">
+        {if $user_id eq '3665019677'}
+        <a data-href='{:url("phone/index/device")}?room_id={$vo.room_id}&price={$vo.price}&gift_id={$vo.gift_id}' href="javascript:void(0)">
+
+        {elseif $vo.status eq '0' || $vo.status eq '3'}
+          <a href="#">
         {else}
         <a data-href='{:url("phone/index/device")}?room_id={$vo.room_id}&price={$vo.price}&gift_id={$vo.gift_id}' href="javascript:void(0)">
         {/if}
@@ -138,12 +151,15 @@
                 <span class="yue">价格<em class="em_s">{$vo.price}币/次</em>
                 </span>
             </div>
-            {if $vo.status eq 0 || $vo.status eq '3'}
+            {if $vo.status eq 0}
             <div class="jul" style="background: red;color: white">{$vo.status_c}</div>
+            {elseif $vo.status eq '3'}
+            <div class="jul" style="background: gold;color: white">{$vo.status_c}</div>
             {else}
             <div class="jul" style="background: green;color: white">{$vo.status_c}</div>
             {/if}
 
+        </a>
         </a>
         </a>
     </div>

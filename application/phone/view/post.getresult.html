@@ -79,7 +79,7 @@
             {if $vo.status < 2}
             <a onclick="applyPost('{$vo.order_id}', '{$address_id}')" class="liji">申请邮寄</a>
             {/if}
-            {if $vo.status neq 4}
+            {if $vo.status < 3}
             <a onclick="exchangePost('{$vo.order_id}')" class="qu">兑换</a>
             {/if}
         </div>
