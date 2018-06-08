@@ -413,6 +413,9 @@
 <footer class="page-footer">
     <div>
         <audio id="roomAudio" class="hidden" src="__STATIC__/{$room_audio}" controls loop autoplay></audio>
+        <audio id="gameAudio" class="hidden" src='__STATIC__/{$game_audio|default="plugs/proom/vid/game_hdl.mp3"}' controls loop></audio>
+        <audio id="moveAudio" class="hidden" src="__STATIC__/plugs/proom/vid/move_jiqi.mp3" controls></audio>
+        <audio id="catchAudio" class="hidden" src="__STATIC__/plugs/proom/vid/move_jiqi.mp3" controls></audio>
     </div>
 </footer>
 <!-- End of site footer -->
@@ -750,6 +753,7 @@
                     $('#u_free_coin').text(notifyData.free_coin);
                     //显示游戏用户头像
                     updateMemberPic('game_up', notifyData.name, notifyData.pic);
+                    audioPlay('game_audio');
 
                 break;
             case 'dev_notify_result':
@@ -761,6 +765,8 @@
                 $('.btn_result').click();
                     //清除游戏用户头像
                     updateMemberPic('game_down', '', '');
+                audioPlay('bg_audio');
+
                 break;
             default :
                 break;
@@ -800,6 +806,37 @@
 
         }
 
+
+        //播放音乐
+        //palyType = bg_audio 播放房间背景音乐
+        //playType = game_audio 播放游戏中背景音乐
+        var audioPlay = function(playType){
+            switch (playType){
+                case 'bg_audio':
+                        //房间背景音乐
+                    $('#roomAudio')[0].play();
+                    $('#gameAudio')[0].pause();
+                    break;
+                case 'game_audio':
+                        //游戏中背景音乐
+                    $('#gameAudio')[0].play();
+                    $('#roomAudio')[0].pause();
+                    break;
+                case 'catch_audio':
+                        //下抓音效
+                        // 在listen.js 中 操作
+                    break;
+                case 'move_audio':
+                        //移动音效
+                    // 在listen.js 中 操作
+                    break;
+                default :
+                    $('#roomAudio')[0].play();
+                    $('#gameAudio')[0].pause();
+                    break;
+            }
+
+        }
 
     //初始化房间信息变量
     var initRoomInfo = function( retData ){

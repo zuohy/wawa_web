@@ -657,13 +657,9 @@ wss.on("connection", function(ws) {
 
                 room.id = roomIndex;
                 room.name = roomName;
-                if(ws.extramsg.userType != USER_TYPE_PUBLISHER){
-                    //looker or actor
-                    room.isVideo = false;
-                }else{
-                    //publisher
-                    room.isVideo = true;
-                }
+                //publisher
+                room.isVideo = true;
+
 
 
                 socket = {};

@@ -187,6 +187,8 @@ define(['jquery', 'admin.plugs'], function () {
         //alert( "处理程序touchstart1: "+ imgMove );
         $('#' + moveTo + '_1').attr('style', 'display: none');
         $('#' + moveTo + '_2').attr('style', imgMove);
+        //播放移动音效
+        $('#moveAudio')[0].play();
 
     }
     function backImg( sendCmd){
@@ -207,7 +209,8 @@ define(['jquery', 'admin.plugs'], function () {
         var imgMove = 'display: ; position:relative;' + moveTo + ':10px;'
         $('#' + moveTo + '_1').attr('style', 'display: ');
         $('#' + moveTo + '_2').attr('style', 'display: none');
-
+        //停止移动音效
+        $('#moveAudio')[0].pause();
     }
     function controlShow( sendCmd){
 
@@ -220,11 +223,12 @@ define(['jquery', 'admin.plugs'], function () {
             $('#m_coins_none').removeClass('hidden');
 
         }else if(cmdObj.type == 'control'){
-
+             //下抓
             $('#m_coins_none').removeClass('hidden');
             $('#m_sec').addClass('hidden');
             $('#m_control').addClass('hidden');
             $('#m_catch').addClass('hidden');
+            $('#gameAudio')[0].pause();  //停止游戏音乐
         }
 
     }

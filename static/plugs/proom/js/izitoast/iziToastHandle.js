@@ -87,7 +87,7 @@ toastController = function(iziToast){
             image: pic,
             imageWidth: 70,
             layout:1,
-            close: false,
+            close: true,
             onClose: function(){
                 console.info('onClose');
             },

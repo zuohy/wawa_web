@@ -36,6 +36,11 @@ class RoomService
         'room_pic' => '',
         'gift_id' => '',
         'room_audio' => '',
+        'game_audio' => '',
+        'move_audio' => '',
+        'catch_audio' => '',
+        'success_audio' => '',
+        'failed_audio' => '',
         'member_count' => '0'   //房间成员人数
     );
     public static $memberInfo = array(    //当前成员信息
