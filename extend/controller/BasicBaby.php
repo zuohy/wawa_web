@@ -140,6 +140,8 @@ class BasicBaby extends Controller
      */
     protected function newUser($unionId, $openId, $name, $pic, $gender, $country, $province, $city)
     {
+        Log::info("newUser: start open_id= " . $openId);
+
         //查询当前是否已经存在用户信息
         $db_wx = Db::name('TUserWeixin');
         $db_user = Db::name('TUserConfig');
@@ -159,14 +161,16 @@ class BasicBaby extends Controller
         $curDate = date('Y-m-d H:m:s');
         if($wxUser && ($wxUser['open_id'] == $openId )){
             $userId = $wxUser['user_id'];
-
+            Log::info("newUser: found user id in system user_id= " . $userId);
         }else{
+
             //保存新用户信息
             $seqNum = DataService::createSequence(10, 'WXUSER');
             $userId = $seqNum;
             $seqCode = DataService::createSequence(11, 'WXUSER-CODE');
             $code = $seqCode;
 
+            Log::info("newUser: create new user in system user_id=" . $userId);
             //异常用户检查
             $tmpUserInfo = $db_user->where('user_id', $userId)->find();
             if($tmpUserInfo && $tmpUserInfo['user_id'] == $userId){
@@ -182,9 +186,20 @@ class BasicBaby extends Controller
                                 'gender' => $gender, 'country' => $country, 'province' => $province, 'city' => $city, 'code'=> $code,
                                 'login_num' => 1,'login_at' => $preDate, 'update_at' => $curDate,);
             $result = DataService::save($db_user, $data_user);
+            if($result){
+                Log::info("newUser: save new user in db_user user_id=" . $userId . " open_id=" . $openId . " union_id=" . $unionId);
+            }else{
+                Log::error("newUser: save new user in db_user error user_id=" . $userId . " open_id=" . $openId . " union_id=" . $unionId);
+            }
 
             $data_wx = array('user_id'=> $seqNum, 'union_id' => $unionId, 'open_id' => $openId);
             $result = DataService::save($db_wx, $data_wx);
+            if($result){
+                Log::info("newUser: save new user in db_wx user_id=" . $userId . " open_id=" . $openId . " union_id=" . $unionId);
+            }else{
+                Log::error("newUser: save new user in db_wx error user_id=" . $userId . " open_id=" . $openId . " union_id=" . $unionId);
+            }
+
         }
 
         $userInfo = $db_user->where('user_id', $userId)->find();
@@ -194,6 +209,11 @@ class BasicBaby extends Controller
             $data_user = array('id'=> $userInfo['id'],
                 'login_num' => $loginNum,'update_at' => $curDate,);
             $result = DataService::save($db_user, $data_user);
+            if($result){
+                Log::info("newUser: update user login num in db_user user_id=" . $userId . " login_num=" . $loginNum . " update_at=" . $curDate);
+            }else{
+                Log::error("newUser: update user login num in db_user user_id=" . $userId . " login_num=" . $loginNum . " update_at=" . $curDate);
+            }
 
             $retData = array('user_id' => $userInfo['user_id'], 'code' => $userInfo['code'], );
             $retMsgArr = array('code' => ErrorCode::CODE_OK, 'type' => '', 'msg' => 'ok', 'data' => $retData);
@@ -204,6 +224,8 @@ class BasicBaby extends Controller
         $retMsg = json_encode($retMsgArr);
         session('openid', $openId);
         session('user_id', $userId);
+
+        Log::info("newUser: end open_id= " . $openId . " user_id=" . $userId);
         return $retMsg;
     }
 

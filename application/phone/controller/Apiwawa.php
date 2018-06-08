@@ -62,8 +62,15 @@ class Apiwawa extends BasicBaby
             case 'share_login':
                 //分享者登录
                 $proCode = isset($jPack['product_code']) ? $jPack['product_code'] : ErrorCode::BABY_HEADER_SEQ_APP;
+                if($proCode == ''){
+                    $proCode = ErrorCode::BABY_HEADER_SEQ_APP;
+                }
                 $codeFather = isset($jPack['code_father']) ? $jPack['code_father'] : '';
                 $userId = isset($jPack['user_id']) ? $jPack['user_id'] : '';
+                if( $userId ){
+                    //分享链接登录 user id 写入 session 缓存
+                    session('user_id', $userId);
+                }
 
                 $retStatus = $this->_buildShareRecord( $proCode, $userId, $codeFather);
                 if(ErrorCode::CODE_OK == $retStatus){
@@ -182,7 +189,7 @@ class Apiwawa extends BasicBaby
                 if($retStatus != ErrorCode::CODE_OK){
                     $this->retMsg['code'] = $retStatus;
                     $this->retMsg['msg'] = ErrorCode::buildMsg(ErrorCode::MSG_TYPE_CLIENT_ERROR, $retStatus);
-                    Log::error("index: dev_user_auth error retMsg= " . $this->retMsg['msg']);
+                    Log::error("index: dev_user_auth error retMsg= " . $this->retMsg['msg'] . " user_id=" . $userId);
                     //通知当前用户 投币失败
                     $showMsg = $this->retMsg['msg']; //ErrorCode::buildMsg(ErrorCode::MSG_TYPE_INFO, ErrorCode::I_USER_INSERT_COINS_FROZEN);
                     $paraArr = array(

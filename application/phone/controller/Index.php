@@ -45,7 +45,7 @@ class Index extends BasicBaby
      */
     public function index()
     {
-
+        $retMsg = array('code' => ErrorCode::E_USER_NOT_FOUND, 'type' => '', 'msg' => 'no wx user', 'data' => '');
         //获取session_key
         $code = isset($_GET['code']) ? $_GET['code'] : '';
         $sessionId = isset($_GET['sessionId']) ? $_GET['sessionId'] : '';
@@ -95,8 +95,11 @@ class Index extends BasicBaby
             if($errCode != 0){
                 return $errCode;
             }
-            Log::info("index: user info= " . $data);
+            Log::info("index: wx user info= " . $data);
             $dataObj = json_decode($data);
+        }else{
+            Log::error("index: wx login not found wx user info= ");
+            return $retMsg;
         }
 
 
@@ -107,7 +110,7 @@ class Index extends BasicBaby
                 $dataObj->gender, $dataObj->country, $dataObj->province, $dataObj->city);
 
         }
-
+        Log::info("index: user info= " . $retMsg);  //返回的 $retMsg 为json 字符串
         return $retMsg;
 
 
