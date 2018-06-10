@@ -412,10 +412,13 @@
 <!-- Begin of site footer -->
 <footer class="page-footer">
     <div>
-        <audio id="roomAudio" class="hidden" src="__STATIC__/{$room_audio}" controls loop autoplay></audio>
+        <audio id="roomAudio" class="hidden" src='__STATIC__/{$room_audio|default="plugs/proom/vid/dj1.mp3"}' controls loop autoplay></audio>
         <audio id="gameAudio" class="hidden" src='__STATIC__/{$game_audio|default="plugs/proom/vid/game_hdl.mp3"}' controls loop></audio>
-        <audio id="moveAudio" class="hidden" src="__STATIC__/plugs/proom/vid/move_jiqi.mp3" controls></audio>
-        <audio id="catchAudio" class="hidden" src="__STATIC__/plugs/proom/vid/move_jiqi.mp3" controls></audio>
+        <audio id="moveAudio" class="hidden" src='__STATIC__/{$move_audio|default="plugs/proom/vid/move_jiqi.mp3"}' controls></audio>
+        <audio id="catchAudio" class="hidden" src='__STATIC__/{$catch_audio|default="plugs/proom/vid/catch_bao.mp3"}' controls></audio>
+        <audio id="winAudio" class="hidden" src='__STATIC__/{$win_audio|default="plugs/proom/vid/win_sound.mp3"}' controls></audio>
+        <audio id="failAudio" class="hidden" src='__STATIC__/{$fail_audio|default="plugs/proom/vid/fail_sound.mp3"}' controls></audio>
+
     </div>
 </footer>
 <!-- End of site footer -->
@@ -765,6 +768,14 @@
                 $('.btn_result').click();
                     //清除游戏用户头像
                     updateMemberPic('game_down', '', '');
+
+                    //抓取成功失败音效
+                    if(notifyData.is_catch == 1){
+                        audioPlay('win_audio');
+                    }else{
+                        audioPlay('fail_audio');
+                    }
+                //恢复背景音
                 audioPlay('bg_audio');
 
                 break;
@@ -829,6 +840,12 @@
                 case 'move_audio':
                         //移动音效
                     // 在listen.js 中 操作
+                    break;
+                case 'win_audio':
+                    $('#winAudio')[0].play();
+                    break;
+                case 'fail_audio':
+                    $('#failAudio')[0].play();
                     break;
                 default :
                     $('#roomAudio')[0].play();

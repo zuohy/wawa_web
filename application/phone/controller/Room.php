@@ -55,6 +55,11 @@ class Room extends BasicBaby
 
         $rAudio = isset($tmpRoom['room_audio']) ? $tmpRoom['room_audio'] : '';
         $gAudio = isset($tmpRoom['game_audio']) ? $tmpRoom['game_audio'] : '';
+        $moveAudio = isset($tmpRoom['move_audio']) ? $tmpRoom['move_audio'] : '';
+        $catchAudio = isset($tmpRoom['catch_audio']) ? $tmpRoom['catch_audio'] : '';
+        $winAudio = isset($tmpRoom['success_audio']) ? $tmpRoom['success_audio'] : '';
+        $failAudio = isset($tmpRoom['failed_audio']) ? $tmpRoom['failed_audio'] : '';
+
         $memberCount = isset($tmpRoom['member_count']) ? $tmpRoom['member_count'] : '';
         $price = isset($tmpRoom['price']) ? $tmpRoom['price'] : '';
         $coin = isset($tmpUser['coin']) ? $tmpUser['coin'] : '';
@@ -78,7 +83,8 @@ class Room extends BasicBaby
 
 
         return view('', ['title' => '房间', 'control_url' =>$controlUrl,
-            'room_audio' =>$rAudio, 'game_audio' =>$gAudio, 'member_count' =>$memberCount,
+            'room_audio' =>$rAudio, 'game_audio' =>$gAudio, 'move_audio' =>$moveAudio, 'catch_audio' =>$catchAudio,
+            'win_audio' =>$winAudio, 'fail_audio' =>$failAudio, 'member_count' =>$memberCount,
             'price' =>$price, 'coin' => $coin, 'free_coin' => $free_coin,  'user_id' => $userId,
                      'room_id' => $uRoomId, 'dev_room_id' => $devRoomId, 'dev_info' => $devInfo]);
     }

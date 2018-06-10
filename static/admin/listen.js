@@ -229,6 +229,8 @@ define(['jquery', 'admin.plugs'], function () {
             $('#m_control').addClass('hidden');
             $('#m_catch').addClass('hidden');
             $('#gameAudio')[0].pause();  //停止游戏音乐
+            $('#catchAudio')[0].play();  //播放下抓音乐
+
         }
 
     }

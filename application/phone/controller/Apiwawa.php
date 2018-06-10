@@ -67,10 +67,6 @@ class Apiwawa extends BasicBaby
                 }
                 $codeFather = isset($jPack['code_father']) ? $jPack['code_father'] : '';
                 $userId = isset($jPack['user_id']) ? $jPack['user_id'] : '';
-                if( $userId ){
-                    //分享链接登录 user id 写入 session 缓存
-                    session('user_id', $userId);
-                }
 
                 $retStatus = $this->_buildShareRecord( $proCode, $userId, $codeFather);
                 if(ErrorCode::CODE_OK == $retStatus){
