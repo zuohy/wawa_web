@@ -49,7 +49,9 @@ class ErrorCode
     const BABY_INCOME_FAILED = 2;    //处理收益异常
     const BABY_INCOME_BACK_CNY = 1;    //收益直接返现金
     const BABY_INCOME_BACK_COIN = 0;    //收益返金币
+
     const BABY_INCOME_BACK_TRUE = 9;    //是为充值收益金币
+    const BABY_INCOME_WAIT_TIMEOUT = 10;   //超期兑换币
 
     //支付常量
     const BABY_PAY_SUCCESS = 1;      //支付成功  微信接口
@@ -113,6 +115,7 @@ class ErrorCode
     const BABY_POST_TO = 3;   //已发货
     const BABY_POST_DONE = 4;   //已兑换
     const BABY_POST_MIN_NUM = 3;   //最少邮寄娃娃数量
+    const BABY_POST_WAIT_TIMEOUT = 7;   //寄存超期时间
 
     const BABY_APPLY_HANDLE = 0;   //用户申请待处理
     const BABY_APPLY_DONE = 1;   //用户申请处理完成

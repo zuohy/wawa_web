@@ -885,7 +885,7 @@ class BasicBaby extends Controller
         if($isCNY == ErrorCode::BABY_INCOME_BACK_CNY){
             $result = $this->miniRedPackage($inUserId, $orderNum, $payValue, '活动收益');
         }else{
-            $this->freeUserCoin($proCode, $inUserId, $iconsType, Error::BABY_INCOME_BACK_TRUE);
+            $this->freeUserCoin($proCode, $inUserId, $iconsType, '活动收益', Error::BABY_INCOME_BACK_TRUE);
         }
 
         if(ErrorCode::CODE_OK == $result){
@@ -989,7 +989,7 @@ class BasicBaby extends Controller
      * @param string $orderId  消费订单编码
      * @return int
      */
-    protected function exchangeUserCoin($userId, $orderId){
+    protected function exchangeUserCoin($userId, $orderId, $remark='兑换礼物'){
         $retStatus = ErrorCode::CODE_OK;
         $lastCoinValue = 0;   //最终充值的金币数量 单位金币  (1金币= 1娃娃币)
         $lastFreeValue = 0;   //最终充值的娃娃币数量 单位娃娃币
@@ -1024,7 +1024,7 @@ class BasicBaby extends Controller
             //增加收益记录 并处理完成状态
             Log::info("exchangeUserCoin: add income coin=" . $inPrice );
             $orderNum = self::createHeaderSeq(ErrorCode::BABY_HEADER_SEQ_IN, 12);
-            ActivityService::addUserIncome($userId, $giftId, $orderNum, $orderId, 0, $inPrice, 0, ErrorCode::BABY_EMPLOY_REASON_1, '兑换礼物', ErrorCode::BABY_INCOME_DONE);
+            ActivityService::addUserIncome($userId, $giftId, $orderNum, $orderId, 0, $inPrice, 0, ErrorCode::BABY_EMPLOY_REASON_1, $remark, ErrorCode::BABY_INCOME_DONE);
             Log::info("exchangeUserCoin: end ok order_id= " . $orderId . "userId=" . $userId);
         }else{
             Log::error("exchangeUserCoin: end failed order_id= " . $orderId .  "userId=" . $userId);
@@ -1088,14 +1088,15 @@ class BasicBaby extends Controller
      * @param string $userId   用户ID
      * @param string $freeType  优惠类型
      * @param string $isBack  收益充值标志
+     * @param string $remark  备注
      * @return bool
      */
-    protected function freeUserCoin($proCode, $userId, $freeType, $isBack=0){
+    protected function freeUserCoin($proCode, $userId, $freeType, $remark='分享收益', $isBack=0){
         $retStatus = ErrorCode::CODE_OK;
         //获取充值优惠
         $receiptFreeInfo = $this->getPayValue($freeType);
         if($isBack == ErrorCode::BABY_INCOME_BACK_TRUE){
-            //为收益充值
+            //为收益者充值
             $lastFreeValue = isset($receiptFreeInfo['b_free_value']) ? $receiptFreeInfo['b_free_value'] : 0;
             $lastCoinValue = isset($receiptFreeInfo['b_coin_value']) ? $receiptFreeInfo['b_coin_value'] : 0;
         }else{
@@ -1112,7 +1113,7 @@ class BasicBaby extends Controller
             Log::info("freeUserCoin: end ok userId= " . $userId . ' product_code=' . $proCode . ' freeType=' . $freeType);
             //保存收益记录表
             $orderNum = self::createHeaderSeq(ErrorCode::BABY_HEADER_SEQ_IN, 12);
-            $result = ActivityService::addUserIncome($userId, $proCode, $orderNum, '', 0, $lastCoinValue, $lastFreeValue, ErrorCode::BABY_EMPLOY_REASON_1, '分享收益', $iStatus=ErrorCode::BABY_INCOME_DONE);
+            $result = ActivityService::addUserIncome($userId, $proCode, $orderNum, '', 0, $lastCoinValue, $lastFreeValue, ErrorCode::BABY_EMPLOY_REASON_1, $remark, $iStatus=ErrorCode::BABY_INCOME_DONE);
 
         }else{
             Log::error("freeUserCoin: end failed userId= " . $userId . ' product_code=' . $proCode . ' freeType=' . $freeType);

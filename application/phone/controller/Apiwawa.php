@@ -71,12 +71,12 @@ class Apiwawa extends BasicBaby
                 $retStatus = $this->_buildShareRecord( $proCode, $userId, $codeFather);
                 if(ErrorCode::CODE_OK == $retStatus){
                     //用户分享app 应用 立刻返 娃娃币
-                    $this->freeUserCoin($proCode, $jPack['user_id'], ErrorCode::BABY_COIN_TYPE_SHARE);
+                    $this->freeUserCoin($proCode, $jPack['user_id'], ErrorCode::BABY_COIN_TYPE_SHARE, '徒弟收益');
 
 
                     $faUserInfo = $this->getUserInfoByCode($codeFather);
                     if($faUserInfo && ($faUserInfo['code'] == $codeFather ) ){
-                        $this->freeUserCoin($proCode, $faUserInfo['user_id'], ErrorCode::BABY_COIN_TYPE_SHARE, ErrorCode::BABY_INCOME_BACK_TRUE);
+                        $this->freeUserCoin($proCode, $faUserInfo['user_id'], ErrorCode::BABY_COIN_TYPE_SHARE, '收徒收益', ErrorCode::BABY_INCOME_BACK_TRUE);
                     }
 
                 }
@@ -471,7 +471,7 @@ class Apiwawa extends BasicBaby
                     if($loginDate <= $preDate){
                         Log::info("user_notify: first login per date". " last_login=" . $uLoginTime);
                         //每天第一次登录 免费送娃娃币
-                        $this->freeUserCoin(ErrorCode::BABY_HEADER_SEQ_APP, $curUserId, ErrorCode::BABY_COIN_TYPE_LOGIN);
+                        $this->freeUserCoin(ErrorCode::BABY_HEADER_SEQ_APP, $curUserId, ErrorCode::BABY_COIN_TYPE_LOGIN, '首登收益');
                         $receiptFreeInfo = $this->getPayValue(ErrorCode::BABY_COIN_TYPE_LOGIN);
                         $freeCoin = isset($receiptFreeInfo['free_value']) ? $receiptFreeInfo['free_value'] : 0;
                         $newFreeCoin = $uMaxFree + $freeCoin;
@@ -550,6 +550,12 @@ class Apiwawa extends BasicBaby
                 $this->retMsg['msg'] = $msgHeader . $msgBody;
                 Log::info("user_notify: end msg=" . $this->retMsg['msg']);
                 break;
+            case 'auto_exchange':
+                //到期自动兑换金币
+                $this->_wait_timeout_exchange(ErrorCode::BABY_POST_WAIT_TIMEOUT);
+
+
+                break;
             default:
                 $this->retMsg['code'] = ErrorCode::CODE_NOT_SUPPORT;
                 $this->retMsg['msg'] = ErrorCode::$ERR_MSG[ErrorCode::CODE_NOT_SUPPORT];
@@ -560,6 +566,17 @@ class Apiwawa extends BasicBaby
         $retMsg = json_encode($this->retMsg);
         Log::info("index: return http msg retMsg= " . $retMsg);
         return $retMsg;
+
+    }
+
+    /**
+     * 测试页面
+     * @return View
+     */
+    public function test()
+    {
+
+        return view('', ['title' => '接口测试中心']);
 
     }
 
@@ -627,72 +644,6 @@ class Apiwawa extends BasicBaby
 
     }
 
-
-    /**
-     * 建立分享关系 邀请码对应用户
-     * @return array
-     */
- /*   private function _buildShareRel($userId, $codeFather)
-    {
-        $isShare = 0;  //0 分享关联成功 1 失败 已经被分享  2 更换
-        //保存分享记录表
-        $db_share_his = Db::name('TUserShareHis');
-
-        //查找当前登录用户
-        $db_user = Db::name('TUserConfig');
-        $userAccept = $db_user->where('user_id', $userId)->find();   //被分享者信息
-        $userInvitation = $db_user->where('code', $codeFather)->find();   //邀请者信息
-
-        if($userInvitation && $userInvitation['code'] == $codeFather){
-            if($userAccept && $userAccept['user_id'] == $userId){
-                if($userAccept['code_father'] != ''){
-                    //当前用户已经被分享了，暂时不更新分享者邀请码
-                    $isShare = ErrorCode::BABY_SHARE_FAILED;
-                }else{
-                    //更新当前用户的父级邀请码
-                    $data_user = array('id'=> $userAccept['id'], 'code_father'=> $codeFather);
-                    $result = DataService::save($db_user, $data_user);
-                    $isShare = ErrorCode::BABY_SHARE_SUCCESS;
-                }
-
-            }else{
-                //记录日志
-                $isShare = ErrorCode::BABY_SHARE_NO_ACCEPT;  //没有被邀请者信息
-
-            }
-        }else{
-            //记录日志
-            $isShare = ErrorCode::BABY_SHARE_NO_INVITATION; //没有找到邀请者信息
-        }
-
-        //保存分享记录表
-        $i_code = isset($userAccept['code']) ? $userAccept['code'] : '';
-        $i_name = isset($userAccept['name']) ? $userAccept['name'] : '';
-        $i_pic = isset($userAccept['pic']) ? $userAccept['pic'] : '';
-        $i_gender = isset($userAccept['gender']) ? $userAccept['gender'] : '';
-        $i_code_father = isset($codeFather) ? $codeFather : '';
-        $i_name_father = isset($userInvitation['name']) ? $userInvitation['name'] : '';
-        $i_pic_father = isset($userInvitation['pic']) ? $userInvitation['pic'] : '';
-        $i_gender_father = isset($userInvitation['gender']) ? $userInvitation['gender'] : '';
-
-        $data_share = array(
-            'code'=> $i_code,
-            'name'=> $i_name,
-            'pic'=> $i_pic,
-            'gender'=> $i_gender,
-
-            'code_father'=> $i_code_father,
-            'name_father'=> $i_name_father,
-            'pic_father'=> $i_pic_father,
-            'gender_father'=> $i_gender_father,
-            's_status'=> $isShare);
-        $result = DataService::save($db_share_his, $data_share);
-        Log::info("_buildShareRel: isShare= " . $isShare);
-        return $isShare;
-
-    }
-*/
-
     /////////////////////////start baby_coontrol 设备服务器消息处理//////////////////////////////////////////////////
     /**
      * 设备服务器认证用户信息
@@ -753,6 +704,72 @@ class Apiwawa extends BasicBaby
         return ErrorCode::CODE_OK;
     }
     ///////////////////////////////////////////////////////////////////////////
+
+    /**
+     * 超期自动兑换金币
+     * @return int
+     */
+    private function _wait_timeout_exchange($MaxDate=ErrorCode::BABY_POST_WAIT_TIMEOUT)
+    {
+
+        $result = ErrorCode::CODE_OK;
+        //查询符合超期兑换条件的 记录
+        //抓取成功 result=1， 寄存中 status =1， 超期时间大于7天
+        log::info("_wait_timeout_exchange: start MaxDate= " . $MaxDate);
+        $db_result = Db::name('TRoomGameResult');
+        //默认为一周 7天
+        //自定义天数
+        $tmpDateStr = "-" . $MaxDate . " day";
+        $tmpPreDate = date("Y-m-d 00-00-00",strtotime($tmpDateStr));
+
+        $timeoutRecord = $db_result->where('create_at', '<', $tmpPreDate)
+            ->where('result', ErrorCode::BABY_CATCH_SUCCESS)   //抓取成功
+            ->where('status', ErrorCode::BABY_POST_IN)    //寄存中
+            ->limit(50)
+            ->select();
+
+        $allCount = count($timeoutRecord);
+        $posCount = 0;
+        foreach($timeoutRecord as $key => $record){
+            $userId = isset($record['user_id']) ? $record['user_id'] : '';
+            $order_id = isset($record['order_id']) ? $record['order_id'] : '';
+
+            //更新游戏结果表为已换币
+            //更新抓取结果状态  由于是重复定时执行， 这里先更新状态，然后再充值
+            $result = $this->updateResultStatus($userId, $order_id, ErrorCode::BABY_POST_DONE);
+            if($result != ErrorCode::CODE_OK){
+                //更新系统日志
+                log::error("_wait_timeout_exchange: update status failed " . " allCount=" . $allCount ." userId=" . $userId  ." order_id=" . $order_id);
+                break;
+            }else{
+                //更新系统日志
+
+            }
+
+            // 调用接口，兑换成相应的娃娃币
+            $result = $this->exchangeUserCoin($userId, $order_id, '超期兑换');
+            if($result != ErrorCode::CODE_OK){
+                //更新系统日志
+                log::error("_wait_timeout_exchange: exchange coin failed " . " allCount=" . $allCount ." userId=" . $userId  ." order_id=" . $order_id);
+                break;
+            }
+
+
+            $posCount = $posCount + 1;
+        }
+
+        if($result != ErrorCode::CODE_OK)
+        {
+            log::error("_wait_timeout_exchange: exchange coin failed " . " allCount=" . $allCount ." posCount=" . $posCount);
+
+        }else{
+            log::info("_wait_timeout_exchange: exchange done" . " allCount=" . $allCount ." posCount=" . $posCount);
+        }
+
+        log::info("_wait_timeout_exchange: end MaxDate= " . $MaxDate);
+        return $result;
+
+    }
 
 
 
