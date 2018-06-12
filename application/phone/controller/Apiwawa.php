@@ -734,6 +734,14 @@ class Apiwawa extends BasicBaby
             $userId = isset($record['user_id']) ? $record['user_id'] : '';
             $order_id = isset($record['order_id']) ? $record['order_id'] : '';
 
+            // 调用接口，兑换成相应的娃娃币
+            $result = $this->exchangeUserCoin($userId, $order_id, '超期兑换');
+            if($result != ErrorCode::CODE_OK){
+                //更新系统日志
+                log::error("_wait_timeout_exchange: exchange coin failed " . " allCount=" . $allCount ." userId=" . $userId  ." order_id=" . $order_id);
+                break;
+            }
+
             //更新游戏结果表为已换币
             //更新抓取结果状态  由于是重复定时执行， 这里先更新状态，然后再充值
             $result = $this->updateResultStatus($userId, $order_id, ErrorCode::BABY_POST_DONE);
@@ -745,15 +753,6 @@ class Apiwawa extends BasicBaby
                 //更新系统日志
 
             }
-
-            // 调用接口，兑换成相应的娃娃币
-            $result = $this->exchangeUserCoin($userId, $order_id, '超期兑换');
-            if($result != ErrorCode::CODE_OK){
-                //更新系统日志
-                log::error("_wait_timeout_exchange: exchange coin failed " . " allCount=" . $allCount ." userId=" . $userId  ." order_id=" . $order_id);
-                break;
-            }
-
 
             $posCount = $posCount + 1;
         }

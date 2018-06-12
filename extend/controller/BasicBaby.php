@@ -1007,6 +1007,8 @@ class BasicBaby extends Controller
         || $resultStatus != ErrorCode::BABY_CATCH_SUCCESS    //结果异常
         || $handleStatus >= ErrorCode::BABY_POST_TO ){         //处理状态 为已经发货 或 已换币
 
+            Log::error("exchangeUserCoin: failed order_id= " . $orderId .  "userId=" . $userId
+                       .  " resultStatus=" . $resultStatus .  " handleStatus=" . $handleStatus);
             $retStatus = ErrorCode::E_NOT_SUPPORT;
             return $retStatus;
 
