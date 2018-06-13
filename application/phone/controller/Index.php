@@ -15,6 +15,7 @@
 namespace app\phone\controller;
 
 use controller\BasicBaby;
+use service\ActivityService;
 use service\HttpService;
 use service\RoomService;
 use service\WxBizDataCrypt;
@@ -185,7 +186,6 @@ class Index extends BasicBaby
         $bannerList = $db_banner->where($field)->order('create_at desc')->select();
         $this->assign('banner_list', $bannerList);
 
-
         $db = Db::name($this->table)->where(['is_deleted' => '0']);
 
         return parent::_list($db);
@@ -204,8 +204,27 @@ class Index extends BasicBaby
         //$uRoomId = isset($uRoomId) ? $uRoomId : '';
         Log::info("device: uRoomId= " . $uRoomId);
 
+
         //保存用户房间ID
         session('room_id', $uRoomId);
+        $userId = session('user_id');
+
+        //房间信息
+        $roomInfo = RoomService::getRoomInfo($uRoomId);
+        $roomTag = isset($roomInfo['tag']) ? $roomInfo['tag'] : '';
+        $this->assign('room_tag', $roomTag);
+        if($roomTag > 0){
+            $catchList = ActivityService::getTopSucCatch($uRoomId, $userId);
+            $this->assign('catch_list', $catchList);
+            $curCatchInfo = ActivityService::getCatchPosNum($userId, $catchList);
+            $this->assign('catch_user', $curCatchInfo);
+
+        }else{
+            $curCatchInfo = ActivityService::getCatchPosNum($userId, []);
+            $this->assign('catch_list', []);
+            $this->assign('catch_user', $curCatchInfo);
+        }
+
 
         //房间 礼物信息
         $giftInfo = RoomService::getGiftInfo($uGiftId);

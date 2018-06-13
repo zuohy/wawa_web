@@ -495,6 +495,88 @@ class ActivityService
         return $incomeList;
     }
 
- }
+    /**
+     * 获取房间抓取成功的top10 暂时直接查询的方式
+     * @return int
+     */
+    public static function getTopSucCatch($roomId, $userId)
+    {
+        $result = ErrorCode::CODE_OK;
+
+        log::info("getTopSucCatch: start roomId= " . $roomId . " userId=" . $userId);
+        //获取房间信息
+        $roomInfo = RoomService::getRoomInfo($roomId);
+        $tmpCreateDate = isset($roomInfo['create_at']) ? $roomInfo['create_at'] : '';
+
+        $db_result = Db::name('TRoomGameResult');
+
+
+        $db_result->where('create_at', '>', $tmpCreateDate)
+            ->where('result', ErrorCode::BABY_CATCH_SUCCESS)   //抓取成功
+            ->where('status', ErrorCode::BABY_POST_OVER)    //不计入兑换的记录
+            ->group('user_id')
+            ->limit(10);
+        $fieldVal = ['COUNT( "user_id") AS tp_count', 'room_id', 'user_id', 'name'];
+        $db_result->field($fieldVal)->order('tp_count DESC');
+
+        $topCatchList = $db_result->select();
+        $topCount = count($topCatchList);
+        log::info("getTopSucCatch: end roomId= " . $roomId . " userId=" . $userId . " topCount=" . $topCount);
+        if( $topCount > 0){
+            return $topCatchList;
+        }else{
+            return [];
+        }
+
+
+
+    }
+    /**
+     * 获取当前用户房间抓取排名
+     * $catchList 为getTopSucCatch 返回的结果数组
+     * @return int
+     */
+    public static function getCatchPosNum($userId, $catchList)
+    {
+        log::info("getCatchPosNum: start userId= " . $userId);
+        $pos = 0;     //指定用户排名位置
+        $curNum = 0;  //指定用户 有抓取次数
+        $preNum = 0;  //上一位排名 有抓取次数
+        $czNum = 0;  //与上一位排名差
+        $name = '';
+        $preUserInfo = '';  //上一位用户
+
+        //检查是否存在当前用户记录
+        foreach($catchList as $key => $user){
+
+            if($userId == $user['user_id']){
+                //找到当前用户
+                $pos = $key+1;
+                $name = $user['name'];
+                $curNum = $user['tp_count'];
+                if($preUserInfo != ''){
+                    $preNum = $preUserInfo['tp_count'];
+                    $czNum = $preNum - $curNum;   //与上一位排名差
+                }
+            }
+
+            //保存为上一位用户
+            $preUserInfo = $user;
+        }
+
+        $curUserInfo = array(
+            'name' => $name,
+            'pos' => $pos,
+            'curNum' => $curNum,
+            'czNum' => $czNum,
+        );
+
+        log::info("getCatchPosNum: end userId= " . $userId . " curUserInfo=" . $curUserInfo['name']);
+        return $curUserInfo;
+
+    }
+
+
+}
 
 

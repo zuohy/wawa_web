@@ -556,6 +556,16 @@ class Apiwawa extends BasicBaby
 
 
                 break;
+            case 'get_top_catch':
+                //获取房间抓取成功的前3个 用户
+                $curUserId = session('user_id');
+                $curRoomId = session('room_id');
+                $roomId = isset($jPack['room_id']) ? $jPack['room_id'] : $curRoomId;  //房间ID
+                $userId = isset($jPack['user_id']) ? $jPack['user_id'] : $curUserId;  //用户ID
+
+                $this->_get_top_catch($roomId, $userId);
+
+                break;
             default:
                 $this->retMsg['code'] = ErrorCode::CODE_NOT_SUPPORT;
                 $this->retMsg['msg'] = ErrorCode::$ERR_MSG[ErrorCode::CODE_NOT_SUPPORT];
@@ -770,7 +780,66 @@ class Apiwawa extends BasicBaby
 
     }
 
+    /**
+     * 获取房间抓取成功的top3 暂时直接查询的方式
+     * @return int
+     */
+    private function _get_top_catch($roomId, $userId)
+    {
+        $result = ErrorCode::CODE_OK;
 
+        log::info("_get_top_catch: start roomId= " . $roomId . " userId=" . $userId);
+        //获取房间信息
+        $roomInfo = RoomService::getRoomInfo($roomId);
+        $tmpCreateDate = isset($roomInfo['create_at']) ? $roomInfo['create_at'] : '';
+
+        $db_result = Db::name('TRoomGameResult');
+
+
+        $db_result->where('create_at', '>', $tmpCreateDate)
+            ->where('result', ErrorCode::BABY_CATCH_SUCCESS)   //抓取成功
+            ->where('status', ErrorCode::BABY_POST_OVER)    //不计入兑换的记录
+            ->group('user_id')
+            ->limit(10);
+        $fieldVal = ['COUNT( "user_id") AS tp_count', 'room_id', 'user_id', 'name', 'pic'];
+        $db_result->field($fieldVal)->order('tp_count DESC');
+
+        $topCatchList = $db_result->select();
+
+        $pos = 0;     //指定用户排名位置
+        $curNum = 0;  //指定用户 有抓取次数
+        $preNum = 0;  //上一位排名 有抓取次数
+        $czNum = 0;  //与上一位排名差
+        $preUserInfo = '';  //上一位用户
+
+        //检查是否存在当前用户记录
+        foreach($topCatchList as $key => $user){
+
+            if($userId == $user['user_id']){
+                //找到当前用户
+                $pos = $key+1;
+                $name = $user['name'];
+                $curNum = $user['tp_count'];
+                if($preUserInfo != ''){
+                    $preNum = $preUserInfo['tp_count'];
+                    $czNum = $preNum - $curNum;   //与上一位排名差
+                }
+            }
+
+            //保存为上一位用户
+            $preUserInfo = $user;
+        }
+
+        $curUserInfo = array(
+            'name' => $name,
+            'pos' => $pos,
+            'curNum' => $curNum,
+            'czNum' => $czNum,
+        );
+
+        log::info("_get_top_catch: end roomId= " . $roomId . " userId=" . $userId);
+        return;
+    }
 
     /**
      * 后台主菜单权限过滤

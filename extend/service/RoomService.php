@@ -41,7 +41,8 @@ class RoomService
         'catch_audio' => '',
         'success_audio' => '',
         'failed_audio' => '',
-        'member_count' => '0'   //房间成员人数
+        'member_count' => '0',   //房间成员人数
+        'create_at' => '',
     );
     public static $memberInfo = array(    //当前成员信息
         'room_id' => '',
@@ -555,6 +556,15 @@ class RoomService
         $tmpMember = self::getMemberInfo($roomId, $userId);
         $memberName = isset($tmpMember['name']) ? $tmpMember['name'] : '';
         $memberPic = isset($tmpMember['pic']) ? $tmpMember['pic'] : '';
+        $tmpTag = isset($tmpRoom['tag']) ? $tmpRoom['tag'] : 0;
+
+        //房间标签 tag 不等于0 活动 不计入兑换
+        $isStatus = ErrorCode::BABY_POST_IN;
+        if($tmpTag > 0){
+            $isStatus = ErrorCode::BABY_POST_OVER;
+        }else{
+            $isStatus = ErrorCode::BABY_POST_IN;
+        }
 
         $db_result = Db::name('TRoomGameResult');
         $data_result = array(
@@ -565,9 +575,10 @@ class RoomService
             'pic' => $memberPic,
             'gift_id' => $giftId,
             'result' => $isCatch,
-            //'status' => '1',  //默认为寄存中
+            'status' => $isStatus,  //默认为寄存中
 
         );
+
 
         $result = DataService::save($db_result, $data_result);
         if($result){

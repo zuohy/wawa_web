@@ -114,6 +114,7 @@ class ErrorCode
     const BABY_POST_WAIT = 2;   //待邮寄
     const BABY_POST_TO = 3;   //已发货
     const BABY_POST_DONE = 4;   //已兑换
+    const BABY_POST_OVER = 5;   //不需要兑换
     const BABY_POST_MIN_NUM = 3;   //最少邮寄娃娃数量
     const BABY_POST_WAIT_TIMEOUT = 7;   //寄存超期时间
 

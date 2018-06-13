@@ -29,12 +29,25 @@
             </a>
             <div class="mo button">
 
-                <a onclick="testApi()" class="liji">请求</a>
+                <a onclick="testApi('auto_exchange')" class="liji">请求</a>
 
             </div>
 
         </div>
+        <div class="add">
 
+            <a href="#">
+                <p>接口名：抓取排行榜<i>地址：</i></p>
+                <span>参数：</span>
+            </a>
+            </a>
+            <div class="mo button">
+
+                <a onclick="testApi('get_top_catch')" class="liji">请求</a>
+
+            </div>
+
+        </div>
     </div>
 </div>
 
@@ -58,35 +71,18 @@
 
 <script  type="text/javascript">
 
-    //选择地址信息 事件处理
-    function chooseAddress(addressId, isChoose)
-    {
-        if(isChoose){
-            //回退页面
-            $.ajax({
-                //几个参数需要注意一下
-                type: "GET",//方法类型
-                dataType: "json",//预期服务器返回的数据类型
-                url: "getresult" ,//url
-                data: {address_id: addressId},
-                success: function (result) {
-                    console.log(result);//打印服务端返回的数据(调试用)
-                },
-                error : function() {
-                    alert("地址选择错误");
-                }
-            });
-
-        }
-
-    }
-
-    function testApi()
+    function testApi(type)
     {
         if( confirm("你确认测试吗？") == false ){
             return;
         }
         var reqData = {type:'auto_exchange'}
+        if(type == 'auto_exchange'){
+            reqData = {type:'auto_exchange'}
+        }else if(type == 'get_top_catch'){
+            reqData = {type:'get_top_catch', room_id: 'els'}
+        }
+
         $.post("{:url('phone/apiwawa/index')}", {json: reqData}, function(ret){
             console.log(ret);
             var retObj = $.parseJSON(ret)

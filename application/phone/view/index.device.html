@@ -1,5 +1,9 @@
 {extend name="extra@phone/main"}
 
+{block name="header"}
+<link rel="stylesheet" href="__STATIC__/plugs/phone/css/act_style.css?ver={:date('ymd')}" type="text/css" />
+{/block}
+
 {block name="body"}
 
 <style>
@@ -88,11 +92,87 @@
 
     </div>
 
+</div>
 
+{if $room_tag eq '1'}
+<div class="rank_page" style="display: block">
+{else}
+<div class="rank_page hidden">
+{/if}
+<!-- 邀请总榜 -->
+    <!-- 悬浮按钮 -->
+    <div class="xuan_btn xuan_rules"><a href="#rules">规则</a></div>
 
+    <div class="rank_page_banner">
+        <img src="__STATIC__/plugs/phone/act_images/list_bg_s.png" width="100%"/>
+    </div>
+    <div class="rank_page_png">
+        <img src="__STATIC__/plugs/phone/act_images/list_board_img.png" width="100%"/>
+    </div>
+    <div class="rank_page_main">
+        <div class="rank_page_main_font">抓取排行榜<br>活动结束后，前三名可以获得丰富奖励</div>
+        <div class="rank_page_now">
+            您当前排名:<span>{$catch_user.pos}</span>, 距离前一名差<font>{$catch_user.czNum}</font>人
+        </div>
+        <div class="rank_page_three">
+            {foreach $catch_list as $key=>$vo}
+            {if $key eq 3}
+            break;
+            {/if}
+            <div class="rank_page_lists">
+                <div class="r_page_list_num r_page_num{$key+1}">{$key+1}</div>
+                <div class="r_page_list_pic">
+                    <img src="__STATIC__/plugs/phone/act_images/n_reward{$key+1}.png"/>
+                    {if $key eq 0}
+                    <span>300娃娃币</span>
+                    {elseif $key eq 1}
+                    <span>200娃娃币</span>
+                    {elseif $key eq 2}
+                    <span>100娃娃币</span>
+                    {/if}
 
+                </div>
+                <div class="r_page_list_name">
+                    <div class="r_duti_num speical_red">{$vo.tp_count}</div>
+                    <div class="r_page_web_name">{$vo.name}</div>
+                </div>
+            </div>
+            {/foreach}
+
+        </div>
+        <div class="r_page_table">
+            <table cellspacing="0">
+                <tr class="r_page_t1">
+                    <td>排名</td>
+                    <td>昵称</td>
+                    <td>成功次数</td>
+                </tr>
+                <tr class="r_page_t1">
+                    <td>{$catch_user.pos}</td>
+                    <td>{$catch_user.name}</td>
+                    <td>{$catch_user.curNum}</td>
+                </tr>
+                <tr class="r_false"></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- 活动规则 -->
+    <div id="rules" class="rules">
+        <img src="__STATIC__/plugs/phone/act_images/rules.png"/>
+        <ul class="rules_ul">
+
+            <li>规则：用户在获胜方球队的房间，抓取娃娃，抓到的娃娃不能兑换，只计入成功次数。</li>
+            <li>世界杯球队比赛结果揭晓后， 总抓取成功次数前三名可以获得对应的金币奖励。</li>
+            <li>条件：用户充值大于20元，抓中3个以上的娃娃，计入奖励名单</li>
+            <li>奖励发放：比赛结束后3天内发放</li>
+            <li class="rules_specil">特别说明:为保证活动的公平性，对于存在违规收徒行为的用户，平台将取消其参加活动的资格，并扣除所有奖励，请遵守平台规则，正常邀请收徒。本活动最终解释权归阿斗夹娃娃所有。</li>
+        </ul>
+    </div>
 
 </div>
+</div>
+
 
     <script src="__STATIC__/plugs/phone/js/jquery.min.js?ver={:date('ymd')}" type="text/javascript"></script>
     <script type="text/javascript" src="__STATIC__/plugs/phone/js/iscroll.js?ver={:date('ymd')}"></script>
