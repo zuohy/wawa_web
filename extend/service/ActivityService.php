@@ -512,6 +512,7 @@ class ActivityService
 
 
         $db_result->where('create_at', '>', $tmpCreateDate)
+            ->where('room_id', $roomId)                           //活动房间
             ->where('result', ErrorCode::BABY_CATCH_SUCCESS)   //抓取成功
             ->where('status', ErrorCode::BABY_POST_OVER)    //不计入兑换的记录
             ->group('user_id')

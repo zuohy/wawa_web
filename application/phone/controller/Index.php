@@ -186,7 +186,7 @@ class Index extends BasicBaby
         $bannerList = $db_banner->where($field)->order('create_at desc')->select();
         $this->assign('banner_list', $bannerList);
 
-        $db = Db::name($this->table)->where(['is_deleted' => '0']);
+        $db = Db::name($this->table)->where(['is_deleted' => '0'])->order('create_at desc');
 
         return parent::_list($db);
 
@@ -269,6 +269,8 @@ class Index extends BasicBaby
                 $vo['status_c'] = '正在游戏';
             }elseif( $status == ErrorCode::BABY_ROOM_STATUS_OFF ){
                 $vo['status_c'] = '维护';
+            }else{
+                $vo['status_c'] = '结束';
             }
 
             if( $tag == ErrorCode::BABY_ROOM_MODEL_COM ){
