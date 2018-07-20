@@ -490,6 +490,7 @@ class ActivityService
         $db_income = Db::name('TUserIncome');
         $incomeList = $db_income->where('i_status', $iStatus)
             ->whereBetween('create_at', [$startDate, $endDate])
+            ->order('create_at desc')
             ->select();
 
         return $incomeList;

@@ -133,7 +133,7 @@
         {if $user_id eq '3665019677'}
         <a data-href='{:url("phone/index/device")}?room_id={$vo.room_id}&price={$vo.price}&gift_id={$vo.gift_id}' href="javascript:void(0)">
 
-        {elseif $vo.status eq '0' || $vo.status eq '3'}
+        {elseif $vo.status eq '0' || $vo.status >= '3'}
           <a href="#">
         {else}
         <a data-href='{:url("phone/index/device")}?room_id={$vo.room_id}&price={$vo.price}&gift_id={$vo.gift_id}' href="javascript:void(0)">
@@ -155,6 +155,8 @@
             <div class="jul" style="background: red;color: white">{$vo.status_c}</div>
             {elseif $vo.status eq '3'}
             <div class="jul" style="background: gold;color: white">{$vo.status_c}</div>
+            {elseif $vo.status > '3'}
+            <div class="jul" style="background:#b3b3b3;color: white">{$vo.status_c}</div>
             {else}
             <div class="jul" style="background: green;color: white">{$vo.status_c}</div>
             {/if}
